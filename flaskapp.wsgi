@@ -1,6 +1,6 @@
 import sys
 import logging
 logging.basicConfig(stream=sys.stderr)
-sys.path.insert(0, '/var/www/MeanderSuite')
+sys.path.insert(0, '/var/www/Personal-Website')
  
 from application import app as application
