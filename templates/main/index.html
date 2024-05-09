@@ -127,8 +127,8 @@
           <div class="col-lg-12 d-flex justify-content-center">
             <ul id="portfolio-flters">
               <li data-filter="*" class="filter-active">All</li>
-              <li data-filter=".filter-app">App</li>
-              <li data-filter=".filter-web">Web</li>
+              <li data-filter=".filter-app">Applications</li>
+              <li data-filter=".filter-web">Pre release</li>
             </ul>
           </div>
         </div>
@@ -141,12 +141,28 @@
               <a href="https://meandersuite.com/" class="details-link" title="More Details"><i class="bx bx-link"></i></a>
             </div>
           </div>
-          <div class="col-lg-4 col-md-6 portfolio-item filter-web">
+          <div class="col-lg-4 col-md-6 portfolio-item filter-app">
             <img src="{{url_for('static', filename='main/img/portfolio/Special Ks Opal.jpg')}}" class="img-fluid" alt="">
             <div class="portfolio-info">
               <h4>Special K's Opal - Coming Soon</h4>
               <p>An opal auction and sale page developed by Nielsen Innovations</p>
               <a href="https://specialksopal.com/" class="details-link" title="More Details"><i class="bx bx-link"></i></a>
+            </div>
+          </div>
+          <div class="col-lg-4 col-md-6 portfolio-item filter-web">
+            <img src="{{url_for('static', filename='main/img/portfolio/Meander Suite.png')}}" class="img-fluid" alt="">
+            <div class="portfolio-info">
+              <h4>Meander Suite - Pre Release</h4>
+              <p>A web application that aims to improve the organisation of students.</p>
+              <a href="{{url_for('meandersuite')}}" class="details-link" title="More Details"><i class="bx bx-link"></i></a>
+            </div>
+          </div>
+          <div class="col-lg-4 col-md-6 portfolio-item filter-web">
+            <img src="{{url_for('static', filename='main/img/portfolio/Special Ks Opal.jpg')}}" class="img-fluid" alt="">
+            <div class="portfolio-info">
+              <h4>Special K's Opal - Pre Release</h4>
+              <p>An opal auction and sale page developed by Nielsen Innovations</p>
+              <a href="{{url_for('specialksopal')}}" class="details-link" title="More Details"><i class="bx bx-link"></i></a>
             </div>
           </div>
         </div>
@@ -161,30 +177,16 @@
       <div class="container">
         <div class="journal-block">
           <div class="row">
+            {% for post in posts %}
             <div class="col-lg-4 col-md-6">
               <div class="journal-info">
-                <a href="{{url_for('blog', blogname='presidents-shield')}}"><img src="{{url_for('static', filename='main/img/Nice whole team photo.jpg')}}" class="img-responsive" alt="img"></a><!--720x540px img-->
+                <a href="{{url_for('blog', blogname=post.tag)}}"><img src="{{ post.image }}" class="img-responsive" alt="img"></a><!--720x540px img-->
                 <div class="journal-txt">
-                  <h4><a href="{{url_for('blog', blogname='presidents-shield')}}">MY LAST EVER PRESIDENTS SHIELD</a></h4>
+                  <h4><a href="{{url_for('blog', blogname=post.tag)}}">{{ post.title }}</a></h4>
                 </div>
               </div>
-            </div>
-            <div class="col-lg-4 col-md-6">
-              <div class="journal-info">
-                <a href="{{url_for('blog', blogname='sponsor-announcement')}}"><img src="{{url_for('static', filename='main/img/sponsor post.jpg')}}" class="img-responsive" alt="img"></a>
-                <div class="journal-txt">
-                  <h4><a href="{{url_for('blog', blogname='sponsor-announcement')}}">SPONSOR ANNOUNCEMENT - SPECIAL K'S OPAL AND NDISMATE</a></h4>
-                </div>
-              </div>
-            </div>
-            <div class="col-lg-4 col-md-6">
-              <div class="journal-info">
-                <a href="{{url_for('blog', blogname='malaysia-2023')}}"><img src="{{url_for('static', filename='main/img/malaysia post.jpg')}}" class="img-responsive" alt="img"></a>
-                <div class="journal-txt">
-                  <h4><a href="{{url_for('blog', blogname='malaysia-2023')}}">MALAYSIA 2023</a></h4>
-                </div>
-              </div>
-            </div>
+            </div>              
+            {% endfor %}
           </div>
         </div>
       </div>
