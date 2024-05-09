@@ -6,14 +6,14 @@
   <title>Nielsen Innovations</title>
   <meta content="Welcome to The Personal Website of Lachlan Nielsen - A bowler and webdeveloper" name="description">
   <meta content="Lachlan Nielsen, Programmer, Web Developer, Bowling, Bowler, Lachlan, Nielsen, Nielsen Innovations" name="keywords">
-  <link href="{{url_for('static', filename='img/favicon.png')}}" rel="icon">
+  <link href="{{url_for('static', filename='main/img/favicon.png')}}" rel="icon">
   <link href="https://fonts.googleapis.com/css?family=Poppins:300,300i,400,400i,500,500i,600,600i,700,700i|Playfair+Display:400,400i,500,500i,600,600i,700,700i,900,900i" rel="stylesheet">
-  <link href="{{url_for('static', filename='vendor/bootstrap/css/bootstrap.min.css')}}" rel="stylesheet">
-  <link href="{{url_for('static', filename='vendor/bootstrap-icons/bootstrap-icons.css')}}" rel="stylesheet">
-  <link href="{{url_for('static', filename='vendor/boxicons/css/boxicons.min.css')}}" rel="stylesheet">
-  <link href="{{url_for('static', filename='vendor/glightbox/css/glightbox.min.css')}}" rel="stylesheet">
-  <link href="{{url_for('static', filename='vendor/swiper/swiper-bundle.min.css')}}" rel="stylesheet">
-  <link href="{{url_for('static', filename='css/style.css')}}" rel="stylesheet">
+  <link href="{{url_for('static', filename='main/vendor/bootstrap/css/bootstrap.min.css')}}" rel="stylesheet">
+  <link href="{{url_for('static', filename='main/vendor/bootstrap-icons/bootstrap-icons.css')}}" rel="stylesheet">
+  <link href="{{url_for('static', filename='main/vendor/boxicons/css/boxicons.min.css')}}" rel="stylesheet">
+  <link href="{{url_for('static', filename='main/vendor/glightbox/css/glightbox.min.css')}}" rel="stylesheet">
+  <link href="{{url_for('static', filename='main/vendor/swiper/swiper-bundle.min.css')}}" rel="stylesheet">
+  <link href="{{url_for('static', filename='main/css/style.css')}}" rel="stylesheet">
   <!-- =======================================================
   * Template Name: Folio
   * Template URL: https://bootstrapmade.com/folio-bootstrap-portfolio-template/
@@ -57,7 +57,7 @@
           <div class="col-lg-4 ">
             <div class="div-img-bg">
               <div class="about-img">
-                <img src="{{url_for('static', filename='img/me.jpg')}}" class="img-responsive" alt="me">
+                <img src="{{url_for('static', filename='main/img/me.jpg')}}" class="img-responsive" alt="me">
               </div>
             </div>
           </div>
@@ -134,7 +134,7 @@
         </div>
         <div class="row portfolio-container">
           <div class="col-lg-4 col-md-6 portfolio-item filter-app">
-            <img src="{{url_for('static', filename='img/portfolio/Meander Suite.png')}}" class="img-fluid" alt="">
+            <img src="{{url_for('static', filename='main/img/portfolio/Meander Suite.png')}}" class="img-fluid" alt="">
             <div class="portfolio-info">
               <h4>Meander Suite - Coming Soon</h4>
               <p>A web application that aims to improve the organisation of students.</p>
@@ -142,7 +142,7 @@
             </div>
           </div>
           <div class="col-lg-4 col-md-6 portfolio-item filter-web">
-            <img src="{{url_for('static', filename='img/portfolio/Special Ks Opal.jpg')}}" class="img-fluid" alt="">
+            <img src="{{url_for('static', filename='main/img/portfolio/Special Ks Opal.jpg')}}" class="img-fluid" alt="">
             <div class="portfolio-info">
               <h4>Special K's Opal - Coming Soon</h4>
               <p>An opal auction and sale page developed by Nielsen Innovations</p>
@@ -163,7 +163,7 @@
           <div class="row">
             <div class="col-lg-4 col-md-6">
               <div class="journal-info">
-                <a href="{{url_for('blog', blogname='presidents-shield')}}"><img src="{{url_for('static', filename='img/Nice whole team photo.jpg')}}" class="img-responsive" alt="img"></a><!--720x540px img-->
+                <a href="{{url_for('blog', blogname='presidents-shield')}}"><img src="{{url_for('static', filename='main/img/Nice whole team photo.jpg')}}" class="img-responsive" alt="img"></a><!--720x540px img-->
                 <div class="journal-txt">
                   <h4><a href="{{url_for('blog', blogname='presidents-shield')}}">MY LAST EVER PRESIDENTS SHIELD</a></h4>
                 </div>
@@ -171,7 +171,7 @@
             </div>
             <div class="col-lg-4 col-md-6">
               <div class="journal-info">
-                <a href="{{url_for('blog', blogname='sponsor-announcement')}}"><img src="{{url_for('static', filename='img/sponsor post.jpg')}}" class="img-responsive" alt="img"></a>
+                <a href="{{url_for('blog', blogname='sponsor-announcement')}}"><img src="{{url_for('static', filename='main/img/sponsor post.jpg')}}" class="img-responsive" alt="img"></a>
                 <div class="journal-txt">
                   <h4><a href="{{url_for('blog', blogname='sponsor-announcement')}}">SPONSOR ANNOUNCEMENT - SPECIAL K'S OPAL AND NDISMATE</a></h4>
                 </div>
@@ -179,7 +179,7 @@
             </div>
             <div class="col-lg-4 col-md-6">
               <div class="journal-info">
-                <a href="{{url_for('blog', blogname='malaysia-2023')}}"><img src="{{url_for('static', filename='img/malaysia post.jpg')}}" class="img-responsive" alt="img"></a>
+                <a href="{{url_for('blog', blogname='malaysia-2023')}}"><img src="{{url_for('static', filename='main/img/malaysia post.jpg')}}" class="img-responsive" alt="img"></a>
                 <div class="journal-txt">
                   <h4><a href="{{url_for('blog', blogname='malaysia-2023')}}">MALAYSIA 2023</a></h4>
                 </div>
@@ -212,12 +212,12 @@
     </div>
   </div>
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
-  <script src="{{url_for('static', filename='vendor/bootstrap/js/bootstrap.bundle.min.js')}}"></script>
-  <script src="{{url_for('static', filename='vendor/glightbox/js/glightbox.min.js')}}"></script>
-  <script src="{{url_for('static', filename='vendor/isotope-layout/isotope.pkgd.min.js')}}"></script>
-  <script src="{{url_for('static', filename='vendor/swiper/swiper-bundle.min.js')}}"></script>
-  <script src="{{url_for('static', filename='vendor/typed.js/typed.umd.js')}}"></script>
-  <script src="{{url_for('static', filename='vendor/php-email-form/validate.js')}}"></script>
-  <script src="{{url_for('static', filename='js/main.js')}}"></script>
+  <script src="{{url_for('static', filename='main/vendor/bootstrap/js/bootstrap.bundle.min.js')}}"></script>
+  <script src="{{url_for('static', filename='main/vendor/glightbox/js/glightbox.min.js')}}"></script>
+  <script src="{{url_for('static', filename='main/vendor/isotope-layout/isotope.pkgd.min.js')}}"></script>
+  <script src="{{url_for('static', filename='main/vendor/swiper/swiper-bundle.min.js')}}"></script>
+  <script src="{{url_for('static', filename='main/vendor/typed.js/typed.umd.js')}}"></script>
+  <script src="{{url_for('static', filename='main/vendor/php-email-form/validate.js')}}"></script>
+  <script src="{{url_for('static', filename='main/js/main.js')}}"></script>
 </body>
 </html>

@@ -4,11 +4,11 @@ blog_posts = {"malaysia-2023":"malaysia.html", "presidents-shield":"presidentssh
 
 @app.route('/')
 def index():
-    return render_template("index.html")
+    return render_template("main/index.html")
 
 @app.route('/blog/<blogname>')
 def blog(blogname):
-    return render_template(str("blog/"+blog_posts[blogname]))
+    return render_template(str("main/blog/"+blog_posts[blogname]))
 
 
 if __name__ == '__main__':
