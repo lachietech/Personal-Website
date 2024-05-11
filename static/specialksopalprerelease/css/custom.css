@@ -1,0 +1,12 @@
+h1,h2,h3,h4,h5,a,p{
+    font-family: "Briem Hand", cursive;
+    font-optical-sizing: auto;
+    font-weight: 100;
+    font-style: normal;
+}
+body{
+    background: var(--BG---purple-grey, linear-gradient(180deg, #7500AC 0%, #C8C8C8 100%));
+}
+.card{
+    background-color: rgba(255, 255, 255, 0.15);
+}

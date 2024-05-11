@@ -32,7 +32,7 @@ def meandersuite():
 ######
 @app.route('/specialksopal')
 def specialksopal():
-    return render_template("specialksopalprerelease/temp.html")
+    return render_template("specialksopalprerelease/index.html")
 
 if __name__ == '__main__':
     app.run(debug=True)
