@@ -19,7 +19,7 @@ else:
 
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY')
-db = mysql.connect(host = os.getenv('HOST'), port = os.getenv('PORT'), user = os.getenv('USER'), password = os.getenv('PASSWORD'))
+db = mysql.connect(host = os.getenv('HOST'), port = os.getenv('PORT'), user = "dbmasteruser", password = os.getenv('PASSWORD'))
 cursor = db.cursor()
 
 def findateacher():

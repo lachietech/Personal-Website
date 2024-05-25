@@ -16,7 +16,7 @@ else:
         
 while True:
     #DB Conn
-    db = mysql.connect(host = os.getenv('HOST'), port = os.getenv('PORT'), user = os.getenv('USER'), password = os.getenv('PASSWORD'))
+    db = mysql.connect(host = os.getenv('HOST'), port = os.getenv('PORT'), user = "dbmasteruser", password = os.getenv('PASSWORD'))
     cursor = db.cursor()
     #calling the api and getting data
     url = os.getenv('URL1')
