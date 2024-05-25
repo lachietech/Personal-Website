@@ -22,37 +22,26 @@ body {
   padding: 0;
   box-sizing: border-box;
 }
-
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
+h1,h2,h3,h4,h5,h6 {
   margin: 0;
 }
-
 h2 {
   color: #292929;
   font-weight: 600;
 }
-
 h4 {
   color: #292929;
   font-size: 14px;
   font-weight: 600;
 }
-
 a {
   color: #292929;
   text-decoration: none !important;
   transition: all 0.5s ease-in-out 0s;
 }
-
 a:hover {
   transition: all 0.5s ease-in-out 0s;
 }
-
 p {
   margin: 25px 0;
   padding: 0;
@@ -60,17 +49,14 @@ p {
   color: #999999;
   line-height: 28px;
 }
-
 ::-moz-selection {
   background: #b8a07e;
   color: #fff;
 }
-
 ::selection {
   background: #b8a07e;
   color: #fff;
 }
-
 .btn {
   background: #333;
   border: medium none;
@@ -82,20 +68,16 @@ p {
   padding: 0 30px;
   text-transform: uppercase;
 }
-
 .btn:hover,
 .btn:focus {
   color: #fff;
 }
-
 .padDiv {
   padding: 30px 20px;
 }
-
 .section-title {
   margin-bottom: 70px;
 }
-
 .section-title h2 {
   font-size: 25px;
   letter-spacing: 2px;
@@ -164,23 +146,19 @@ p {
   border-radius: 4px;
   transition: all 0.4s;
 }
-
 .back-to-top i {
   font-size: 28px;
   color: #fff;
   line-height: 0;
 }
-
 .back-to-top:hover {
   background: #c6b398;
   color: #fff;
 }
-
 .back-to-top.active {
   visibility: visible;
   opacity: 1;
 }
-
 /*--------------------------------------------------------------
 # Header
 --------------------------------------------------------------*/
@@ -851,89 +829,6 @@ p {
   font-size: 14px;
   line-height: 24px;
 }
-
-/*--------------------------------------------------------------
-# Journal
---------------------------------------------------------------*/
-#contact {
-  height: auto;
-  width: 100%;
-}
-
-.contact-details {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.contact-details li {
-  padding-bottom: 10px;
-}
-
-#contact input,
-#contact textarea {
-  width: 100%;
-  margin-bottom: 5px;
-}
-
-#contact textarea {
-  min-height: 160px;
-}
-
-.php-email-form .error-message {
-  display: none;
-  color: #fff;
-  background: #ed3c0d;
-  text-align: left;
-  padding: 15px;
-  margin-bottom: 15px;
-  font-weight: 600;
-}
-
-.php-email-form .error-message br+br {
-  margin-top: 25px;
-}
-
-.php-email-form .sent-message {
-  display: none;
-  color: #fff;
-  background: #18d26e;
-  text-align: center;
-  padding: 15px;
-  font-weight: 600;
-  margin-bottom: 15px;
-}
-
-.php-email-form .loading {
-  display: none;
-  background: #fff;
-  text-align: center;
-  padding: 15px;
-  margin-bottom: 15px;
-}
-
-.php-email-form .loading:before {
-  content: "";
-  display: inline-block;
-  border-radius: 50%;
-  width: 24px;
-  height: 24px;
-  margin: 0 10px -6px 0;
-  border: 3px solid #18d26e;
-  border-top-color: #eee;
-  animation: animate-loading 1s linear infinite;
-}
-
-@keyframes animate-loading {
-  0% {
-    transform: rotate(0deg);
-  }
-
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
 /*--------------------------------------------------------------
 # Blog
 --------------------------------------------------------------*/
@@ -998,74 +893,6 @@ p {
 .content-main .post-meta a {
   color: #a2a2a2;
   margin-left: 5px;
-}
-
-/* Commonts */
-.comments {
-  background: #fff;
-}
-
-.entry-comments h6 {
-  margin-right: 10px;
-  font-size: 13px;
-  letter-spacing: 0.1em;
-  font-weight: 500;
-}
-
-.entry-comments-item {
-  margin-top: 40px;
-  padding-bottom: 40px;
-  border-bottom: 1px solid #f2f2f2;
-}
-
-.entry-comments-avatar {
-  position: absolute;
-  display: block;
-  border-radius: 50%;
-  width: 60px;
-  height: 60px;
-}
-
-.entry-comments-body {
-  padding-left: 86px;
-}
-
-.entry-comments-author {
-  margin-right: 10px;
-  font-size: 13px;
-  color: #292929;
-  letter-spacing: 0.1em;
-  font-weight: 500;
-}
-
-.rep {
-  font-size: 13px;
-  color: #292929;
-  letter-spacing: 0.1em;
-  font-weight: 500;
-  text-transform: capitalize;
-}
-
-.entry-comments span a {
-  font-size: 13px;
-  color: #999;
-}
-
-.entry-comments-reply {
-  padding-left: 10%;
-}
-
-/* Commonts form */
-.cmt {
-  background: #fff;
-}
-
-blockquote {
-  padding: 40px;
-  background-color: #f2f2f2;
-  margin: 30px 0;
-  border: none;
-  border-left: 4px solid #b8a07e;
 }
 
 /*--------------------------------------------------------------
