@@ -6,21 +6,18 @@ import requests
 import mysql.connector as mysql 
 from dotenv import load_dotenv
 import os
+from ..databases import db as dbconn
 
 if load_dotenv("/Users/lniel/OneDrive - Department of Education/Coding/personal website/.env"):
-    print("Dotenv loaded")
     pass
 else:
     if load_dotenv("/var/www/.env"):
-        print("Dotenv loaded")
         pass
     else:
         print("Dotenv not found")
 
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY')
-db = mysql.connect(host = os.getenv('HOST'), port = os.getenv('PORT'), user = "dbmasteruser", password = os.getenv('PASSWORD'))
-cursor = db.cursor()
 
 def findateacher():
     #setting date and time (redifine these to make it a permanant situation)
