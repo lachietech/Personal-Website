@@ -1,4 +1,4 @@
-from __main__ import app
+from app import app
 from flask import Flask, redirect, render_template, request, session, url_for
 from flask_bootstrap import Bootstrap
 from flask_bcrypt import Bcrypt
