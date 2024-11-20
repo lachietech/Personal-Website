@@ -4,7 +4,6 @@
 
 # All Flask Imports
 from flask import Flask, redirect, render_template, request, session, url_for, jsonify
-from flask_bootstrap import Bootstrap
 from flask_bcrypt import Bcrypt
 
 # All General Imports
