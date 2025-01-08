@@ -20,10 +20,10 @@ from backend.meandersuiteprerelease.studenthub_backend import page2 as p2, stude
 from backend.meandersuiteprerelease.teacherhub_backend import page1 as p1, pb4lpointsys as pb4l, qcaatracker as qcaa, teachernotifications as tn, teacherpage as tpage, teacherplanner as tp
 from backend.meandersuiteprerelease.adminhub_backend import adminpage as ap
 from backend.specialksopalprerelease import *
-from backend.databases import db as mdb
+from backend.databases import db as md
 
 # Finding The .env Variables File
-if load_dotenv("/Users/lniel/OneDrive - Department of Education/Coding/personal website/.env"):
+if load_dotenv("/Users/lniel/OneDrive/BUSINESS/Coding/personal website/.env"):
     pass
 else:
     if load_dotenv("/var/www/.env"):
