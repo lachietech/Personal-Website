@@ -45,14 +45,8 @@ cursor = db.cursor()
 
 @app.route('/', methods=['GET'])
 def index():
-    return render_template("main/index.html", posts=mdb.blog_posts)
+    return render_template("main/index.html")
 
-@app.route('/blog/<blogname>', methods=['GET'])
-def blog(blogname):
-    for post in mdb.blog_posts:
-        if post["tag"] == blogname:
-            return render_template(str("main/blog/"+post["filename"]))
-    return url_for('index')
 
 ###################################################################################################################################################################################################
 # MEANDER SUITE ROUTES ############################################################################################################################################################################
