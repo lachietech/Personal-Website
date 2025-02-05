@@ -1,39 +1,37 @@
 {% extends "meandersuiteprerelease/mainfiles/mainlayout.html" %}
 {% block style %}
     <style>
-        
+        #documentation .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+        #documentation .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #004085;
+        }
+        #documentation img {
+            height: 30%;
+            display: block;
+            margin: 0 auto 20px;
+        }
     </style>
 {% endblock style %}
 {% block content %}
-<section class="py-5" id="features">
+<section class="py-5" id="documentation">
     <div class="container px-5 my-5">
-        <div class="row gx-5">
-            <div class="col-lg-4 mb-5 mb-lg-0"><h2 class="fw-bolder mb-0">A Better Way To Manage, Organise, and excel.</h2></div>
-            <div class="col-lg-8">
-                <div class="row gx-5 row-cols-1 row-cols-md-2">
-                    <div class="col mb-5 h-100">
-                        <div class="text-black rounded-3 mb-3"><i class="bi bi-collection"></i></div>
-                        <h2 class="h5">Tailored And Researched Projects</h2>
-                        <p class="mb-0">Paragraph of text beneath the heading to explain the heading. Here is just a bit more text.</p>
-                    </div>
-                    <div class="col mb-5 h-100">
-                        <div class="text-black rounded-3 mb-3"><i class="bi bi-building"></i></div>
-                        <h2 class="h5">Ultimate Accessibility</h2>
-                        <p class="mb-0">Paragraph of text beneath the heading to explain the heading. Here is just a bit more text.</p>
-                    </div>
-                    <div class="col mb-5 mb-md-0 h-100">
-                        <div class="text-black rounded-3 mb-3"><i class="bi bi-toggles2"></i></div>
-                        <h2 class="h5">Easy To Manage</h2>
-                        <p class="mb-0">Paragraph of text beneath the heading to explain the heading. Here is just a bit more text.</p>
-                    </div>
-                    <div class="col h-100">
-                        <div class="text-black rounded-3 mb-3"><i class="bi bi-toggles2"></i></div>
-                        <h2 class="h5">Simple And Effective</h2>
-                        <p class="mb-0">Paragraph of text beneath the heading to explain the heading. Here is just a bit more text.</p>
-                    </div>
-                </div>
-            </div>
+        <div class="mb-5 mb-lg-0">
+            <h2 class="fw-bolder mb-5">Meander Suite Documentation</h2>
         </div>
+        <div>
+            <p class="lead">Welcome to the documentation page for Meander Suite. Here you will find all the necessary information to understand and use our website effectively.</p>
+            <p class="lead">Our project aims to provide a better way to manage, organize, and excel in education. We have tailored and researched projects to ensure ultimate accessibility and ease of management.</p>
+            <p class="lead">The documentation includes detailed guides, developers notes, FAQs, and troubleshooting tips to help you navigate through the features of our website.</p>
+            <p class="lead">For detailed documentation, please download the file below:</p>
+            <br>
+            <center><a href="/path/to/documentation.pdf" class="btn btn-primary btn-lg disabled">Download Documentation</a></center>
+            <center><p class="lead">* the documentation is currently unnavailable</p></center>
+        </div>
+        
     </div>
 </section>
 {% endblock content %}

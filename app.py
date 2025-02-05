@@ -15,11 +15,7 @@ from time import strftime, time
 # All Backend Code Imports
 from backend.main import login as logni
 from backend.databases import db as mdb
-from backend.meandersuiteprerelease import teacherfinder, msw, login as logms, register
-from backend.meandersuiteprerelease.studenthub_backend import page2 as p2, studentnotifications as sn, studentpage as spage, studentplanner as sp
-from backend.meandersuiteprerelease.teacherhub_backend import page1 as p1, pb4lpointsys as pb4l, qcaatracker as qcaa, teachernotifications as tn, teacherpage as tpage, teacherplanner as tp
-from backend.meandersuiteprerelease.adminhub_backend import adminpage as ap
-from backend.databases import db as md
+from backend.meandersuiteprerelease import msw, login as logms
 
 # Finding The .env Variables File
 if load_dotenv("/Users/lniel/OneDrive/BUSINESS/Coding/personal website/.env"):
@@ -60,59 +56,15 @@ def index():
 # Main Website Route
 @app.route('/meandersuite')
 def meandersuite():
-    return render_template("meandersuiteprerelease/index.html")
+    return render_template("meandersuiteprerelease/mainfiles/index.html")
 
 # ------------------------------------------------------------
 # Setting up subpages for the main website
 # ------------------------------------------------------------
 
-@app.route('/meandersuite/teacherfinder')
-def teacherfinderdesc():
-    return render_template("meandersuiteprerelease/mainfiles/teacherfinder.html")
-
-@app.route('/meandersuite/studentnotifications')
-def studentnotificationsdesc():
-    return render_template("meandersuiteprerelease/mainfiles/studentnotifications.html")
-
-@app.route('/meandersuite/studentplanner')
-def studentplannerdesc():
-    return render_template("meandersuiteprerelease/mainfiles/studentplanner.html")
-
-@app.route('/meandersuite/teachernotifications')
-def teachernotificationsdesc():
-    return render_template("meandersuiteprerelease/mainfiles/teachernotifications.html")
-
 @app.route('/meandersuite/msw')
 def mswdesc():
     return render_template("meandersuiteprerelease/mainfiles/mswdesc.html")
-
-@app.route('/meandersuite/pb4lpoints')
-def pb4lpointsysdesc():
-    return render_template("meandersuiteprerelease/mainfiles/pb4lpointsysdesc.html")
-
-@app.route('/meandersuite/qcaatracker')
-def qcaatrackerdesc():
-    return render_template("meandersuiteprerelease/mainfiles/qcaatrackerdesc.html")
-
-@app.route('/meandersuite/personalplanner')
-def personalplannerdesc():
-    return render_template("meandersuiteprerelease/mainfiles/personalplannerdesc.html")
-
-@app.route('/meandersuite/studenttimetable')
-def studenttimetabledesc():
-    return render_template("meandersuiteprerelease/mainfiles/studenttimetabledesc.html")
-
-@app.route('/meandersuite/teachertimetable')
-def teachertimetabledesc():
-    return render_template("meandersuiteprerelease/mainfiles/teachertimetabledesc.html")
-
-@app.route('/meandersuite/teacherprojects')
-def teacherprojects():
-    return render_template("meandersuiteprerelease/mainfiles/teacherprojects.html")
-
-@app.route('/meandersuite/studentprojects')
-def studentprojects():
-    return render_template("meandersuiteprerelease/mainfiles/studentprojects.html")
 
 @app.route('/meandersuite/documentation')
 def documentation():
@@ -122,212 +74,24 @@ def documentation():
 # Authentication Pages
 # ______________________________________________________________________________________________________________________________________________________________
 
-@app.route('/meandersuite/teachercontentpack')
-def teachercontentpackdesc():
-    if request.method == "POST":
-        return
-    if request.method == "GET":
-        return render_template("meandersuiteprerelease/mainfiles/teachercontentpack.html")
-
-@app.route('/meandersuite/studentcontentpack')
-def studentcontentpackdesc():
-    if request.method == "POST":
-        return
-    if request.method == "GET":
-        return render_template("meandersuiteprerelease/mainfiles/studentcontentpack.html")
-
-@app.route('/meandersuite/duluxepack')
-def duluxepackdesc():
-    if request.method == "POST":
-        return
-    if request.method == "GET":
-        return render_template("meandersuiteprerelease/mainfiles/duluxepack.html")
-
 @app.route('/meandersuite/login', methods=["GET", "POST"])
 def login():
     if request.method == "POST":
         password = str(request.form.get("password"))
         username = str(request.form.get("username"))
-        accesscode = str(request.form.get("accesscode"))
-        return logms.login(username, password, accesscode)
+        return logms.login(username, password)
     if request.method == "GET":
         return render_template("meandersuiteprerelease/mainfiles/login.html")
 
 # ______________________________________________________________________________________________________________________________________________________________
-# StudentHub
+# Suite Pages
 # ______________________________________________________________________________________________________________________________________________________________
 
 # Setting up a root page for the StudentHub extension
-@app.route('/meandersuite/studenthub')
-def studentpage():
-    if "logged_in" in session:
-        if session["lvl"] == 1:
-            if request.method == "POST":
-                return
-            if request.method == "GET":
-                return render_template("meandersuiteprerelease/studentpagefiles/studentpage.html", 
-                                       val1=msw.TrafficLights()[0], val2=msw.TrafficLights()[1], val3=msw.TrafficLights()[2], val4=msw.TrafficLights()[3], val5=msw.TrafficLights()[4])
-        else:
-            return redirect(url_for('login'))
-    else:
-        return redirect(url_for('login'))
-
-# ------------------------------------------------------------
-# StudentHub's Subpages and applications
-# ------------------------------------------------------------
-@app.route('/meandersuite/studenthub/timetablechanges')
-def studentnotifications():
-    if "logged_in" in session:
-        if session["lvl"] == 1:
-            if request.method == "POST":
-                return
-            if request.method == "GET":
-                return render_template("meandersuiteprerelease/studentpagefiles/studenttimetable.html", 
-                                       val1=msw.TrafficLights()[0], val2=msw.TrafficLights()[1], val3=msw.TrafficLights()[2], val4=msw.TrafficLights()[3], val5=msw.TrafficLights()[4])
-        else:
-            return redirect(url_for('login'))
-    else:
-        return redirect(url_for('login'))
-
-@app.route('/meandersuite/studenthub/planner')
-def studentplanner():
-    if "logged_in" in session:
-        if session["lvl"] == 1:
-            if request.method == "POST":
-                return
-            if request.method == "GET":
-                return render_template("meandersuiteprerelease/studentpagefiles/studentplanner.html", 
-                                       val1=msw.TrafficLights()[0], val2=msw.TrafficLights()[1], val3=msw.TrafficLights()[2], val4=msw.TrafficLights()[3], val5=msw.TrafficLights()[4])
-        else:
-            return redirect(url_for('login'))
-    else:
-        return redirect(url_for('login'))
-
-@app.route('/meandersuite/studenthub/teacherfinder')
-def page2():
-    if "logged_in" in session:
-        if session["lvl"] == 1:
-            if request.method == "POST":
-                return render_template("meandersuiteprerelease/studentpagefiles/answer.html", 
-                                       value1=teacherfinder.findateacher(), val1=msw.TrafficLights()[0], val2=msw.TrafficLights()[1], val3=msw.TrafficLights()[2], 
-                                       val4=msw.TrafficLights()[3], val5=msw.TrafficLights()[4])
-            if request.method == "GET":
-                return render_template("meandersuiteprerelease/studentpagefiles/index.html", 
-                                       val1=msw.TrafficLights()[0], val2=msw.TrafficLights()[1], val3=msw.TrafficLights()[2], val4=msw.TrafficLights()[3], val5=msw.TrafficLights()[4])   
-        else:
-            return redirect(url_for('login'))
-    else:
-        return redirect(url_for('login'))
-
-# ______________________________________________________________________________________________________________________________________________________________
-# TeacherHub
-# ______________________________________________________________________________________________________________________________________________________________
-
-# Setting up a root page for the TeacherHub extension
-@app.route('/meandersuite/teacherhub')
-def teacherpage():
-    if "logged_in" in session:
-        if session["lvl"] == 2:
-            if request.method == "POST":
-                return
-            if request.method == "GET":
-                return render_template("meandersuiteprerelease/teacherpagefiles/teacherpage.html", 
-                                       val1=msw.TrafficLights()[0], val2=msw.TrafficLights()[1], val3=msw.TrafficLights()[2], val4=msw.TrafficLights()[3], val5=msw.TrafficLights()[4])
-        else:
-            return redirect(url_for('login'))
-    else:
-        return redirect(url_for('login'))
-# ------------------------------------------------------------
-# TeacherHub's Subpages and Applications
-# ------------------------------------------------------------
-@app.route('/meandersuite/teacherhub/timetablechanges')
-def teachernotifications():
-    if "logged_in" in session:
-        if session["lvl"] == 2:
-            if request.method == "POST":
-                return
-            if request.method == "GET":
-                return render_template("meandersuiteprerelease/teacherpagefiles/teachertimetable.html", 
-                                       val1=msw.TrafficLights()[0], val2=msw.TrafficLights()[1], val3=msw.TrafficLights()[2], val4=msw.TrafficLights()[3], val5=msw.TrafficLights()[4])
-        else:
-            return redirect(url_for('login'))
-    else:
-        return redirect(url_for('login'))
-
-@app.route('/meandersuite/teacherhub/planner')
-def teacherplanner():
-    if "logged_in" in session:
-        if session["lvl"] == 2:
-            if request.method == "POST":
-                return
-            if request.method == "GET":
-                return render_template("meandersuiteprerelease/teacherpagefiles/teacherplanner.html", 
-                                       val1=msw.TrafficLights()[0], val2=msw.TrafficLights()[1], val3=msw.TrafficLights()[2], val4=msw.TrafficLights()[3], val5=msw.TrafficLights()[4])
-        else:
-            return redirect(url_for('login'))
-    else:
-        return redirect(url_for('login'))
-
-@app.route('/meandersuite/teacherhub/teacherfinder', methods=["GET", "POST"])
-def page1():
-    if "logged_in" in session:
-        if session["lvl"] == 2:
-            if request.method == "POST":
-                return render_template("meandersuiteprerelease/teacherpagefiles/answer.html", 
-                                       val1=msw.TrafficLights()[0], val2=msw.TrafficLights()[1], val3=msw.TrafficLights()[2], val4=msw.TrafficLights()[3], 
-                                       val5=msw.TrafficLights()[4], value1=teacherfinder.findateacher())
-            if request.method == "GET":
-                return render_template("meandersuiteprerelease/teacherpagefiles/index.html", 
-                                       val1=msw.TrafficLights()[0], val2=msw.TrafficLights()[1], val3=msw.TrafficLights()[2], val4=msw.TrafficLights()[3], val5=msw.TrafficLights()[4])
-        else:
-            return redirect(url_for('login'))
-    else:
-        return redirect(url_for('login'))   
-
-@app.route('/meandersuite/teacherhub/pb4lpointsys')
-def pb4lpointsys():
-    if "logged_in" in session:
-        if session["lvl"] == 2:
-            if request.method == "POST":
-                return 
-            if request.method == "GET":
-                return render_template("meandersuiteprerelease/teacherpagefiles/pb4lpointsys.html", 
-                                       val1=msw.TrafficLights()[0], val2=msw.TrafficLights()[1], val3=msw.TrafficLights()[2], val4=msw.TrafficLights()[3], val5=msw.TrafficLights()[4])
-        else:
-            return redirect(url_for('login'))
-    else:
-        return redirect(url_for('login'))
-
-@app.route('/meandersuite/teacherhub/qcaatracker')
-def qcaatracker():
-    if "logged_in" in session:
-        if session["lvl"] == 2:
-            if request.method == "POST":
-                return
-            if request.method == "GET":
-                return render_template("meandersuiteprerelease/teacherpagefiles/qcaatracker.html", 
-                                       val1=msw.TrafficLights()[0], val2=msw.TrafficLights()[1], val3=msw.TrafficLights()[2], val4=msw.TrafficLights()[3], val5=msw.TrafficLights()[4])
-        else:
-            return redirect(url_for('login'))
-    else:
-        return redirect(url_for('login'))
-
-
-# ______________________________________________________________________________________________________________________________________________________________
-# AdminHub 
-# ______________________________________________________________________________________________________________________________________________________________
-
-# Setting up a root page for the AdminHub extension
-@app.route('/meandersuite/adminpage')
-def adminpage():
-    if "logged_in" in session:
-        if session["lvl"] == 3:
-            if request.method == "POST":
-                return
-            if request.method == "GET":
-                return render_template("meandersuiteprerelease/adminpagefiles/adminpage.html",)
-        else:
-            return redirect(url_for('login'))
+@app.route('/meandersuite/suite')
+def suite():
+    if request.method == "GET":
+        return render_template("meandersuiteprerelease/suitefiles/index.html") # , val1=msw.TrafficLights()[0], val2=msw.TrafficLights()[1], val3=msw.TrafficLights()[2], val4=msw.TrafficLights()[3], val5=msw.TrafficLights()[4]
     else:
         return redirect(url_for('login'))
         

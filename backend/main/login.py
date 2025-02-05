@@ -7,7 +7,7 @@ import os
 from dotenv import load_dotenv
 from ..databases import db as dbconn
 
-if load_dotenv("/Users/lniel/OneDrive - Department of Education/Coding/personal website/.env"):
+if load_dotenv("/Users/lniel/OneDrive/BUSINESS/Coding/personal website/.env"):
     pass
 else:
     if load_dotenv("/var/www/.env"):

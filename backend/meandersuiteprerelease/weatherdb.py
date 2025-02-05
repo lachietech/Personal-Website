@@ -4,7 +4,7 @@ import mysql.connector as mysql
 from dotenv import load_dotenv
 import os
 
-if load_dotenv("/Users/lniel/OneDrive - Department of Education/Coding/personal website/.env"):
+if load_dotenv("/Users/lniel/OneDrive/BUSINESS/Coding/personal website/.env"):
     pass
 else:
     if load_dotenv("/var/www/.env"):

@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 import os
 from ..databases import db as dbconn
 
-if load_dotenv("/Users/lniel/OneDrive - Department of Education/Coding/personal website/.env"):
+if load_dotenv("/Users/lniel/OneDrive/BUSINESS/Coding/personal website/.env"):
     pass
 else:
     if load_dotenv("/var/www/.env"):
@@ -24,28 +24,16 @@ db = dbconn.db
 cursor = db.cursor()
 
 def login(username, password, accesscode):
-    sql = "SELECT * FROM `dbmaster`.User WHERE accesscode = %s AND username = %s"
-    u = (accesscode, username)
-    cursor.execute(sql, u)
+    sql = "SELECT * FROM `meandersuite`.users WHERE username = %s"
+    cursor.execute(sql, username)
     myresult = cursor.fetchall()
     db.commit()
 
     if bcrypt.check_password_hash(str(myresult[0][2]), str(password)):
-        if myresult[0][3] == "1":
+        if myresult[0][1] == True:
             session['logged_in'] = True
-            session['lvl'] = 1
             session['username'] = username
-            return redirect(url_for('studentpage'))
-        if myresult[0][3] == "2":
-            session['logged_in'] = True
-            session['lvl'] = 2
-            session['username'] = username
-            return redirect(url_for('teacherpage'))
-        if myresult[0][3] == "3":
-            session['logged_in'] = True
-            session['lvl'] = 3
-            session['username'] = username
-            return redirect(url_for('adminpage'))
+            return redirect(url_for('suite'))
     else:
         # If incorrect stay on the password page
         return render_template("mainfiles/login.html")
