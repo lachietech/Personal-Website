@@ -14,6 +14,15 @@
             display: block;
             margin: 0 auto 20px;
         }
+        @media (max-width: 768px) {
+            .text-justify {
+                text-align: justify;
+            }
+            .img-fluid {
+                width: 100%;
+                height: auto;
+            }
+        }
     </style>
 {% endblock style %}
 {% block content %}
@@ -23,15 +32,14 @@
             <h2 class="fw-bolder mb-5">Meander Suite Documentation</h2>
         </div>
         <div>
-            <p class="lead">Welcome to the documentation page for Meander Suite. Here you will find all the necessary information to understand and use our website effectively.</p>
-            <p class="lead">Our project aims to provide a better way to manage, organize, and excel in education. We have tailored and researched projects to ensure ultimate accessibility and ease of management.</p>
-            <p class="lead">The documentation includes detailed guides, developers notes, FAQs, and troubleshooting tips to help you navigate through the features of our website.</p>
-            <p class="lead">For detailed documentation, please download the file below:</p>
+            <p class="lead text-justify">Welcome to the documentation page for Meander Suite. Here you will find all the necessary information to understand and use our website effectively.</p>
+            <p class="lead text-justify">Our project aims to provide a better way to manage, organize, and excel in education. We have tailored and researched projects to ensure ultimate accessibility and ease of management.</p>
+            <p class="lead text-justify">The documentation includes detailed guides, developers notes, FAQs, and troubleshooting tips to help you navigate through the features of our website.</p>
+            <p class="lead text-justify">For detailed documentation, please download the file below:</p>
             <br>
             <center><a href="/path/to/documentation.pdf" class="btn btn-primary btn-lg disabled">Download Documentation</a></center>
             <center><p class="lead">* the documentation is currently unnavailable</p></center>
         </div>
-        
     </div>
 </section>
 {% endblock content %}

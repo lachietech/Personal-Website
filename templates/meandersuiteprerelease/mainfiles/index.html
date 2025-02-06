@@ -2,17 +2,26 @@
 {% block style %}
     <style>
         /* Add any custom styles here */
+        @media (max-width: 768px) {
+            .text-justify {
+                text-align: justify;
+            }
+            .img-fluid {
+                width: 80%;
+                height: auto;
+            }
+        }
     </style>
 {% endblock style %}
 {% block content %}
     <section class="py-5">
-        <center><img src="{{ url_for('static', filename='meandersuiteprerelease/mainfiles/logoblack.png')}}" style="width:60%;" class="img-fluid px-5 my-5" alt="Product Image"></center>
-        <div class="container px-5 my-5">
+        <div class="container px-5 my-5 text-justify">
             <div class="row gx-5">
-                <div class="mb-5">
+                <div class="mb-5 text-justify">
                     <h1 class="fw-bolder text-center mb-2">Welcome To Meander Suite</h1>
                     <p class="lead">Meander Suite is a complex research application developed by Nielsen Innovations that specialises in the management of the school environment, childrens behaviours, and allowing students and staff alike to be more organised and prepared.</p>
                     <p class="lead">This app takes a researched and tested response to help teachers be more informed about the behaviours of their students. Using the 3 P's model, Predict, Prepare, Prevent. Teachers can make more informed decisions on how they can work with the environmental conditions, to maximise student learning. It offers a variety of tools to help students and teachers to make these decisions and manage behaviours.</p>
+
                 </div>
             </div>
         </div>

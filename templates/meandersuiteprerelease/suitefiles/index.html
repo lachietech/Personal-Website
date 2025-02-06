@@ -20,9 +20,14 @@
             text-align: right; 
             font-size: 20px; 
         }
-  
-
-
+        .offcanvas {
+            width: 250px; /* Adjust the width to make it thinner */
+        }
+        .weather-info {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
         </style>
     </head>
     <body>
@@ -30,7 +35,7 @@
             <div class="offcanvas-body py-0 px-0">
                 <nav class="navbar navbar-light bg-light flex-column p-4" style="height: 100%;">
                     <div class="container-fluid">
-                        <button type="button" class="navbar-brand border-0 bg-transparent" data-bs-dismiss="offcanvas" aria-label="Close"><img src="{{ url_for('static', filename='meandersuiteprerelease/mainfiles/logoblack.png')}}" style="width: 70%;" class="img-fluid"></button>
+                        <button type="button" class="navbar-brand border-0 bg-transparent" data-bs-dismiss="offcanvas" aria-label="Close"><img src="{{ url_for('static', filename='meandersuiteprerelease/mainfiles/logoblack.png')}}" class="img-fluid"></button>
                         <ul class="navbar-nav mb-2 mb-lg-0">
                             <li class="nav-item w-100">
                                 <a class="nav-link"  href="#msw">Meander Suite Weather</a>
@@ -38,6 +43,12 @@
                             <button class="btn btn-secondary w-100 mt-3" href="#apppage"><i class="bi bi-plus">Add New App</i></button>
                         </ul>
                     </div>
+                    <ul class="navbar-nav mb-2 mb-lg-0">
+                        <li class="nav-item mt-auto">
+                            <a class="nav-link" href="#settings"><i class="bi bi-gear"></i>  Settings</a>
+                        </li>
+                    </ul>
+
                 </nav>
             </div>
         </div>
@@ -47,13 +58,12 @@
             </button>
             <div class="container px-5 my-5 text-center">
                 <div class="row mt-5">
-                    <div class="col-md-12 py text-center">
-                        <div class="col-md-12 mt-5 text-center">
+                    <div class="text-center">
+                        <div class=" mt-5 text-center">
                             <div>
                                 <h1>Weather Information</h1>
                             </div>
-                            
-                            <div class="d-inline-flex text-center mt-4">
+                            <div class="weather-info mt-4">
                                 <div class="me-4 ms-4">
                                     <i class="bi bi-thermometer-half fs-1"></i>
                                     <br>
