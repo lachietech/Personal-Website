@@ -28,6 +28,10 @@
             flex-wrap: wrap;
             justify-content: center;
         }
+        .weather-info div {
+            text-align: center;
+            width: 60px;
+        }
         </style>
     </head>
     <body>
@@ -126,13 +130,13 @@
             <script>
                 // Sample weather data
                 const weatherData = {
-                    temperature: 25,
-                    humidity: 60,
-                    cloudCoverage: 20,
-                    moonCycle: 50,
-                    UV: 5,
-                    windSpeed: 10,
-                    rain: 0,
+                    temperature: 225,
+                    humidity: 260,
+                    cloudCoverage: 220,
+                    moonCycle: 250,
+                    UV: 225,
+                    windSpeed: 100,
+                    rain: 350,
                     severity: 100
 
                 };
@@ -143,7 +147,7 @@
                 document.getElementById('cloudCoverage').innerText = `${weatherData.cloudCoverage}%`;
                 document.getElementById('moonCycle').innerText = `${weatherData.moonCycle}%`;
                 document.getElementById('UV').innerText = `${weatherData.UV}`;
-                document.getElementById('windSpeed').innerText = `${weatherData.windSpeed} km/h`;
+                document.getElementById('windSpeed').innerText = `${weatherData.windSpeed} km`;
                 document.getElementById('rain').innerText = `${weatherData.rain} mm`;
                 document.getElementById('severity').style = `width:${weatherData.severity}%;`;
             </script>
