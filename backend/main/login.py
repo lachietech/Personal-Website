@@ -24,14 +24,14 @@ cursor = db.cursor()
 ###################################################################################################################################################################################################
 # MAIN SETUP AND DEFINITION OF MAIN VARIABLES #####################################################################################################################################################
 ###################################################################################################################################################################################################
-def register(username, password, lvl):
+def register(username, password, email, first_name, last_name, location):
     salt = bcrypt.gensalt()
     hashed_password = bcrypt.hashpw(password.encode('utf-8'), salt)
     cursor.execute("""SELECT * FROM NielsenInnovations.users WHERE username = %s""", (username,))
     if len(cursor.fetchall()) > 1:
         return
     else:
-        cursor.execute("""INSERT INTO NielsenInnovations.users (username, password, lvl) VALUES (%s, %s, %s)""", (username, hashed_password, lvl))
+        cursor.execute("""INSERT INTO NielsenInnovations.users (username, password, email, firstname, lastname, location) VALUES (%s, %s, %s, %s, %s, %s)""", (username, hashed_password, email, first_name, last_name, location))
         db.commit()
 
 ###################################################################################################################################################################################################

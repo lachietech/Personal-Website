@@ -23,8 +23,18 @@ app.secret_key = os.getenv('SECRET_KEY')
 db = dbconn.db
 cursor = db.cursor()
 
-def login(username, password, accesscode):
-    sql = "SELECT * FROM `meandersuite`.users WHERE username = %s"
+def register(username, password, email, first_name, last_name, location):
+    salt = bcrypt.gensalt()
+    hashed_password = bcrypt.hashpw(password.encode('utf-8'), salt) 
+    cursor.execute("""SELECT * FROM MeanderSuite.users WHERE username = %s""", (username,))
+    if len(cursor.fetchall()) > 1:
+        return
+    else:
+        cursor.execute("""INSERT INTO MeanderSuite.users (username, password, email, firstname, lastname, location) VALUES (%s, %s, %s, %s, %s, %s)""", (username, hashed_password, email, first_name, last_name, location))
+        db.commit()
+
+def login(username, password):
+    sql = "SELECT * FROM MeanderSuite.users WHERE username = %s"
     cursor.execute(sql, username)
     myresult = cursor.fetchall()
     db.commit()

@@ -15,7 +15,7 @@ from time import strftime, time
 # All Backend Code Imports
 from backend.main import login as logni
 from backend.databases import db as mdb
-from backend.meandersuiteprerelease import msw, login as logms
+from backend.meandersuiteprerelease import login as logms
 
 # Finding The .env Variables File
 if load_dotenv("/Users/lniel/OneDrive/BUSINESS/Coding/personal website/.env"):
@@ -48,7 +48,6 @@ def index():
 # MEANDER SUITE ROUTES ############################################################################################################################################################################
 ###################################################################################################################################################################################################
 # This is a complex program that has many of its own pages and subpages. They will be noted in the comment headers. Pay attention to the types of pages.
-
 # ______________________________________________________________________________________________________________________________________________________________
 # Main Welcome Website
 # ______________________________________________________________________________________________________________________________________________________________
@@ -73,7 +72,20 @@ def documentation():
 # ______________________________________________________________________________________________________________________________________________________________
 # Authentication Pages
 # ______________________________________________________________________________________________________________________________________________________________
+@app.route('/meandersuite/register', methods=["GET", "POST"])
+def register():
+    if request.method == "POST":
+        password = str(request.form.get("password"))
+        username = str(request.form.get("username"))
+        email = str(request.form.get("email"))
+        first_name = str(request.form.get("first_name"))
+        last_name = str(request.form.get("last_name"))
+        location = str(request.form.get("location"))
 
+        return logms.register(username, password, email, first_name, last_name, location)
+    if request.method == "GET":
+        return render_template("meandersuiteprerelease/mainfiles/register.html")
+    
 @app.route('/meandersuite/login', methods=["GET", "POST"])
 def login():
     if request.method == "POST":
