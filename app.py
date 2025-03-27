@@ -108,7 +108,9 @@ def suite():
     if request.method == "GET":
         if session["logged_in"]:
             msw.run()
-            return render_template("meandersuiteprerelease/suitefiles/index.html") # , val1=msw.TrafficLights()[0], val2=msw.TrafficLights()[1], val3=msw.TrafficLights()[2], val4=msw.TrafficLights()[3], val5=msw.TrafficLights()[4]
+            return render_template("meandersuiteprerelease/suitefiles/index.html", val1 = msw.run()[0], val2 = msw.run()[1], val3 = msw.run()[2], val4 = msw.run()[3], val5 = msw.run()[4], val6 = msw.run()[5])
+        else:
+            return redirect(url_for("login"))
             
         
 ###################################################################################################################################################################################################

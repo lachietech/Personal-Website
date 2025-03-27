@@ -9,20 +9,6 @@
         <script src="https://kit.fontawesome.com/85e648c8d7.js" crossorigin="anonymous"></script>
         <link href="{{url_for('static', filename='main/bootstrap-icons/bootstrap-icons.css')}}" rel="stylesheet">
         <style>
-        .outerbar { 
-            background: linear-gradient(90deg, rgba(61,255,0,1) 0%, rgba(255,248,0,1) 25%, rgba(255,149,0,1) 50%, rgba(255,0,0,1) 75%, rgba(0,0,0,1) 100%); 
-            border-radius: 1vh; 
-            padding: 0.5%; 
-            text-align: right;  
-        }
-        .innerbar { 
-            text-align: right; 
-            font-size: 1vh; 
-            color: white;
-        }
-        .offcanvas {
-            width: 250px; /* Adjust the width to make it thinner */
-        }
         .weather-info {
             display: flex;
             flex-wrap: wrap;
@@ -34,37 +20,20 @@
         }
         </style>
     </head>
-    <body>
-        <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvas" data-bs-keyboard="false" data-bs-backdrop="false">
-            <div class="offcanvas-body py-0 px-0">
-                <nav class="navbar navbar-light bg-light flex-column p-4" style="height: 100%;">
-                    <div class="container-fluid">
-                        <button type="button" class="navbar-brand border-0 bg-transparent" data-bs-dismiss="offcanvas" aria-label="Close"><img src="{{ url_for('static', filename='meandersuiteprerelease/mainfiles/logoblack.png')}}" class="img-fluid"></button>
-                        <ul class="navbar-nav mb-2 mb-lg-0">
-                            <li class="nav-item w-100">
-                                <a class="nav-link"  href="#msw">Meander Suite Weather</a>
-                            </li>
-                            <button class="btn btn-secondary w-100 mt-3" href="#apppage"><i class="bi bi-plus">Add New App</i></button>
-                        </ul>
-                    </div>
-                    <ul class="navbar-nav mb-2 mb-lg-0">
-                        <li class="nav-item mt-auto">
-                            <a class="nav-link" href="#settings"><i class="bi bi-gear"></i>  Settings</a>
-                        </li>
-                    </ul>
-
-                </nav>
-            </div>
-        </div>
+    <body id="body">
         <div class="container-fluid">
-            <button class="btn" data-bs-toggle="offcanvas" data-bs-target="#offcanvas" role="button">
-                <i class="bi bi-list fs-3" data-bs-toggle="offcanvas" data-bs-target="#offcanvas"></i>
+            <button class="btn" action="#settings" role="button">
+                <i class="bi bi-gear fs-3"></i>
             </button>
             <div class="container px-5 my-5 text-center">
-                <div class="row mt-5">
+                <div class="row mt-3">
                     <div class="text-center">
-                        <div class=" mt-5 text-center">
-                            <div>
+                        <div class=" mt-3 text-center">
+                            <div class="col-md-12">
+                                <h1>Severity Rating</h1>
+                                <h1 id="severity">100</h1>
+                            </div>
+                            <div class="mt-3">
                                 <h1>Weather Information</h1>
                             </div>
                             <div class="weather-info mt-4">
@@ -84,11 +53,6 @@
                                     <p id="cloudCoverage"></p>
                                 </div>
                                 <div class="me-3 ms-3">
-                                    <i class="bi bi-moon fs-1"></i>
-                                    <br>
-                                    <p id="moonCycle"></p>
-                                </div>
-                                <div class="me-3 ms-3">
                                     <i class="bi bi-sun fs-1"></i>
                                     <br>
                                     <p id="UV"></p>
@@ -105,15 +69,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-12 mt-5">
-                            <h1>Severity Rating</h1>
-                            <h2>100%</h2>
-                            <div>
-                                <div class="outerbar">
-                                    <div class="innerbar severity" id="severity"><i class="bi bi-circle-fill"></i></div>
-                                </div>
-                            </div>
-                        </div>
+                        
                         <div class="col-md-12 mt-5">
                             <h1>Details</h1>
                             <p>add deets here</p>
@@ -131,26 +87,38 @@
             <script>
                 // Sample weather data
                 const weatherData = {
-                    temperature: 225,
-                    humidity: 260,
-                    cloudCoverage: 220,
-                    moonCycle: 250,
-                    UV: 225,
-                    windSpeed: 100,
-                    rain: 350,
-                    severity: 100
-
+                    temperature: {{val1}} ,
+                    humidity: {{val2}} ,
+                    cloudCoverage: {{val3}} ,
+                    UV: {{val4}} ,
+                    windSpeed: {{val5}} ,
+                    rain: {{val6}} ,
+                    severity: 25
                 };
+                function getcolor() {
+                    if (weatherData.severity <= 25) {
+                        return "rgba(0, 200, 80, 0.7)";
+                    } 
+                    else if (weatherData.severity <= 50) {
+                        return "rgba(255,191,0, 0.7)";
+                    }
+                    else if (weatherData.severity <= 75) {
+                        return "rgba(255, 100, 1, 0.7)";
+                    }
+                    else {
+                        return "rgba(237, 41, 56, 0.7)";
+                    }
+                }
         
                 // Display weather data
                 document.getElementById('temperature').innerText = `${weatherData.temperature}°C`;
                 document.getElementById('humidity').innerText = `${weatherData.humidity}%`;
                 document.getElementById('cloudCoverage').innerText = `${weatherData.cloudCoverage}%`;
-                document.getElementById('moonCycle').innerText = `${weatherData.moonCycle}%`;
                 document.getElementById('UV').innerText = `${weatherData.UV}`;
                 document.getElementById('windSpeed').innerText = `${weatherData.windSpeed}km`;
                 document.getElementById('rain').innerText = `${weatherData.rain}mm`;
-                document.getElementById('severity').style = `width:${weatherData.severity}%;`;
+                document.getElementById('severity').innerText = `${weatherData.severity}`;
+                document.getElementById('body').style = `background-color: ${getcolor()};`;
             </script>
         </div>
         <script>
