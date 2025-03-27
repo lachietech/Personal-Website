@@ -4,7 +4,7 @@ import pandas as pd
 from statistics import mode
 import requests
 import mysql.connector as mysql
-from flask_bcrypt import Bcrypt 
+import bcrypt
 from dotenv import load_dotenv
 import os
 from ..databases import db as dbconn
@@ -18,32 +18,38 @@ else:
         print("Dotenv not found")
 
 app = Flask(__name__)
-bcrypt = Bcrypt(app)
 app.secret_key = os.getenv('SECRET_KEY')
 db = dbconn.db
 cursor = db.cursor()
 
-def register(username, password, email, first_name, last_name, location):
+def register(username, password, email, first_name, last_name, locationl, locations, locationc):
     salt = bcrypt.gensalt()
     hashed_password = bcrypt.hashpw(password.encode('utf-8'), salt) 
     cursor.execute("""SELECT * FROM MeanderSuite.users WHERE username = %s""", (username,))
-    if len(cursor.fetchall()) > 1:
-        return
+    if len(cursor.fetchall()) > 0:
+        return redirect(url_for('register'))
     else:
-        cursor.execute("""INSERT INTO MeanderSuite.users (username, password, email, firstname, lastname, location) VALUES (%s, %s, %s, %s, %s, %s)""", (username, hashed_password, email, first_name, last_name, location))
+        cursor.execute("""INSERT INTO MeanderSuite.users (username, password, email, firstname, lastname, locationl, locations, locationc) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)""", (username, hashed_password, email, first_name, last_name, locationl, locations, locationc))
         db.commit()
+        return login(username, password)
 
 def login(username, password):
-    sql = "SELECT * FROM MeanderSuite.users WHERE username = %s"
-    cursor.execute(sql, username)
-    myresult = cursor.fetchall()
+    cursor.execute("SELECT * FROM MeanderSuite.users WHERE username = %s", (username,))
+    user = cursor.fetchone()
     db.commit()
-
-    if bcrypt.check_password_hash(str(myresult[0][2]), str(password)):
-        if myresult[0][1] == True:
+    if user:
+        if bcrypt.checkpw(password.encode('utf-8'), user[2].encode('utf-8')):
             session['logged_in'] = True
-            session['username'] = username
+            session['username'] = user[1]
+            session['first_name'] = user[4]
+            session['last_name'] = user[5]
+            session['locationl'] = user[6]
+            session['locations'] = user[7]
+            session['locationc'] = user[8]
+
             return redirect(url_for('suite'))
+        else:
+            # If incorrect stay on the password page
+            return redirect(url_for('login'))
     else:
-        # If incorrect stay on the password page
-        return render_template("mainfiles/login.html")
+        return redirect(url_for('login'))

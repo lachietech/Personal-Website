@@ -16,6 +16,7 @@ from time import strftime, time
 from backend.main import login as logni
 from backend.databases import db as mdb
 from backend.meandersuiteprerelease import login as logms
+from backend.meandersuiteprerelease import msw
 
 # Finding The .env Variables File
 if load_dotenv("/Users/lniel/OneDrive/BUSINESS/Coding/personal website/.env"):
@@ -80,9 +81,11 @@ def register():
         email = str(request.form.get("email"))
         first_name = str(request.form.get("first_name"))
         last_name = str(request.form.get("last_name"))
-        location = str(request.form.get("location"))
+        locationl = str(request.form.get("location-l"))
+        locations = str(request.form.get("location-s"))
+        locationc = str(request.form.get("location-c"))
 
-        return logms.register(username, password, email, first_name, last_name, location)
+        return logms.register(username, password, email, first_name, last_name, locationl, locations, locationc)
     if request.method == "GET":
         return render_template("meandersuiteprerelease/mainfiles/register.html")
     
@@ -103,9 +106,10 @@ def login():
 @app.route('/meandersuite/suite')
 def suite():
     if request.method == "GET":
-        return render_template("meandersuiteprerelease/suitefiles/index.html") # , val1=msw.TrafficLights()[0], val2=msw.TrafficLights()[1], val3=msw.TrafficLights()[2], val4=msw.TrafficLights()[3], val5=msw.TrafficLights()[4]
-    else:
-        return redirect(url_for('login'))
+        if session["logged_in"]:
+            msw.run()
+            return render_template("meandersuiteprerelease/suitefiles/index.html") # , val1=msw.TrafficLights()[0], val2=msw.TrafficLights()[1], val3=msw.TrafficLights()[2], val4=msw.TrafficLights()[3], val5=msw.TrafficLights()[4]
+            
         
 ###################################################################################################################################################################################################
 # RUN LINE ########################################################################################################################################################################################

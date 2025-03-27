@@ -20,6 +20,13 @@ app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY')
 db = dbconn.db
 cursor = db.cursor()
+api_key = os.getenv('API_KEY')
+
+def run():
+    query = str(session["locationl"] + " " + session["locations"] + " " + session["locationc"])
+    call = f'https://api.weatherapi.com/v1/forecast.json?key={api_key}&q={query}&days=1&aqi=no&alerts=yes'
+    data = requests.get(call).json()
+    print(data)
 
 def TrafficLights():
     rank = 0
