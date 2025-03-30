@@ -18,11 +18,13 @@ else:
 
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY')
-db = mysql.connect(host = os.getenv('HOST'), port = os.getenv('PORT'), user = "dbmasteruser", password = os.getenv('PASSWORD'))
-cursor = db.cursor()
+
 api_key = os.getenv('API_KEY')
 
 def dbcheck():
+    db = mysql.connect(host = os.getenv('HOST'), port = os.getenv('PORT'), user = "dbmasteruser", password = os.getenv('PASSWORD'))
+    cursor = db.cursor()
+
     locl = session["locationl"]
     locs = session["locations"]
     locc = session["locationc"]
@@ -36,10 +38,15 @@ def dbcheck():
         last_updated = result[0]  # this is a datetime obj
         if (datetime.now() - last_updated).total_seconds() < 3600:
             db.commit()
+            db.close()
             return 1  # fresh
         else:
+            db.commit()
+            db.close()
             return 2  # stale
     else:
+        db.commit()
+        db.close()
         return 2  # no record
 
 def run():
@@ -56,6 +63,9 @@ def run():
     
 
 def getnewdata():
+    db = mysql.connect(host = os.getenv('HOST'), port = os.getenv('PORT'), user = "dbmasteruser", password = os.getenv('PASSWORD'))
+    cursor = db.cursor()
+
     query = str(session["locationl"] + " " + session["locations"] + " " + session["locationc"])
     call = f'https://api.weatherapi.com/v1/forecast.json?key={api_key}&q={query}&days=1&aqi=no&alerts=yes'
     json_data = requests.get(call).json()
@@ -102,11 +112,12 @@ def getnewdata():
     # Update last_updated on locations table
     cursor.execute("""UPDATE MeanderSuite.locations SET last_updated = %s WHERE id = %s""", (now, location_id))
     db.commit()
+    db.close()
 
 def severity():
+    db = mysql.connect(host = os.getenv('HOST'), port = os.getenv('PORT'), user = "dbmasteruser", password = os.getenv('PASSWORD'))
+    cursor = db.cursor(dictionary=True)
     def get_weather_data(locationl, locations, locationc):
-        cursor = db.cursor(dictionary=True)
-
         cursor.execute("""SELECT id FROM MeanderSuite.locations WHERE locationl = %s AND locations = %s AND locationc = %s""", (locationl, locations, locationc))
         location = cursor.fetchone()
         location_id = location['id']
@@ -187,4 +198,5 @@ def severity():
     display_weather = [temp,humidity,cloud,uv,wind,precip]
 
     db.commit()
+    db.close()
     return display_weather

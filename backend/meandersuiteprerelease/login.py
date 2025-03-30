@@ -19,10 +19,12 @@ else:
 
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY')
-db = mysql.connect(host = os.getenv('HOST'), port = os.getenv('PORT'), user = "dbmasteruser", password = os.getenv('PASSWORD'))
-cursor = db.cursor()
+
 
 def register(username, password, email, first_name, last_name, locationl, locations, locationc):
+    db = mysql.connect(host = os.getenv('HOST'), port = os.getenv('PORT'), user = "dbmasteruser", password = os.getenv('PASSWORD'))
+    cursor = db.cursor()
+
     salt = bcrypt.gensalt()
     hashed_password = bcrypt.hashpw(password.encode('utf-8'), salt) 
     cursor.execute("""SELECT * FROM MeanderSuite.users WHERE username = %s""", (username,))
@@ -31,9 +33,13 @@ def register(username, password, email, first_name, last_name, locationl, locati
     else:
         cursor.execute("""INSERT INTO MeanderSuite.users (username, password, email, firstname, lastname, locationl, locations, locationc) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)""", (username, hashed_password, email, first_name, last_name, locationl, locations, locationc))
         db.commit()
+        db.close()
         return login(username, password)
 
 def login(username, password):
+    db = mysql.connect(host = os.getenv('HOST'), port = os.getenv('PORT'), user = "dbmasteruser", password = os.getenv('PASSWORD'))
+    cursor = db.cursor()
+
     cursor.execute("SELECT * FROM MeanderSuite.users WHERE username = %s", (username,))
     user = cursor.fetchone()
     user2 = cursor.fetchall()
@@ -48,10 +54,16 @@ def login(username, password):
             session['locationl'] = user[6]
             session['locations'] = user[7]
             session['locationc'] = user[8]
+            db.commit()
+            db.close()
             return redirect(url_for('suite'))
         
         else:
+            db.commit()
+            db.close()
             # If incorrect stay on the password page
             return redirect(url_for('login'))
     else:
+        db.commit()
+        db.close()
         return redirect(url_for('login'))
