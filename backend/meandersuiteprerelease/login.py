@@ -39,11 +39,9 @@ def register(username, password, email, first_name, last_name, locationl, locati
 def login(username, password):
     db = mysql.connect(host = os.getenv('HOST'), port = os.getenv('PORT'), user = "dbmasteruser", password = os.getenv('PASSWORD'))
     cursor = db.cursor()
-
+    
     cursor.execute("SELECT * FROM MeanderSuite.users WHERE username = %s", (username,))
     user = cursor.fetchone()
-    user2 = cursor.fetchall()
-    print("User2:", user2)
     db.commit()
     if user:
         if bcrypt.checkpw(password.encode('utf-8'), user[2].encode('utf-8')):
