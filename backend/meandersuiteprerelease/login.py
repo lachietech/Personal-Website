@@ -7,7 +7,7 @@ import mysql.connector as mysql
 import bcrypt
 from dotenv import load_dotenv
 import os
-from ..databases import db as dbconn
+
 
 if load_dotenv("/Users/lniel/OneDrive/BUSINESS/Coding/personal website/.env"):
     pass
@@ -19,7 +19,7 @@ else:
 
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY')
-db = dbconn.db
+db = mysql.connect(host = os.getenv('HOST'), port = os.getenv('PORT'), user = "dbmasteruser", password = os.getenv('PASSWORD'))
 cursor = db.cursor()
 
 def register(username, password, email, first_name, last_name, locationl, locations, locationc):
@@ -36,6 +36,8 @@ def register(username, password, email, first_name, last_name, locationl, locati
 def login(username, password):
     cursor.execute("SELECT * FROM MeanderSuite.users WHERE username = %s", (username,))
     user = cursor.fetchone()
+    user2 = cursor.fetchall()
+    print("User2:", user2)
     db.commit()
     if user:
         if bcrypt.checkpw(password.encode('utf-8'), user[2].encode('utf-8')):
@@ -46,8 +48,8 @@ def login(username, password):
             session['locationl'] = user[6]
             session['locations'] = user[7]
             session['locationc'] = user[8]
-
             return redirect(url_for('suite'))
+        
         else:
             # If incorrect stay on the password page
             return redirect(url_for('login'))

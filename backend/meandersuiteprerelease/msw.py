@@ -6,7 +6,6 @@ import requests
 import mysql.connector as mysql 
 from dotenv import load_dotenv
 import os
-from ..databases import db as dbconn
 from datetime import datetime
 
 if load_dotenv("/Users/lniel/OneDrive/BUSINESS/Coding/personal website/.env"):
@@ -19,19 +18,24 @@ else:
 
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY')
-db = dbconn.db
+db = mysql.connect(host = os.getenv('HOST'), port = os.getenv('PORT'), user = "dbmasteruser", password = os.getenv('PASSWORD'))
 cursor = db.cursor()
 api_key = os.getenv('API_KEY')
 
 def dbcheck():
+    locl = session["locationl"]
+    locs = session["locations"]
+    locc = session["locationc"]
+    print("Session Location:", locl, locs, locc)
     # check db to see if the location is already in the database.
-    cursor.execute("""SELECT last_updated FROM MeanderSuite.locations WHERE locationl = %s AND locations = %s AND locationc = %s""", (session["locationl"], session["locations"], session["locationc"]))
+    cursor.execute("""SELECT last_updated FROM MeanderSuite.locations WHERE locationl = %s AND locations = %s AND locationc = %s""", (locl, locs, locc, ))
     result = cursor.fetchone()
     print("DB Check result:", result)
 
     if result:
         last_updated = result[0]  # this is a datetime obj
         if (datetime.now() - last_updated).total_seconds() < 3600:
+            db.commit()
             return 1  # fresh
         else:
             return 2  # stale
@@ -39,12 +43,13 @@ def dbcheck():
         return 2  # no record
 
 def run():
+    dbcheckr = dbcheck()
     # Get the weather data from the database if the locations are available and valid.
-    if dbcheck() == 1:
+    if dbcheckr == 1:
         # run the severity AI which will return the values in a form that can be placed on the website. potentially json.
         return severity()
     # If the location data is outdated or nonexistent then get new data from api and replace it in the database.
-    if dbcheck() == 2:
+    if dbcheckr == 2:
         getnewdata()
         # run the severity AI which will return the values in a form that can be placed on the website. potentially json.
         return severity()
@@ -135,6 +140,51 @@ def severity():
     cloud = weather_data['current']['cloud']
     wind = weather_data['current']['wind_kph']
 
+    rank = 0
+
+    #rank tempurature 
+    if temp >= 16 and temp <= 35:
+        rank += 1
+    if temp >= 36 and temp <= 44:
+        rank += 2
+    if temp >= 6 and temp <= 15:
+        rank += 2
+    if temp >= 45:
+        rank += 3
+    if temp <= 5:
+        rank += 3
+    #rank humidity
+    if humidity >= 20 and humidity <= 80:
+        rank += 1
+    if humidity >= 6 and humidity <= 19:
+        rank += 2
+    if humidity >= 81 and humidity <= 94:
+        rank += 2
+    if humidity >= 0 and humidity <= 5:
+        rank += 3
+    if humidity >= 95 and humidity <= 100:
+        rank += 3
+    #rank cloud percentage
+    found = False
+    for i in range(10):
+        if found == False:
+            for x in range(10):
+                if found == False:
+                    num = int(i * 10) + x
+                    if cloud == num:
+                        found = True
+                if rank == 10 and cloud == 100:
+                    found = True
+            rank += 1
+    #rank wind speed
+
+    # send out data based on rankings
+    #rank >= 20: #rank BLACK
+    # rank >= 15 and rank <= 19: #rank RED
+    # rank >= 10 and rank <= 14: #rank YELLOW
+    # rank >= 4 and rank <= 9: #rank GREEN
+
     display_weather = [temp,humidity,cloud,uv,wind,precip]
 
+    db.commit()
     return display_weather

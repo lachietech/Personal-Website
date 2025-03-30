@@ -2,19 +2,17 @@
 # MAIN SETUP AND DEFINITION OF MAIN VARIABLES #####################################################################################################################################################
 ###################################################################################################################################################################################################
 
-# All Flask Imports
+# Flask Imports
 from flask import Flask, redirect, render_template, request, session, url_for, jsonify
 from flask_bcrypt import Bcrypt
 
-# All General Imports
+# General Imports
 import os, pandas as pd, requests, mysql.connector as mysql
 from dotenv import load_dotenv
 from statistics import mode
 from time import strftime, time
 
-# All Backend Code Imports
-from backend.main import login as logni
-from backend.databases import db as mdb
+# MS Backend Code Imports
 from backend.meandersuiteprerelease import login as logms
 from backend.meandersuiteprerelease import msw
 
@@ -33,7 +31,7 @@ bcrypt = Bcrypt(app)
 app.secret_key = os.getenv('SECRET_KEY')
 
 # Preparing Database Connection
-db = mdb.db
+db = mysql.connect(host = os.getenv('HOST'), port = os.getenv('PORT'), user = "dbmasteruser", password = os.getenv('PASSWORD'))
 cursor = db.cursor()
 
 ###################################################################################################################################################################################################
