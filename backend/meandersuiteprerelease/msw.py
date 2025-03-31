@@ -1,6 +1,7 @@
 from flask import Flask, redirect, render_template, request, session, url_for
 from time import strftime, time
 import pandas as pd
+import numpy as np
 from statistics import mode
 import requests
 import mysql.connector as mysql 
@@ -150,52 +151,113 @@ def severity():
     uv = weather_data['current']['uv']
     cloud = weather_data['current']['cloud']
     wind = weather_data['current']['wind_kph']
+    gust = weather_data['current']['gust_kph']
+    feelslike = weather_data['current']['feelslike_c']
+    vis = weather_data['current']['vis_km']
+    pressure = weather_data['current']['pressure_mb']
+    
+    if precip > 0: 
+        is_raining = 1
+    else: 
+        is_raining = 0
 
-    rank = 0
 
-    #rank tempurature 
-    if temp >= 16 and temp <= 35:
-        rank += 1
-    if temp >= 36 and temp <= 44:
-        rank += 2
-    if temp >= 6 and temp <= 15:
-        rank += 2
-    if temp >= 45:
-        rank += 3
-    if temp <= 5:
-        rank += 3
-    #rank humidity
-    if humidity >= 20 and humidity <= 80:
-        rank += 1
-    if humidity >= 6 and humidity <= 19:
-        rank += 2
-    if humidity >= 81 and humidity <= 94:
-        rank += 2
-    if humidity >= 0 and humidity <= 5:
-        rank += 3
-    if humidity >= 95 and humidity <= 100:
-        rank += 3
-    #rank cloud percentage
-    found = False
-    for i in range(10):
-        if found == False:
-            for x in range(10):
-                if found == False:
-                    num = int(i * 10) + x
-                    if cloud == num:
-                        found = True
-                if rank == 10 and cloud == 100:
-                    found = True
-            rank += 1
-    #rank wind speed
+    # CWIS MAX MODEL - Child Weather Impact Scorer (Pro Version)
+    baseline = 1.5
+    age_group = 'general'
+    sensory_sensitive = False
+    toubled = False
 
-    # send out data based on rankings
-    #rank >= 20: #rank BLACK
-    # rank >= 15 and rank <= 19: #rank RED
-    # rank >= 10 and rank <= 14: #rank YELLOW
-    # rank >= 4 and rank <= 9: #rank GREEN
+    # Adjustable weights (tuned for general population)
+    alpha_temp = 0.5
+    alpha_feelslike = 0.5
+    alpha_humidity = 0.3
+    alpha_wind = 0.2
+    alpha_gust = 0.15
+    alpha_precip = 0.4
+    alpha_cloud = 0.3
+    alpha_uv = 0.5
+    alpha_vis = 0.3
+    alpha_pressure = 0.2
+    alpha_rain = 0.8
 
-    display_weather = [temp,humidity,cloud,uv,wind,precip]
+    # locational norms
+    tnorm = 24
+    pnorm = 1015
+
+    # Sensory adjustments
+    if sensory_sensitive:
+        alpha_wind *= 1.5
+        alpha_gust *= 1.5
+        alpha_precip *= 1.5
+        alpha_cloud *= 1.3
+
+    # Age adjustments
+    if age_group == 'toddler':
+        alpha_temp *= 1.2
+        alpha_feelslike *= 1.2
+    elif age_group == 'teen':
+        alpha_uv *= 0.8
+        alpha_cloud *= 0.8
+
+    #troubled adjustments
+    if toubled:
+        error = 0.3
+    else:
+        error = 0.0
+
+    
+    # Normalize factors
+    temp_stress = abs(temp - tnorm) / 10
+    feelslike_stress = abs(feelslike - tnorm) / 10
+    humidity_ratio = humidity / 100
+    wind_norm = wind / 10
+    gust_norm = gust / 10
+    precip_norm = min(precip / 10, 1)
+    cloud_ratio = cloud / 100
+    uv_stress = max(0, (5 - uv) / 5)
+    vis_stress = max(0, (10 - vis) / 10)
+    pressure_stress = abs(pnorm - pressure) / 50
+
+    # CWIS calculation
+    cwis = (baseline +
+            alpha_temp * temp_stress +
+            alpha_feelslike * feelslike_stress +
+            alpha_humidity * humidity_ratio +
+            alpha_wind * wind_norm +
+            alpha_gust * gust_norm +
+            alpha_precip * precip_norm +
+            alpha_cloud * cloud_ratio +
+            alpha_uv * uv_stress +
+            alpha_vis * vis_stress +
+            alpha_pressure * pressure_stress +
+            alpha_rain * is_raining +
+            error)
+    
+    if cwis < -1.5:
+        severityrating = "Strongly Positive"
+        msg = "Conditions are highly favorable. Expect elevated energy, smooth social interaction, and balanced mood even among sensitive or younger kids."
+    elif -1.5 <= cwis < -0.5:
+        severityrating = "Moderate Positive"
+        msg = "Conditions are supportive. Kids are likely to be calm, engaged, and generally pleasant with minor fluctuations."
+    elif -0.5 <= cwis < 0.5:
+        severityrating = "Neutral"
+        msg = "Weather is unlikely to strongly influence children's psychological states today. Mood will be dominated by internal or social factors."
+    elif 0.5 <= cwis < 2.0:
+        severityrating = "Mild Negative"
+        msg = "Minor behavioral disturbances such as irritability, lower attention, or moodiness might be seen, particularly if the group is sensitive or tired."
+    elif 2.0 <= cwis < 4.0:
+        severityrating = "Moderate Negative"
+        msg = "Noticeable mood and behavioral disturbances likely, such as increased restlessness, frustration, or lethargy. Teachers and caregivers may need to apply extra structure or patience."
+    else:
+        severityrating = "Strong Negative"
+        msg = "High risk of significant disruptions. Outbursts, emotional volatility, sensory overload, or extreme fatigue may occur. Prepare calming strategies and structured activities."
+
+
+    print(f"CWIS Score: {cwis}")
+    print(f"Interpretation: {msg}")
+
+    display_weather = [temp,humidity,cloud,uv,wind,precip,cwis,msg,severityrating]
 
     db.commit()
     db.close()
