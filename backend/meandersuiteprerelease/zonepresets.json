@@ -1,0 +1,242 @@
+{
+    "Af": {
+        "comfort_temp": 26,
+        "humidity_optimal": 80,
+        "max_uv_tolerated": 10,
+        "wind_tolerance": 20,
+        "gust_tolerance": 30,
+        "pressure_norm": 1010
+    },
+    "Am": {
+        "comfort_temp": 26,
+        "humidity_optimal": 78,
+        "max_uv_tolerated": 10,
+        "wind_tolerance": 22,
+        "gust_tolerance": 32,
+        "pressure_norm": 1011
+    },
+    "Aw": {
+        "comfort_temp": 28,
+        "humidity_optimal": 70,
+        "max_uv_tolerated": 11,
+        "wind_tolerance": 25,
+        "gust_tolerance": 35,
+        "pressure_norm": 1010
+    },
+    "BWh": {
+        "comfort_temp": 30,
+        "humidity_optimal": 30,
+        "max_uv_tolerated": 12,
+        "wind_tolerance": 30,
+        "gust_tolerance": 40,
+        "pressure_norm": 1012
+    },
+    "BWk": {
+        "comfort_temp": 26,
+        "humidity_optimal": 35,
+        "max_uv_tolerated": 10,
+        "wind_tolerance": 28,
+        "gust_tolerance": 38,
+        "pressure_norm": 1013
+    },
+    "BSh": {
+        "comfort_temp": 29,
+        "humidity_optimal": 40,
+        "max_uv_tolerated": 11,
+        "wind_tolerance": 27,
+        "gust_tolerance": 37,
+        "pressure_norm": 1012
+    },
+    "BSk": {
+        "comfort_temp": 24,
+        "humidity_optimal": 45,
+        "max_uv_tolerated": 9,
+        "wind_tolerance": 25,
+        "gust_tolerance": 35,
+        "pressure_norm": 1013
+    },
+    "Csa": {
+        "comfort_temp": 26,
+        "humidity_optimal": 55,
+        "max_uv_tolerated": 10,
+        "wind_tolerance": 20,
+        "gust_tolerance": 30,
+        "pressure_norm": 1014
+    },
+    "Csb": {
+        "comfort_temp": 24,
+        "humidity_optimal": 60,
+        "max_uv_tolerated": 9,
+        "wind_tolerance": 18,
+        "gust_tolerance": 28,
+        "pressure_norm": 1014
+    },
+    "Csc": {
+        "comfort_temp": 22,
+        "humidity_optimal": 65,
+        "max_uv_tolerated": 8,
+        "wind_tolerance": 16,
+        "gust_tolerance": 26,
+        "pressure_norm": 1015
+    },
+    "Cwa": {
+        "comfort_temp": 27,
+        "humidity_optimal": 70,
+        "max_uv_tolerated": 10,
+        "wind_tolerance": 22,
+        "gust_tolerance": 32,
+        "pressure_norm": 1012
+    },
+    "Cwb": {
+        "comfort_temp": 24,
+        "humidity_optimal": 75,
+        "max_uv_tolerated": 9,
+        "wind_tolerance": 20,
+        "gust_tolerance": 30,
+        "pressure_norm": 1013
+    },
+    "Cwc": {
+        "comfort_temp": 22,
+        "humidity_optimal": 78,
+        "max_uv_tolerated": 8,
+        "wind_tolerance": 18,
+        "gust_tolerance": 28,
+        "pressure_norm": 1014
+    },
+    "Cfa": {
+        "comfort_temp": 26,
+        "humidity_optimal": 70,
+        "max_uv_tolerated": 10,
+        "wind_tolerance": 21,
+        "gust_tolerance": 31,
+        "pressure_norm": 1013
+    },
+    "Cfb": {
+        "comfort_temp": 23,
+        "humidity_optimal": 75,
+        "max_uv_tolerated": 9,
+        "wind_tolerance": 19,
+        "gust_tolerance": 29,
+        "pressure_norm": 1014
+    },
+    "Cfc": {
+        "comfort_temp": 21,
+        "humidity_optimal": 78,
+        "max_uv_tolerated": 8,
+        "wind_tolerance": 17,
+        "gust_tolerance": 27,
+        "pressure_norm": 1015
+    },
+    "Dsa": {
+        "comfort_temp": 22,
+        "humidity_optimal": 60,
+        "max_uv_tolerated": 9,
+        "wind_tolerance": 20,
+        "gust_tolerance": 30,
+        "pressure_norm": 1013
+    },
+    "Dsb": {
+        "comfort_temp": 20,
+        "humidity_optimal": 65,
+        "max_uv_tolerated": 8,
+        "wind_tolerance": 18,
+        "gust_tolerance": 28,
+        "pressure_norm": 1014
+    },
+    "Dsc": {
+        "comfort_temp": 18,
+        "humidity_optimal": 70,
+        "max_uv_tolerated": 7,
+        "wind_tolerance": 16,
+        "gust_tolerance": 26,
+        "pressure_norm": 1015
+    },
+    "Dsd": {
+        "comfort_temp": 16,
+        "humidity_optimal": 75,
+        "max_uv_tolerated": 6,
+        "wind_tolerance": 14,
+        "gust_tolerance": 24,
+        "pressure_norm": 1015
+    },
+    "Dwa": {
+        "comfort_temp": 21,
+        "humidity_optimal": 65,
+        "max_uv_tolerated": 9,
+        "wind_tolerance": 20,
+        "gust_tolerance": 30,
+        "pressure_norm": 1013
+    },
+    "Dwb": {
+        "comfort_temp": 19,
+        "humidity_optimal": 70,
+        "max_uv_tolerated": 8,
+        "wind_tolerance": 18,
+        "gust_tolerance": 28,
+        "pressure_norm": 1014
+    },
+    "Dwc": {
+        "comfort_temp": 17,
+        "humidity_optimal": 75,
+        "max_uv_tolerated": 7,
+        "wind_tolerance": 16,
+        "gust_tolerance": 26,
+        "pressure_norm": 1015
+    },
+    "Dwd": {
+        "comfort_temp": 15,
+        "humidity_optimal": 78,
+        "max_uv_tolerated": 6,
+        "wind_tolerance": 14,
+        "gust_tolerance": 24,
+        "pressure_norm": 1015
+    },
+    "Dfa": {
+        "comfort_temp": 24,
+        "humidity_optimal": 65,
+        "max_uv_tolerated": 10,
+        "wind_tolerance": 21,
+        "gust_tolerance": 31,
+        "pressure_norm": 1013
+    },
+    "Dfb": {
+        "comfort_temp": 22,
+        "humidity_optimal": 70,
+        "max_uv_tolerated": 9,
+        "wind_tolerance": 19,
+        "gust_tolerance": 29,
+        "pressure_norm": 1014
+    },
+    "Dfc": {
+        "comfort_temp": 20,
+        "humidity_optimal": 75,
+        "max_uv_tolerated": 8,
+        "wind_tolerance": 17,
+        "gust_tolerance": 27,
+        "pressure_norm": 1015
+    },
+    "Dfd": {
+        "comfort_temp": 18,
+        "humidity_optimal": 78,
+        "max_uv_tolerated": 7,
+        "wind_tolerance": 15,
+        "gust_tolerance": 25,
+        "pressure_norm": 1015
+    },
+    "ET": {
+        "comfort_temp": 10,
+        "humidity_optimal": 70,
+        "max_uv_tolerated": 7,
+        "wind_tolerance": 15,
+        "gust_tolerance": 25,
+        "pressure_norm": 1016
+    },
+    "EF": {
+        "comfort_temp": -5,
+        "humidity_optimal": 65,
+        "max_uv_tolerated": 6,
+        "wind_tolerance": 10,
+        "gust_tolerance": 20,
+        "pressure_norm": 1017
+    }
+}

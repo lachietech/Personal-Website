@@ -106,7 +106,7 @@ def suite():
     if request.method == "GET":
         if session["logged_in"]:
             result = msw.run()
-            return render_template("meandersuiteprerelease/suitefiles/index.html", val1 = result[0], val2 = result[1], val3 = result[2], val4 = result[3], val5 = result[4], val6 = result[5], val7 = result[6], val8 = result[7], val9 = result[8])
+            return render_template("meandersuiteprerelease/suitefiles/index.html", val1 = result[0], val2 = result[1], val3 = result[2], val4 = result[3], val5 = result[4], val6 = result[5], val7 = result[6], val8 = result[7], val9 = result[8], val10 = result[9], val11 = result[10])
         else:
             return redirect(url_for("login"))
             
