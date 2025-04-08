@@ -5,17 +5,11 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>Meander Suite</title>
         <link rel="icon" href="{{ url_for('static', filename='meandersuiteprerelease/mainfiles/sitelogo.png')}}">
-
-        <!-- Bootstrap -->
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
-        <!-- Font Awesome -->
         <script src="https://kit.fontawesome.com/85e648c8d7.js" crossorigin="anonymous"></script>
-        <!-- Bootstrap Icons -->
         <link href="{{url_for('static', filename='main/bootstrap-icons/bootstrap-icons.css')}}" rel="stylesheet">
-
         <style>
             body {
-                /* 🍭 Smooth Gradient Background */
                 background: linear-gradient(135deg, #b1b1b1, #8fb8ff);
                 background-attachment: fixed;
                 min-height: 100vh;
@@ -25,7 +19,6 @@
                 align-items: center;
                 justify-content: center;
             }
-
             .weather-info {
                 background: rgba(49, 47, 47, 0.39);
                 backdrop-filter: blur(15px);
@@ -40,33 +33,28 @@
                 gap: 2rem;
                 margin-bottom: 2rem;
                 transition: all 0.4s ease;
-                max-width: 1000px;   /* ⬅️ cap */
+                max-width: 1000px;
                 width: 100%;
                 margin-left: auto;
                 margin-right: auto;
             }
-
             .weather-info div {
                 flex: 0 0 auto;
                 text-align: center;
                 transition: transform 0.3s;
             }
-
             .weather-info div:hover {
                 transform: translateY(-5px) scale(1.05);
             }
-
             .weather-info i {
                 font-size: 2.5rem;
                 margin-bottom: 0.3rem;
                 display: inline-block;
                 transition: transform 0.3s;
             }
-
             .weather-info div:hover i {
                 animation: float 1s infinite alternate;
             }
-
             @keyframes float {
                 from {
                     transform: translateY(0px);
@@ -75,12 +63,10 @@
                     transform: translateY(-5px);
                 }
             }
-
             .weather-info p {
                 font-size: 1rem;
                 font-weight: 600;
             }
-
             .color {
                 background: rgba(255, 255, 255, 0.08);
                 backdrop-filter: blur(15px);
@@ -88,16 +74,14 @@
                 box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
                 padding: 1rem 2rem;
                 text-align: center;
-                max-width: 1000px;   /* ⬅️ cap */
+                max-width: 1000px;
                 width: 100%;
                 margin-left: auto;
                 margin-right: auto;
             }
-
             .color h1, .color h2, .color p {
                 margin: 0.5rem 0;
             }
-
             .btn {
                 position: absolute;
                 top: 20px;
@@ -106,11 +90,9 @@
                 z-index: 10;
                 transition: transform 0.3s;
             }
-
             .btn:hover i {
                 transform: rotate(30deg);
             }
-
             @media (max-width: 768px) {
                 .weather-info {
                     gap: 1rem;

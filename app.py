@@ -60,10 +60,6 @@ def meandersuite():
 # Setting up subpages for the main website
 # ------------------------------------------------------------
 
-@app.route('/meandersuite/msw')
-def mswdesc():
-    return render_template("meandersuiteprerelease/mainfiles/mswdesc.html")
-
 @app.route('/meandersuite/documentation')
 def documentation():
     return render_template("meandersuiteprerelease/mainfiles/documentation.html")
