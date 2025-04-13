@@ -56,14 +56,6 @@ def index():
 def meandersuite():
     return render_template("meandersuiteprerelease/mainfiles/index.html")
 
-# ------------------------------------------------------------
-# Setting up subpages for the main website
-# ------------------------------------------------------------
-
-@app.route('/meandersuite/documentation')
-def documentation():
-    return render_template("meandersuiteprerelease/mainfiles/documentation.html")
-
 # ______________________________________________________________________________________________________________________________________________________________
 # Authentication Pages
 # ______________________________________________________________________________________________________________________________________________________________

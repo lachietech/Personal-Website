@@ -10,7 +10,7 @@
         <link href="{{url_for('static', filename='main/bootstrap-icons/bootstrap-icons.css')}}" rel="stylesheet">
         <style>
             body {
-                background: linear-gradient(135deg, #b1b1b1, #8fb8ff);
+                background: rgb(240, 240, 240);
                 background-attachment: fixed;
                 min-height: 100vh;
                 color: white;
@@ -20,7 +20,7 @@
                 justify-content: center;
             }
             .weather-info {
-                background: rgba(49, 47, 47, 0.39);
+                background: rgba(39, 39, 39, 0.5);
                 backdrop-filter: blur(15px);
                 border-radius: 20px;
                 box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
@@ -86,12 +86,9 @@
                 position: absolute;
                 top: 20px;
                 right: 20px;
-                color: white;
+                color: rgb(110, 110, 110);
                 z-index: 10;
                 transition: transform 0.3s;
-            }
-            .btn:hover i {
-                transform: rotate(30deg);
             }
             @media (max-width: 768px) {
                 .weather-info {
