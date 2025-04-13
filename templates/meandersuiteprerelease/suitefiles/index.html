@@ -28,7 +28,6 @@
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
-                flex-wrap: nowrap;
                 overflow-x: auto;
                 gap: 2rem;
                 margin-bottom: 2rem;
@@ -68,10 +67,10 @@
                 font-weight: 600;
             }
             .color {
-                background: rgba(255, 255, 255, 0.08);
+                background: rgba(39, 39, 39, 0.5);
                 backdrop-filter: blur(15px);
                 border-radius: 20px;
-                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
                 padding: 1rem 2rem;
                 text-align: center;
                 max-width: 1000px;
@@ -110,9 +109,8 @@
             </div>
             <div class="color" id="color">
                 <h1 id="severity">CWIS Score: {{val7}}/100</h1>
-                <h2>Rating: {{val8}}</h2>
-                <h2>Mood: {{val9}}</h2>
-                <h2>Behavior: {{val10}}</h2>
+                <h2>Rating: {{val8}}    Mood: {{val9}}</h2>
+                <h3>Expected Behaviours: {{val10}}</h3>
                 <p>{{val11}}</p>
             </div>
         </div>
@@ -143,7 +141,7 @@
             document.getElementById('UV').innerText = `${weatherData.UV} UV`;
             document.getElementById('windSpeed').innerText = `${weatherData.windSpeed} KM/H`;
             document.getElementById('rain').innerText = `${weatherData.rain} MM`;
-            document.querySelector('.color').style.backgroundColor = getcolor();
+            document.querySelector('body').style.backgroundColor = getcolor();
         </script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
     </body>
