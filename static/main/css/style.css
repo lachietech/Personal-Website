@@ -29,7 +29,7 @@ p {
     padding: 30px 20px;
 }
 .section-title {
-    margin-bottom: 70px;
+    margin-bottom: 40px;
 }
 .section-title h2 {
     font-size: 25px;
@@ -43,14 +43,18 @@ p {
 .text-justified {
     text-align: justify;
 }
+.topimg {
+    width: 80%;
+    height: auto;
+}
 .shop{
-    height: 400px;
+    width: 80%;
 }
 .ms{
-    width: 100%;
-    margin-top: 30px;
-    margin-bottom: 30px;
+    width: 90%;
+    margin-bottom: 40px;
 }
+
 
 
 #header {
@@ -91,12 +95,10 @@ p {
     margin-bottom: 10px;
     font-weight: 500;
     font-size: 28px;
-    text-align: left;
 }
 
 #about .about-descr .separator {
     margin-bottom: 0;
-    text-align: justify;
 }
 
 
