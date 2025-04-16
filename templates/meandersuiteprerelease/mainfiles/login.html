@@ -1,35 +1,67 @@
-{% extends "meandersuiteprerelease/mainfiles/mainlayout.html" %}
-{% block style %}
-    <style>
-        html, body {
-            background-color: rgb(240, 240, 240);
-        }
-    </style>
-{% endblock style %}
-{% block content %}
-    <div class="container-fluid">
-        <div class="container align-items-center my-5">
-            <div class="align-items-center">
-                <div class="card-body align-items-center">
-                    <form id="loginForm" method="POST">
-                        <div class="mb-3 pb-1">
-                            <img src="{{url_for('static', filename='meandersuiteprerelease/mainfiles/logoblack.png')}}", style="width: 40%; margin-left: 30%; margin-right: 30%;">
-                        </div>
-                        <div class="form-outline my-3">
-                            <input type="text" name="username" id="username" class="form-control form-control-lg" placeholder="Username" required />
-                        </div>
-                        <div class="form-outline my-3">
-                            <input type="password" name="password" id="password" class="form-control form-control-lg" placeholder="Password" required />
-                        </div>
-                        <div class="pt-1 mb-1 text-center">
-                            <input class="btn btn-secondary btn-lg btn-block" type="submit" name="log" id="log" value="Login">
-                        </div>
-                        <div class="pt-1 mb-1 text-center">
-                            <a href="{{ url_for('register') }}" class="">Don't have an account? Register</a>
-                        </div>
-                    </form>
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" />
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+        <title>Meander Suite</title>
+        <link rel="icon" href="{{ url_for('static', filename='meandersuiteprerelease/mainfiles/sitelogo.png')}}">
+        <script src="https://kit.fontawesome.com/85e648c8d7.js" crossorigin="anonymous"></script>
+        <style>
+            body {
+                font-family: 'Inter', sans-serif;
+                background-color: #eef5ff;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+                margin: 0;
+            }
+            .form-container {
+                background: white;
+                padding: 3rem;
+                border-radius: 12px;
+                box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+                width: 80%;
+                max-width: 600px;
+            }
+            .logo-fixed {
+                position: fixed;
+                top: 1rem;
+                left: 1rem;
+                width: 150px;
+                height: auto;
+                z-index: 999;
+            }
+            .form-floating > label {
+                left: 1rem;
+            }
+        </style>
+    </head>
+    <body>
+        <a href="{{ url_for('meandersuite') }}"><img src="{{ url_for('static', filename='meandersuiteprerelease/mainfiles/logoblack.png') }}" alt="MeanderSuite Logo" class="logo-fixed"></a>
+
+        <div class="form-container">
+            <h2 class="mb-4 text-center">Login to Meander Suite</h2>
+            <form method="POST">
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="username" name="username" placeholder="username" required>
+                    <label for="email">Username</label>
                 </div>
-            </div>
+                <div class="form-floating mb-3">
+                    <input type="password" class="form-control" id="password" name="password" placeholder="Password" required>
+                    <label for="password">Password</label>
+                </div>
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary btn-lg">Login</button>
+                </div>
+                <p class="mt-3 text-center">Don't have an account? <a href="{{ url_for('register') }}">Register here</a></p>
+            </form>
         </div>
-    </div>
-{% endblock content %}
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
+    </body>
+</html>
