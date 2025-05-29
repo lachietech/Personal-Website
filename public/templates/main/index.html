@@ -7,18 +7,193 @@
         <meta content="Welcome to Nielsen Innovations The Personal Website of Lachlan Nielsen - A bowler and webdeveloper" name="description">
         <meta content="Lachlan Nielsen, Programmer, Web Developer, Bowling, Bowler, Lachlan, Nielsen, Nielsen Innovations" name="keywords">
         <link href="../../../static/main/img/favicon.png" rel="icon">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Italianno&display=swap" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css?family=Poppins:300,300i,400,400i,500,500i,600,600i,700,700i|Playfair+Display:400,400i,500,500i,600,600i,700,700i,900,900i" rel="stylesheet">
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
         <link href="../../../static/main/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-        <link href="../../../static/main/css/style.css" rel="stylesheet">
+        <style>
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(10px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .header-section {
+                background: linear-gradient(to bottom, #000000, #666666);
+                color: white;
+                text-align: center;
+                padding: 100px 20px;
+            }
+            .header-title {
+                font-weight: 800;
+                font-size: 4vw;
+                letter-spacing: 1.5px;
+                margin-bottom: 6vh;
+                opacity: 0;
+                animation: fadeIn 2s ease-in-out forwards;
+            }
+            .underline {
+                margin-left: auto;
+                margin-right: auto;
+                width: 30%;
+                height: 4px;
+                background-color: white;
+                opacity: 0;
+                animation: fadeIn 2s ease-in-out forwards;
+                animation-delay: 0.5s;
+            }
+
+
+
+            body {
+                background: rgb(247, 247, 247);
+                color: rgb(137, 137, 137);
+                font-family: "Poppins", helvetica;
+                font-size: 15px;
+                font-weight: 300;
+                line-height: 20px;
+                letter-spacing: 0.02em;
+                overflow-x: hidden;
+                margin: 0 auto;
+                padding: 0;
+                box-sizing: border-box;
+            }
+            h2 {
+                color: rgb(41, 41, 41);
+                font-weight: 600;
+            }
+            a {
+                color: rgb(41, 41, 41);
+                text-decoration: none !important;
+            }
+            p {
+                padding: 0;
+                font-size: 18px;
+                color: rgb(71, 71, 71);
+                line-height: 28px;
+            }
+            .padDiv {
+                padding: 30px 20px;
+            }
+            .section-title {
+                margin-bottom: 40px;
+            }
+            .section-title h2 {
+                font-size: 25px;
+                letter-spacing: 2px;
+                text-transform: uppercase;
+            }
+            .paddsection {
+                padding-top: 9vh;
+                padding-bottom: 5vh;
+            }
+            .text-justified {
+                text-align: justify;
+            }
+            .topimg {
+                width: 80%;
+                height: auto;
+            }
+            .shop{
+                width: 80%;
+            }
+            .ms{
+                width: 90%;
+                margin-bottom: 40px;
+            }
+
+            .fade-scroll {
+                opacity: 0;
+                transform: translateY(20px);
+                transition: opacity 2s ease-out, transform 2s ease-out;
+            }
+
+            .fade-scroll.visible {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+
+            #about {
+                width: 100%;
+                background: rgb(247, 247, 247);
+            }
+            .about-img{
+                width: 100%;
+                height: auto;
+                opacity: 0;
+                animation: fadeIn 2s ease-in-out forwards;
+            }
+            .about-descr {
+                margin-top: 28px;
+                margin-bottom: 10px;
+                font-size: 28px;
+                opacity: 0;
+                animation: fadeIn 2s ease-in-out forwards;
+                animation-delay: 0.5s;
+            }
+            .about-descr .p-signature {
+                font-family: "Italianno", cursive;
+                font-weight: 400;
+                font-style: normal;
+                font-size: 30px;
+            }
+
+
+
+            #footer {
+                background: rgb(247, 247, 247);
+                padding-top: 50px;
+                padding-bottom: 50px;
+            }
+            #footer .socials-media {
+                width: 100%;
+            }
+            #footer .socials-media ul {
+                display: inline-block;
+                float: none;
+                margin: 0 0 20px 0;
+            }
+            #footer .socials-media ul li {
+                float: left;
+                margin-left: 10px;
+                margin-right: 10px;
+            }
+            #footer .socials-media ul li a {
+                font-size: 24px;
+                color: rgb(153, 153, 153);
+                letter-spacing: 0.1em;
+                font-weight: 500;
+                background: transparent;
+                text-transform: uppercase;
+                transition: all 0.5s ease-in-out 0s;
+            }
+            #footer .socials-media ul li a:hover {
+                color: rgb(114, 158, 240);
+                transition: all 0.5s ease-in-out 0s;
+            }
+            #footer p {
+                font-size: 12px;
+                letter-spacing: 0.1em;
+                font-weight: 500;
+                margin-top: 0;
+                text-transform: uppercase;
+            }
+        </style>
     </head>
     <body>
-        <header id="header" class="fixed-top ">
-            <div class="text-center">
-                <h1 class="logo"><a href="/">NIELSEN INNOVATIONS</a></h1>
-            </div>
-        </header>
         <main id="main">
+            <div class="header-section">
+                <div class="header-title"><i>NIELSEN INNOVATIONS</i></div>
+                <div class="underline"></div>
+            </div>
             <div id="about" class="paddsection">
                 <div class="container text-center">
                     <div class="row justify-content-between">
@@ -28,41 +203,37 @@
                             </div>
                         </div>
                         <div class="col-lg-7">
-                            <div class="about-descr text-center">
-                                <p class="p-heading">Hi, I'm Lachlan Nielsen</p>
-                                <p class="separator">I am an 18 year old web developer and entreprenuer from Australia. I have been programming and developing since I was 12, and my dream is to start a company based upon good morals and innovative ideas. Welcome to the newest age of innovation here at Nielsen Innovations!</p>
-                                <p class="p-heading">Contact Me</p>
-                                <p class="separator">Email: nielseninnovation@outlook.com</p>
-                                <p class="separator">or</p>
+                            <div class="about-descr text-justified mx-4 ">
+                                <p class="p-signature">Welcome to the future,</p>
+                                <p class="separator">Nielsen Innovations is my dream. From concepts to products this is all my own effort, a self-made, self-taught empire of sorts. These Ideas and concepts are made with people in mind, each app serves a deeper purpose, and I take pride in seeing each app make changes in people's lives and change the future for communities bringing the immpossible just one step closer. Welcome to the newest age of innovation here at Nielsen Innovations!</p>
+                                <p class="p-signature">- Lachlan Nielsen</p>
                                 <center class="mt-2"><a href="https://www.facebook.com/profile.php?id=100033197287519"><i class="bi fs-3 bi-facebook mx-1"></i></a>        <a href="https://www.instagram.com/lachlan_nielsen_/"><i class="bi fs-3 bi-instagram mx-1"></i></a>        <a href="https://github.com/lachietech"><i class="bi fs-3 bi-github mx-1"></i></a> </center>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div id="meandersuite" class="paddsection">
+            <div id="meandersuite" class="paddsection fade-scroll">
                 <div class="container text-center">
                     <div class="section-title text-center">
                         <h2>Introducing the Newest project: Meander Suite!</h2>
                     </div>
                     <div class="row justify-content-between ">
+                        <div class="col-lg-7">
+                            <p class="separator text-justified mx-4">
+                                Meander Suite is a powerful research-driven platform designed to help schools better understand and manage student behavior in relation to environmental factors - Specifically the weather. Developed with researched care and innovation, it gives educators tools to predict, prepare, and prevent classroom challenges before they arise. This tool comes with an outstanding research paper that outlines the research and development of the application, and how it can be used.
+                            </p>                       
+                        </div>
                         <div class="col-lg-5 text-center">
                             <a href="/meandersuite">
-                                <img src="../../../static/main/img/portfolio/meandersuiteprerelease.png" class="ms rounded shadow my-5" alt="MeanderSuite Preview">
+                                <img src="../../../static/main/img/portfolio/meandersuite.png" class="ms rounded shadow" alt="MeanderSuite Preview">
                             </a>
-                        </div>
-                        <div class="col-lg-7">
-                            <p class="separator text-center">
-                                Meander Suite is a powerful research-driven platform designed to help schools better understand and manage student behavior in relation to environmental factors - Specifically the weather. Developed with researched care and innovation, it gives educators tools to predict, prepare, and prevent classroom challenges before they arise. This tool comes with an outstanding research paper that outlines the research and development of the application, and how it can be used.
-                            </p>
-                            <p class="separator text-center">
-                                Meander Suite is currently in active development. You can explore the pre-release and get a firsthand look at how it works by clicking the banner!
-                            </p>                            
                         </div>
                     </div>
                 </div>
             </div>
-            <div id="merch" class="paddsection bg-light text-center">
+            
+            <div id="merch" class="paddsection text-center fade-scroll">
                 <div class="container">
                     <div class="section-title">
                         <h2>Official Nielsen Innovations Merch</h2>
@@ -71,28 +242,35 @@
                         <div class="col-lg-5 ">
                             <img src="../../../static/main/img/shop.jpg" class="shop rounded shadow" alt="shop Preview">
                         </div>
-                        <div class="col-lg-5">
-                            <p class="separator text-center" style="margin-top: 60px;">Hoodies, Sweaters, T-Shirts and much more! Check out the brand new shop on Etsy! </p>
-                            <p class="separator text-center">If you're looking to support the mission of innovation and represent Nielsen Innovations, Head on over and check out our exclusive gear on live on Etsy!</p>
-                            <div>
-                                <a href="https://nielseninnovations.etsy.com" class="btn"> Browse the Store</a>
+                        <div class="col-lg-7">
+                            <div class="mx-4">
+                                <p class="separator text-center" style="margin-top: 60px;">Hoodies, Sweaters, T-Shirts and much more! Check out the brand new shop on Etsy! </p>
+                                <p class="separator text-center">If you're looking to support the mission of innovation and represent Nielsen Innovations, Head on over and check out our exclusive gear on live on Etsy!</p>
+                                <div>
+                                    <a href="https://nielseninnovations.etsy.com" class="btn"> Browse the Store</a>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div id="portfolio2" class="paddsection">
+            <div id="portfolio2" class="paddsection fade-scroll">
                 <div class="container">
                     <div class="section-title text-center">
                         <h2>All Applications</h2>
                     </div>
-                    <p class="separator text-center">Whether you are looking for some of my aplications, or you are looking to check out what is in the works. This is the place! Pre-Releases are links that demonstrate the functionality of websites before they are released. These websites may be experimental and not all features may be working. Please be patient new features will arrive shortly.</p>
                 </div>
                 <div class="container">
                     <div class="row">
-                        <div class="col-lg-4 col-md-6 mt-2 mb-2">
-                            <a href="/meandersuite"><img src="../../../static/main/img/portfolio/meandersuiteprerelease.png" class="img-fluid" alt=""></a>
+                        <div class="col-lg-4 col-md-6 my-4">
+                            <a href="/meandersuite"><img src="../../../static/main/img/portfolio/meandersuite.png" class="img-fluid rounded shadow" alt=""></a>
+                        </div>
+                        <div class="col-lg-4 col-md-6 my-4">
+                            <a href="https://sandgateseniors.com"><img src="../../../static/main/img/portfolio/sandgateseniors.png" class="img-fluid rounded shadow" alt=""></a>
+                        </div>
+                        <div class="col-lg-4 col-md-6 my-4">
+                            <a href="/meandersuite"><img src="../../../static/main/img/portfolio/pinpoint.png" class="img-fluid rounded shadow" alt=""></a>
                         </div>
                     </div>
                 </div>
@@ -107,9 +285,32 @@
                         <li><a href="https://github.com/lachietech"><i class="bi bi-github"></i></a></li>
                     </ul>
                 </div>
-                <p>&copy; Copyright Lachlan Nielsen. All rights reserved.</p>
+                <p>&copy; Copyright Nielsen Innovations.</p>
             </div>
         </div>
+        <script>
+            const faders = document.querySelectorAll('.fade-scroll');
+
+            const appearOptions = {
+                threshold: 0.1, // Trigger when 10% is visible
+                rootMargin: '0px 0px -50px 0px' // Slightly earlier
+            };
+
+            const appearOnScroll = new IntersectionObserver(function(
+                entries,
+                observer
+            ) {
+                entries.forEach(entry => {
+                if (!entry.isIntersecting) return;
+                entry.target.classList.add('visible');
+                observer.unobserve(entry.target);
+                });
+            }, appearOptions);
+
+            faders.forEach(fader => {
+                appearOnScroll.observe(fader);
+            });
+        </script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
