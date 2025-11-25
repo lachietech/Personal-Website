@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SuperChatv1</title>
+  <style>
+    /* ===== Minimal, fixed split layout (no responsive stacking) ===== */
+    * { 
+        box-sizing: border-box; 
+    }
+    html, body { 
+        height: 100%; 
+    }
+    body { 
+        margin: 0; 
+        font-family: sans-serif; 
+        background: #0f1115; 
+        color: #e5e7eb; 
+    }
+    .app { 
+        display: flex; 
+        height: 100vh; 
+    }
+
+    /* Left: chat list (names only) */
+    .sidebar {
+        width: 320px; 
+        border-right: 1px solid #232838; 
+        background: #12151c; 
+        display: flex; 
+        flex-direction: column;
+    }
+    .sidebar header { 
+        padding: 12px; 
+        border-bottom: 1px solid #232838; 
+    }
+    .sidebar h1 { 
+        margin: 0 0 8px;
+        text-align: center; 
+        font-size: 20px; 
+        font-weight: 700; 
+    }
+
+    .search { 
+        display: flex; 
+        gap: 8px; 
+        align-items: center; 
+        background: #0b0e13; 
+        border: 1px solid #232838; 
+        border-radius: 8px; 
+        padding: 8px 10px; 
+    }
+    .search input { 
+        flex: 1; border: 0; 
+        outline: none; 
+        background: transparent; 
+        color: #e5e7eb; 
+        font-size: 14px; 
+    }
+
+    .chat-list { 
+        overflow: auto; 
+        padding: 8px; 
+    }
+    .chat-item {
+        padding: 10px 12px; 
+        border-radius: 8px; 
+        cursor: pointer; 
+        font-size: 14px; 
+        user-select: none;
+    }
+    .chat-item:hover { 
+        background: #171a22; 
+    }
+    .chat-item.active { 
+        background: #1b1f2a; 
+        border: 1px solid #232838; 
+    }
+
+    /* Right: active chat */
+    .chat { 
+        flex: 1; 
+        display: flex; 
+        flex-direction: column; 
+        min-width: 0; 
+    }
+    .chat header { 
+        padding: 12px 14px; 
+        border-bottom: 1px solid #232838; 
+        background: #12151c; 
+    }
+    .chat header .name { 
+        font-weight: 700; 
+        font-size: 20px;
+        text-align: center;
+    }
+
+    .messages { 
+        flex: 1; 
+        overflow: auto; 
+        padding: 16px; 
+        display: flex; 
+        flex-direction: column; 
+        gap: 10px; 
+    }
+    .message-received, .message-sent {
+        align-self: flex-start;
+        max-width: 70ch;
+        display: flex;
+        padding: 10px 12px;
+        border-radius: 12px;
+        font-size: 14px;
+        line-height: 1.35;
+        background: #6e90fd;
+        border-color: #30364a;
+        word-break: break-word;      /* Wrap long words */
+        white-space: pre-wrap;       /* Preserve line breaks and wrap */
+    }
+    .message-sent {
+        align-self: flex-end;
+    }
+
+    .composer {
+        border-top: 1px solid #232838;
+        padding: 14px 12px;
+        display: flex;
+        align-items: flex-end;
+        gap: 10px;
+        background: #181c27;
+    }
+
+    .composer textarea {
+        flex: 1;
+        border: 1px solid #232838;
+        background: #10131a;
+        color: #e5e7eb;
+        padding: 10px 12px;
+        border-radius: 10px;
+        outline: none;
+        resize: none;
+        font-size: 15px;
+        min-height: 32px;
+        max-height: 100px; /* About 4 lines */
+        line-height: 1.5;
+        overflow-y: auto;
+        box-sizing: border-box;
+        transition: border-color 0.2s;
+    }
+
+    .composer textarea:focus {
+        border-color: #4f46e5;
+        background: #161a23;
+    }
+
+    .composer button {
+        border: 0;
+        padding: 0 18px;
+        border-radius: 10px;
+        font-weight: 600;
+        background: #4f46e5;
+        color: white;
+        cursor: pointer;
+        font-size: 15px;
+        height: 40px;
+        transition: background 0.2s;
+    }
+
+    .composer button:hover {
+        background: linear-gradient(90deg, #6e90fd 60%, #4f46e5 100%);
+    }
+
+
+    /* Custom scrollbar for sidebar and messages */
+    .sidebar .chat-list,
+    .messages {
+        scrollbar-width: thin;
+        scrollbar-color: #4f46e5 #181c27;
+    }
+
+    /* For Webkit browsers */
+    .sidebar .chat-list::-webkit-scrollbar,
+    .messages::-webkit-scrollbar {
+        width: 8px;
+        background: #181c27;
+    }
+
+    .sidebar .chat-list::-webkit-scrollbar-thumb,
+    .messages::-webkit-scrollbar-thumb {
+        background: #4f46e5;
+        border-radius: 8px;
+    }
+
+    .sidebar .chat-list::-webkit-scrollbar-thumb:hover,
+    .messages::-webkit-scrollbar-thumb:hover {
+        background: #6e90fd;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar" aria-label="Chats list">
+      <header>
+        <h1>Let's Make Some Friends</h1>
+        <label class="search" aria-label="Search users">
+          <input type="text" placeholder="Search username…" name="userSearch" autocomplete="off" />
+        </label>
+      </header>
+      <div class="chat-list" role="list" id="chatList">
+      </div>
+    </aside>
+    <section class="chat" aria-label="Active chat">
+      <header>
+        <div class="name" id="activeName"></div>
+      </header>
+      <main class="messages" id="messages"></main>
+      <form class="composer" id="composer" onsubmit="return false;">
+        <textarea id="messageInput" placeholder="Write a message…" rows="1"></textarea>
+        <button id="sendBtn" type="submit">Send</button>
+      </form>
+    </section>
+  </div>
+  <script> 
+    // --------------------------- chat.js Functions -------------------------------
+    // -- This file contains the JavaScript logic for the chat application page.  --
+    // -- It handles fetching data from api's, loading and sending messages, and  --
+    // -- performing client-side encryption/decryption using the Web Crypto API.  --
+
+    // ----------------------------- initialisation --------------------------------
+    fetch('api/session-data')
+      .then(r => r.json())
+      .then(data => {
+        sessionStorage.setItem('username', data.username);
+        sessionStorage.setItem('privateKey', data.privateKey); // ⚠ sensitive
+        sessionStorage.setItem('publicKey', data.publicKey);
+      })
+      .catch(err => console.error('Error fetching session data:', err));
+
+    let user = sessionStorage.getItem('username') || 'user';
+    let currentConversation = null;
+    let lastMessageTimestamp = 0;
+    let conversation = [];
+
+    const chatList   = document.getElementById('chatList');
+    const search     = document.querySelector('input[name="userSearch"]');
+    const messagesEl = document.getElementById('messages');
+    const composer   = document.getElementById('composer');
+    const messageInp = document.getElementById('messageInput');
+    const activeName = document.getElementById('activeName');
+
+    // ------------------------------ UI/UX helpers --------------------------------
+
+    fetch('api/users')
+      .then(r => r.json())
+      .then(users => {
+        users.forEach(u => {
+          const div = document.createElement('div');
+          div.className = 'chat-item';
+          div.id = u;
+          div.textContent = u;
+          chatList.appendChild(div);
+        });
+      })
+      .catch(err => console.error('Error fetching users:', err));
+
+    search.addEventListener('input', function () {
+      const q = this.value.toLowerCase().trim();
+      Array.from(chatList.children).forEach(ci => {
+        const name = (ci.id || '').toLowerCase();
+        ci.style.display = name.includes(q) ? '' : 'none';
+      });
+    });
+
+    chatList.addEventListener('click', (e) => {
+      const row = e.target.closest('.chat-item');
+      if (!row) return;
+      setActive(row.id);
+    });
+
+    function setActive(name) {
+      currentConversation = name;
+      activeName.textContent = name;
+      Array.from(chatList.children).forEach(ci =>
+        ci.classList.toggle('active', ci.id === name)
+      );
+
+      loadMessages(name, true);
+    }
+
+    messageInp.addEventListener('input', function() {
+      this.style.height = 'auto';
+      this.style.height = Math.min(this.scrollHeight, 100) + 'px';
+    });
+
+    messageInp.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        composer.requestSubmit();
+      }
+    });
+
+
+
+    // ---------------------------- Helper functions -------------------------------
+    // --- These functions are for the frontend cryptography and are used in the ---
+    // -- chat application. They handle key import, caching, and Base64 encoding. --
+
+    // -------- Base64 <-> Uint8Array helpers (safe for large buffers) -------------
+    function base64ToUint8Array(b64) {
+      const bin = atob(b64);
+      const len = bin.length;
+      const out = new Uint8Array(len);
+      for (let i = 0; i < len; i++) out[i] = bin.charCodeAt(i);
+      return out;
+    }
+    function uint8ArrayToBase64(u8) {
+      // Chunked to avoid call stack issues with very large arrays
+      let s = '';
+      const CHUNK = 0x8000; // 32KB
+      for (let i = 0; i < u8.length; i += CHUNK) {
+        s += String.fromCharCode.apply(null, u8.subarray(i, i + CHUNK));
+      }
+      return btoa(s);
+    }
+
+    // ----------------------- CryptoKey import utilities --------------------------
+    async function importRsaPrivateKey(base64Pkcs8) {
+      const der = base64ToUint8Array(base64Pkcs8).buffer;
+      return await window.crypto.subtle.importKey(
+        'pkcs8',
+        der,
+        { name: 'RSA-OAEP', hash: 'SHA-256' },
+        false,
+        ['decrypt']
+      );
+    }
+    async function importRsaPublicKey(base64Spki) {
+      const clean = (base64Spki || '').replace(/[\r\n\s]/g, '');
+      if (!clean) throw new Error('Public key is empty!');
+      const der = base64ToUint8Array(clean).buffer;
+      return await window.crypto.subtle.importKey(
+        'spki',
+        der,
+        { name: 'RSA-OAEP', hash: 'SHA-256' },
+        false,
+        ['encrypt']
+      );
+    }
+
+    // ------------------------------ CryptoKey cache ------------------------------
+    let _cachedPrivateKey = null;
+    let _cachedPrivateKeyB64 = null;
+
+    let _cachedMyPublicKey = null;
+    let _cachedMyPublicKeyB64 = null;
+
+    // Cache of recipient username -> CryptoKey
+    const _recipientPubKeyCache = new Map();
+
+    async function getPrivateKeyCryptoKey() {
+      const b64 = sessionStorage.getItem('privateKey');
+      if (_cachedPrivateKey && _cachedPrivateKeyB64 === b64) return _cachedPrivateKey;
+      const key = await importRsaPrivateKey(b64);
+      _cachedPrivateKey = key;
+      _cachedPrivateKeyB64 = b64;
+      return key;
+    }
+
+    async function getMyPublicKeyCryptoKey() {
+      const b64 = sessionStorage.getItem('publicKey');
+      if (_cachedMyPublicKey && _cachedMyPublicKeyB64 === b64) return _cachedMyPublicKey;
+      const key = await importRsaPublicKey(b64);
+      _cachedMyPublicKey = key;
+      _cachedMyPublicKeyB64 = b64;
+      return key;
+    }
+
+    async function getRecipientPublicKeyCryptoKey(username) {
+      if (_recipientPubKeyCache.has(username)) return _recipientPubKeyCache.get(username);
+      const b64 = await fetch(`api/userkey?name=${encodeURIComponent(username)}`).then(r => r.text());
+      const key = await importRsaPublicKey(b64);
+      _recipientPubKeyCache.set(username, key);
+      return key;
+    }
+
+
+
+
+
+    // ------------------------------- Load messages -------------------------------
+    // --- This is the function that decrypts and displays messages from the db. ---
+
+    async function loadMessages(name, forceScroll = false) {
+      try {
+        const messages = await fetch('api/messages?chat=' + encodeURIComponent(name)).then(r => r.json());
+
+        // Import RSA private key once per load (then reused for every message).
+        const myPrivateKey = await getPrivateKeyCryptoKey();
+
+        const decryptedMessages = [];
+        for (const msg of messages) {
+          const { user, recipient, message, timestamp, iv, key1, key2 } = msg;
+
+          const me = sessionStorage.getItem('username');
+          const fromMe = user === me;
+          const toMe   = recipient === me;
+
+          let aesKeyEncryptedB64;
+          if (fromMe) aesKeyEncryptedB64 = key1;
+          else if (toMe) aesKeyEncryptedB64 = key2;
+          else continue; // not part of our conversation (defensive)
+
+          // Decode wire fields
+          const encAesKey = base64ToUint8Array(aesKeyEncryptedB64).buffer;
+          const ivBuf     = base64ToUint8Array(iv);                 // 12 bytes for GCM
+          const ctBuf     = base64ToUint8Array(message).buffer;
+
+          // Unwrap AES key with our RSA private key
+          const rawAesKey = await window.crypto.subtle.decrypt(
+            { name: 'RSA-OAEP' },
+            myPrivateKey,
+            encAesKey
+          );
+
+          // Import AES key and decrypt payload
+          const aesKey = await window.crypto.subtle.importKey('raw', rawAesKey, { name: 'AES-GCM' }, false, ['decrypt']);
+          const decryptedBuf = await window.crypto.subtle.decrypt({ name: 'AES-GCM', iv: ivBuf }, aesKey, ctBuf);
+
+          const text = new TextDecoder().decode(decryptedBuf);
+          decryptedMessages.push({ from: user, text, timestamp });
+        }
+
+        // Normalize timestamp to number for comparison
+        const latestTimestamp = decryptedMessages.length
+          ? (typeof decryptedMessages[decryptedMessages.length - 1].timestamp === 'number'
+              ? decryptedMessages[decryptedMessages.length - 1].timestamp
+              : new Date(decryptedMessages[decryptedMessages.length - 1].timestamp).getTime())
+          : 0;
+
+        const hasNew = latestTimestamp > lastMessageTimestamp;
+        conversation = decryptedMessages;
+        lastMessageTimestamp = latestTimestamp;
+
+        // Render
+        messagesEl.innerHTML = '';
+        const me = sessionStorage.getItem('username');
+        for (const msg of decryptedMessages) {
+          const div = document.createElement('div');
+          div.className = msg.from === me ? 'message-sent' : 'message-received';
+          div.textContent = msg.text;
+          messagesEl.appendChild(div);
+        }
+
+        if (forceScroll || hasNew) messagesEl.scrollTop = messagesEl.scrollHeight;
+      } catch (err) {
+        console.error('Error fetching/decrypting messages:', err);
+        messagesEl.innerHTML = 'Failed to load messages.';
+      }
+    }
+
+
+
+
+
+    // ------------------------------- send messages -------------------------------
+    // ----- This is the function that encrypts and sends messages to the db.  -----
+
+    composer.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const text = messageInp.value.trim();
+      if (!text || !currentConversation) return;
+
+      // Generate per-message AES-GCM key
+      const aesKey = await window.crypto.subtle.generateKey(
+        { name: 'AES-GCM', length: 256 },
+        true,
+        ['encrypt', 'decrypt']
+      );
+
+      // Encrypt plaintext
+      const iv = window.crypto.getRandomValues(new Uint8Array(12));
+      const ciphertext = await window.crypto.subtle.encrypt(
+        { name: 'AES-GCM', iv },
+        aesKey,
+        new TextEncoder().encode(text)
+      );
+
+      // Import our public key and the recipient’s (from cache/remote)
+      const myPubKey        = await getMyPublicKeyCryptoKey();
+      const recipPubKey     = await getRecipientPublicKeyCryptoKey(currentConversation);
+
+      // Export raw AES key to wrap
+      const rawAesKey = await window.crypto.subtle.exportKey('raw', aesKey);
+
+      // Wrap AES key for both parties with RSA-OAEP
+      const aesKeyForMe        = await window.crypto.subtle.encrypt({ name: 'RSA-OAEP' }, myPubKey,    rawAesKey);
+      const aesKeyForRecipient = await window.crypto.subtle.encrypt({ name: 'RSA-OAEP' }, recipPubKey, rawAesKey);
+
+      // Build payload using safe Base64 helpers
+      const payload = {
+        user: sessionStorage.getItem('username'),
+        recipient: currentConversation,
+        message:  uint8ArrayToBase64(new Uint8Array(ciphertext)),
+        timestamp: Date.now(),
+        iv:       uint8ArrayToBase64(iv),
+        key1:     uint8ArrayToBase64(new Uint8Array(aesKeyForMe)),
+        key2:     uint8ArrayToBase64(new Uint8Array(aesKeyForRecipient))
+      };
+
+      // Send to server
+      await fetch('api/send-message', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      // UI tidy + refresh
+      messageInp.value = '';
+      messageInp.style.height = 'auto';
+      loadMessages(currentConversation, true);
+    });
+
+
+
+
+    // ------------------------------ Poll for updates -----------------------------
+    setInterval(() => {
+      if (currentConversation) loadMessages(currentConversation);
+    }, 500);
+
+
+
+  </script>
+</body>
+</html>
