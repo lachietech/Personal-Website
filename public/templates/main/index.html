@@ -2,318 +2,433 @@
 <html lang="en">
     <head>
         <meta charset="utf-8">
-        <meta content="width=device-width, initial-scale=1.0" name="viewport">
-        <title>Nielsen Innovations</title>
-        <meta content="Welcome to Nielsen Innovations The Personal Website of Lachlan Nielsen - A bowler and webdeveloper" name="description">
-        <meta content="Lachlan Nielsen, Programmer, Web Developer, Bowling, Bowler, Lachlan, Nielsen, Nielsen Innovations" name="keywords">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <!-- Primary Meta Tags -->
+        <title>Nielsen Innovations - Full Stack Web Development & Digital Solutions | Lachlan Nielsen</title>
+        <meta name="title" content="Nielsen Innovations - Full Stack Web Development & Digital Solutions">
+        <meta name="description" content="Nielsen Innovations offers professional web development, UI/UX design, and innovation consulting services. Led by Lachlan Nielsen, a self-taught full-stack developer creating cutting-edge digital solutions in Brisbane, Australia.">
+        <meta name="keywords" content="Lachlan Nielsen, Nielsen Innovations, Full Stack Developer, Web Development Brisbane, UI/UX Design, React Developer, Node.js Developer, Custom Web Applications, Innovation Consulting, Meander Suite, SuperChat">
+        <meta name="author" content="Lachlan Nielsen">
+        <meta name="robots" content="index, follow">
+        <link rel="canonical" href="https://nielseninnovations.com/">
+        
+        <!-- Open Graph / Facebook -->
+        <meta property="og:type" content="website">
+        <meta property="og:url" content="https://nielseninnovations.com/">
+        <meta property="og:title" content="Nielsen Innovations - Building Tomorrow's Solutions Today">
+        <meta property="og:description" content="Professional web development, UI/UX design, and innovation consulting. Creating powerful digital experiences with modern technology.">
+        <meta property="og:image" content="https://nielseninnovations.com/static/main/img/og-image.jpg">
+        <meta property="og:locale" content="en_AU">
+        <meta property="og:site_name" content="Nielsen Innovations">
+        
+        <!-- Twitter -->
+        <meta property="twitter:card" content="summary_large_image">
+        <meta property="twitter:url" content="https://nielseninnovations.com/">
+        <meta property="twitter:title" content="Nielsen Innovations - Building Tomorrow's Solutions Today">
+        <meta property="twitter:description" content="Professional web development, UI/UX design, and innovation consulting by Lachlan Nielsen.">
+        <meta property="twitter:image" content="https://nielseninnovations.com/static/main/img/og-image.jpg">
+        
+        <!-- Favicon -->
         <link href="../../../static/main/img/favicon.png" rel="icon">
+        <link href="../../../static/main/img/favicon.png" rel="apple-touch-icon">
+        
+        <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Italianno&display=swap" rel="stylesheet">
-        <link href="https://fonts.googleapis.com/css?family=Poppins:300,300i,400,400i,500,500i,600,600i,700,700i|Playfair+Display:400,400i,500,500i,600,600i,700,700i,900,900i" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+        
+        <!-- Stylesheets -->
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
         <link href="../../../static/main/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-        <style>
-            @keyframes fadeIn {
-                from {
-                    opacity: 0;
-                    transform: translateY(10px);
-                }
-                to {
-                    opacity: 1;
-                    transform: translateY(0);
-                }
+        
+        <!-- Structured Data -->
+        <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "ProfessionalService",
+            "name": "Nielsen Innovations",
+            "description": "Full-stack web development, UI/UX design, and innovation consulting services",
+            "url": "https://nielseninnovations.com",
+            "logo": "https://nielseninnovations.com/static/main/img/favicon.png",
+            "image": "https://nielseninnovations.com/static/main/img/og-image.jpg",
+            "founder": {
+                "@type": "Person",
+                "name": "Lachlan Nielsen",
+                "jobTitle": "Full Stack Developer",
+                "url": "https://nielseninnovations.com",
+                "sameAs": [
+                    "https://github.com/lachietech",
+                    "https://www.instagram.com/lachlan_nielsen_/",
+                    "https://www.facebook.com/profile.php?id=100033197287519"
+                ]
+            },
+            "address": {
+                "@type": "PostalAddress",
+                "addressLocality": "Brisbane",
+                "addressRegion": "Queensland",
+                "addressCountry": "AU"
+            },
+            "contactPoint": {
+                "@type": "ContactPoint",
+                "contactType": "Customer Service",
+                "availableLanguage": "English"
+            },
+            "sameAs": [
+                "https://github.com/lachietech",
+                "https://www.instagram.com/lachlan_nielsen_/",
+                "https://www.facebook.com/profile.php?id=100033197287519"
+            ],
+            "offers": {
+                "@type": "AggregateOffer",
+                "priceCurrency": "AUD",
+                "offerCount": "3",
+                "offers": [
+                    {
+                        "@type": "Offer",
+                        "itemOffered": {
+                            "@type": "Service",
+                            "name": "Web Development",
+                            "description": "Full-stack web applications built with modern technologies"
+                        }
+                    },
+                    {
+                        "@type": "Offer",
+                        "itemOffered": {
+                            "@type": "Service",
+                            "name": "UI/UX Design",
+                            "description": "Beautiful, intuitive interfaces that users love"
+                        }
+                    },
+                    {
+                        "@type": "Offer",
+                        "itemOffered": {
+                            "@type": "Service",
+                            "name": "Innovation Consulting",
+                            "description": "Strategic planning and technical guidance for your next big project"
+                        }
+                    }
+                ]
             }
-
-            .header-section {
-                background: linear-gradient(to bottom, #000000, #666666);
-                color: white;
-                text-align: center;
-                padding: 100px 20px;
-            }
-            .header-title {
-                font-weight: 800;
-                font-size: 4vw;
-                letter-spacing: 1.5px;
-                margin-bottom: 6vh;
-                opacity: 0;
-                animation: fadeIn 2s ease-in-out forwards;
-            }
-            .underline {
-                margin-left: auto;
-                margin-right: auto;
-                width: 30%;
-                height: 4px;
-                background-color: white;
-                opacity: 0;
-                animation: fadeIn 2s ease-in-out forwards;
-                animation-delay: 0.5s;
-            }
-
-
-
-            body {
-                background: rgb(247, 247, 247);
-                color: rgb(137, 137, 137);
-                font-family: "Poppins", helvetica;
-                font-size: 15px;
-                font-weight: 300;
-                line-height: 20px;
-                letter-spacing: 0.02em;
-                overflow-x: hidden;
-                margin: 0 auto;
-                padding: 0;
-                box-sizing: border-box;
-            }
-            h2 {
-                color: rgb(41, 41, 41);
-                font-weight: 600;
-            }
-            a {
-                color: rgb(41, 41, 41);
-                text-decoration: none !important;
-            }
-            p {
-                padding: 0;
-                font-size: 18px;
-                color: rgb(71, 71, 71);
-                line-height: 28px;
-            }
-            .padDiv {
-                padding: 30px 20px;
-            }
-            .section-title {
-                margin-bottom: 40px;
-            }
-            .section-title h2 {
-                font-size: 25px;
-                letter-spacing: 2px;
-                text-transform: uppercase;
-            }
-            .paddsection {
-                padding-top: 9vh;
-                padding-bottom: 5vh;
-            }
-            .text-justified {
-                text-align: justify;
-            }
-            .topimg {
-                width: 80%;
-                height: auto;
-            }
-            .shop{
-                width: 80%;
-            }
-            .ms{
-                width: 90%;
-                margin-bottom: 40px;
-            }
-
-            .fade-scroll {
-                opacity: 0;
-                transform: translateY(20px);
-                transition: opacity 2s ease-out, transform 2s ease-out;
-            }
-
-            .fade-scroll.visible {
-                opacity: 1;
-                transform: translateY(0);
-            }
-
-
-            #about {
-                width: 100%;
-                background: rgb(247, 247, 247);
-            }
-            .about-img{
-                width: 100%;
-                height: auto;
-                opacity: 0;
-                animation: fadeIn 2s ease-in-out forwards;
-            }
-            .about-descr {
-                margin-top: 28px;
-                margin-bottom: 10px;
-                font-size: 28px;
-                opacity: 0;
-                animation: fadeIn 2s ease-in-out forwards;
-                animation-delay: 0.5s;
-            }
-            .about-descr .p-signature {
-                font-family: "Italianno", cursive;
-                font-weight: 400;
-                font-style: normal;
-                font-size: 30px;
-            }
-
-
-
-            #footer {
-                background: rgb(247, 247, 247);
-                padding-top: 50px;
-                padding-bottom: 50px;
-            }
-            #footer .socials-media {
-                width: 100%;
-            }
-            #footer .socials-media ul {
-                display: inline-block;
-                float: none;
-                margin: 0 0 20px 0;
-            }
-            #footer .socials-media ul li {
-                float: left;
-                margin-left: 10px;
-                margin-right: 10px;
-            }
-            #footer .socials-media ul li a {
-                font-size: 24px;
-                color: rgb(153, 153, 153);
-                letter-spacing: 0.1em;
-                font-weight: 500;
-                background: transparent;
-                text-transform: uppercase;
-                transition: all 0.5s ease-in-out 0s;
-            }
-            #footer .socials-media ul li a:hover {
-                color: rgb(114, 158, 240);
-                transition: all 0.5s ease-in-out 0s;
-            }
-            #footer p {
-                font-size: 12px;
-                letter-spacing: 0.1em;
-                font-weight: 500;
-                margin-top: 0;
-                text-transform: uppercase;
-            }
-        </style>
+        }
+        </script>
+        <link href="../../../static/main/css/index.css" rel="stylesheet">
     </head>
     <body>
-        <main id="main">
-            <div class="header-section">
-                <div class="header-title"><i>NIELSEN INNOVATIONS</i></div>
-                <div class="underline"></div>
-            </div>
-            <div id="about" class="paddsection">
-                <div class="container text-center">
-                    <div class="row justify-content-between">
-                        <div class="col-lg-5 ">
-                            <div class="about-img">
-                                <img src="../../../static/main/img/me2.jpg" class="topimg rounded shadow " alt="me">
-                            </div>
-                        </div>
-                        <div class="col-lg-7">
-                            <div class="about-descr text-justified mx-4 ">
-                                <p class="p-signature">Welcome to the future,</p>
-                                <p class="separator">Nielsen Innovations is my dream. From concepts to products this is all my own effort, a self-made, self-taught empire of sorts. These Ideas and concepts are made with people in mind, each app serves a deeper purpose, and I take pride in seeing each app make changes in people's lives and change the future for communities bringing the impossible just one step closer. Welcome to the newest age of innovation here at Nielsen Innovations!</p>
-                                <p class="p-signature">- Lachlan Nielsen</p>
-                                <center class="mt-2"><a href="https://www.facebook.com/profile.php?id=100033197287519"><i class="bi fs-3 bi-facebook mx-1"></i></a>        <a href="https://www.instagram.com/lachlan_nielsen_/"><i class="bi fs-3 bi-instagram mx-1"></i></a>        <a href="https://github.com/lachietech"><i class="bi fs-3 bi-github mx-1"></i></a> </center>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div id="portfolio2" class="paddsection fade-scroll">
-                <div class="container">
-                    <div class="section-title text-center">
-                        <h2>Client Websites</h2>
-                    </div>
-                    <p class="separator text-center mx-4">
-                        Nielsen Innovations also offers web development services for clients. Here are some of the websites I have developed for clients:
-                    </p> 
-                </div>
-                <div class="container">
-                    <div class="row">
-                        <div class="col-lg-4 col-md-6 my-4">
-                            <a href="https://sandgateseniors.com"><img src="../../../static/main/img/portfolio/sandgateseniors.png" class="img-fluid rounded shadow" alt=""></a>
-                        </div>
-                        <div class="col-lg-4 col-md-6 my-4">
-                            <a href=""><img src="../../../static/main/img/portfolio/clientcomingsoon.png" class="img-fluid rounded shadow" alt=""></a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div id="meandersuite" class="paddsection fade-scroll">
-                <div class="container text-center">
-                    <div class="section-title text-center">
-                        <h2>Introducing My Research Project: Meander Suite!</h2>
-                    </div>
-                    <div class="row justify-content-between ">
-                        <div class="col-lg-7">
-                            <p class="separator text-justified mx-4">
-                                Meander Suite is a powerful research-driven platform designed to help schools better understand and manage student behavior in relation to environmental factors - Specifically the weather. Developed with researched care and innovation, it gives educators tools to predict, prepare, and prevent classroom challenges before they arise. This tool comes with an outstanding research paper that outlines the research and development of the application, and how it can be used.
-                            </p>                       
-                        </div>
-                        <div class="col-lg-5 text-center">
-                            <a href="/meandersuite">
-                                <img src="../../../static/main/img/portfolio/meandersuite.png" class="ms rounded shadow" alt="MeanderSuite Preview">
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="portfolio2" class="paddsection fade-scroll">
-                <div class="container">
-                    <div class="section-title text-center">
-                        <h2>All Projects</h2>
-                    </div>
-                    <p class="separator text-center mx-4">
-                        Here are some of the projects I have developed for university, clients, and personal use:
-                    </p> 
-                </div>
-                <div class="container">
-                    <div class="row">
-                        <div class="col-lg-4 col-md-6 my-4">
-                            <a href="/meandersuite"><img src="../../../static/main/img/portfolio/meandersuite.png" class="img-fluid rounded shadow" alt=""></a>
-                        </div>
-                        <div class="col-lg-4 col-md-6 my-4">
-                            <a href="/superchat"><img src="../../../static/main/img/portfolio/superchat.png" class="img-fluid rounded shadow" alt=""></a>
-                        </div>
-                        <div class="col-lg-4 col-md-6 my-4">
-                            <a href="/"><img src="../../../static/main/img/portfolio/projectcomingsoon.png" class="img-fluid rounded shadow" alt=""></a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </main>
-        <div id="footer" class="text-center">
+        <!-- Navigation -->
+        <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
             <div class="container">
-                <div class="socials-media text-center">
-                    <ul class="list-unstyled">
-                        <li><a href="https://www.facebook.com/profile.php?id=100033197287519"><i class="bi bi-facebook"></i></a></li>
-                        <li><a href="https://www.instagram.com/lachlan_nielsen_/"><i class="bi bi-instagram"></i></a></li>
-                        <li><a href="https://github.com/lachietech"><i class="bi bi-github"></i></a></li>
+                <a class="navbar-brand" href="#">NIELSEN INNOVATIONS</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item"><a class="nav-link" href="#home">Home</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#about">About</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#services">Services</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#portfolio">Portfolio</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
                     </ul>
                 </div>
-                <p>&copy; Copyright Nielsen Innovations.</p>
             </div>
-        </div>
-        <script>
-            const faders = document.querySelectorAll('.fade-scroll');
+        </nav>
 
-            const appearOptions = {
-                threshold: 0.1, // Trigger when 10% is visible
-                rootMargin: '0px 0px -50px 0px' // Slightly earlier
+        <!-- Hero Section -->
+        <section id="home" class="hero">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-lg-8 mx-auto hero-content text-center">
+                        <h1>Building Tomorrow's Solutions Today</h1>
+                        <div class="d-flex gap-3 flex-wrap justify-content-center mt-4">
+                            <a href="#portfolio" class="btn btn-primary-custom">View My Work</a>
+                            <a href="#contact" class="btn btn-outline-custom">Get In Touch</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section id="about" class="section">
+            <div class="container">
+                <div class="row align-items-center g-4">
+                    <div class="col-lg-4 fade-up">
+                        <div class="about-img">
+                            <img src="../../../static/main/img/me2.jpg" alt="Lachlan Nielsen" class="img-fluid">
+                        </div>
+                    </div>
+                    <div class="col-lg-8 fade-up">
+                        <div class="about-card">
+                            <h3 class="mb-4">Hi, I'm Lachlan Nielsen</h3>
+                            <p>Nielsen Innovations is my dream brought to life. As a self-taught, self-made developer, I've built an empire of innovation from the ground up. Every application I create serves a deeper purpose – designed with people in mind, making meaningful changes in communities and bringing the impossible one step closer to reality.</p>
+                            <p>From concepts to fully-realized products, this is all my own effort. I take pride in seeing each app transform lives and shape the future of communities around the world.</p>
+                            <p class="mt-4"><strong>Welcome to the newest age of innovation.</strong></p>
+                            <div class="social-links">
+                                <a href="https://www.facebook.com/profile.php?id=100033197287519" class="social-link"><i class="bi bi-facebook"></i></a>
+                                <a href="https://www.instagram.com/lachlan_nielsen_/" class="social-link"><i class="bi bi-instagram"></i></a>
+                                <a href="https://github.com/lachietech" class="social-link"><i class="bi bi-github"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Services Section -->
+        <section id="services" class="section" style="background: #f8fafc;">
+            <div class="container">
+                <div class="section-title fade-up">
+                    <h2>What I Offer</h2>
+                    <p>Comprehensive digital solutions tailored to your needs</p>
+                </div>
+                <div class="row g-4">
+                    <div class="col-lg-3 col-md-6 fade-up">
+                        <div class="service-card">
+                            <div class="service-icon">
+                                <i class="bi bi-code-slash"></i>
+                            </div>
+                            <h3>Web Development</h3>
+                            <p>Full-stack web applications built with modern technologies. From responsive designs to complex backend systems.</p>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6 fade-up">
+                        <div class="service-card">
+                            <div class="service-icon">
+                                <i class="bi bi-palette"></i>
+                            </div>
+                            <h3>UI/UX Design</h3>
+                            <p>Beautiful, intuitive interfaces that users love. Creating seamless experiences that drive engagement.</p>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6 fade-up">
+                        <div class="service-card">
+                            <div class="service-icon">
+                                <i class="bi bi-lightbulb"></i>
+                            </div>
+                            <h3>Innovation Consulting</h3>
+                            <p>Transform your ideas into reality. Strategic planning and technical guidance for your next big project.</p>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6 fade-up">
+                        <div class="service-card" style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); border: 2px dashed var(--primary); cursor: default;">
+                            <div class="service-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); width: 100px; height: 100px; margin: 0 auto 1.5rem; font-size: 3rem;">
+                                <i class="bi bi-mortarboard"></i>
+                            </div>
+                            <h3>Online Courses</h3>
+                            <p>Master modern web development with comprehensive courses. Learn from real-world projects and expert guidance.</p>
+                            <span class="badge bg-primary mt-2" style="font-size: 1rem;">Coming Soon</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Portfolio Section -->
+        <section id="portfolio" class="section">
+            <div class="container">
+                <div class="section-title fade-up">
+                    <h2>Featured Projects</h2>
+                    <p>Showcasing innovation and technical excellence</p>
+                </div>
+                
+                <!-- Meander Suite Highlight -->
+                <div class="row mb-5 fade-up">
+                    <div class="col-12">
+                        <div class="about-card">
+                            <div class="row align-items-center g-4">
+                                <div class="col-lg-7">
+                                    <h3 class="mb-3">Meander Suite - Research Project</h3>
+                                    <p>A powerful research-driven platform designed to help schools better understand and manage student behavior in relation to environmental factors - specifically the weather. Developed with research-based care and innovation, it gives educators tools to predict, prepare, and prevent classroom challenges before they arise.</p>
+                                    <p class="mb-4">This tool comes with an outstanding research paper that outlines the research and development of the application, and how it can be used.</p>
+                                    <a href="/meandersuite" class="btn btn-primary-custom">Explore Meander Suite</a>
+                                </div>
+                                <div class="col-lg-5">
+                                    <a href="/meandersuite" class="portfolio-item">
+                                        <img src="../../../static/main/img/portfolio/meandersuite.png" alt="MeanderSuite" class="img-fluid">
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 class="text-center mb-4 fade-up">All Projects</h3>
+                <div class="row g-4">
+                    <div class="col-lg-4 col-md-6 fade-up">
+                        <a href="/meandersuite" class="portfolio-item" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; min-height: 300px; border-radius: 20px;">
+                            <div style="text-align: center; padding: 0.75rem; background: rgba(255,255,255,0.95); border-radius: 15px; margin: 1rem; max-width: 85%;">
+                                <img src="../../../static/main/img/portfolio/meandersuite.png" alt="Meander Suite" style="max-width: 100%; height: auto; border-radius: 10px;">
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-lg-4 col-md-6 fade-up">
+                        <a href="/superchat" class="portfolio-item" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; min-height: 300px; border-radius: 20px;">
+                            <div style="text-align: center; padding: 0.75rem; background: rgba(255,255,255,0.95); border-radius: 15px; margin: 1rem; max-width: 85%;">
+                                <img src="../../../static/main/img/portfolio/superchat.png" alt="SuperChat" style="max-width: 100%; height: auto; border-radius: 10px;">
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-lg-4 col-md-6 fade-up">
+                        <a href="https://sandgateseniors.com" class="portfolio-item" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; min-height: 300px; border-radius: 20px;">
+                            <div style="text-align: center; padding: 0.75rem; background: rgba(255,255,255,0.95); border-radius: 15px; margin: 1rem; max-width: 85%;">
+                                <img src="../../../static/main/img/portfolio/sandgateseniors.png" alt="Sandgate Seniors" style="max-width: 100%; height: auto; border-radius: 10px;">
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-lg-4 col-md-6 fade-up">
+                        <div class="portfolio-item" style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); display: flex; align-items: center; justify-content: center; min-height: 300px; border: 2px dashed var(--primary); cursor: default;">
+                            <div style="text-align: center; padding: 2rem;">
+                                <i class="bi bi-hourglass-split" style="font-size: 4rem; color: var(--primary); margin-bottom: 1rem;"></i>
+                                <h4 style="color: var(--dark); margin-bottom: 0.5rem;">New Project</h4>
+                                <span class="badge bg-primary" style="font-size: 1rem;">Coming Soon</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="section contact-section">
+            <div class="container">
+                <div class="section-title fade-up">
+                    <h2 style="color: white;">Get In Touch</h2>
+                    <p style="color: rgba(255,255,255,0.7);">Have a project in mind? Let's make it happen together.</p>
+                </div>
+                <div class="row justify-content-center">
+                    <div class="col-lg-8 fade-up">
+                        <div class="contact-form">
+                            <div id="formMessage"></div>
+                            <form id="contactForm">
+                                <div class="mb-3">
+                                    <input type="text" class="form-control" id="name" name="name" placeholder="Your Name" required>
+                                </div>
+                                <div class="mb-3">
+                                    <input type="email" class="form-control" id="email" name="email" placeholder="Your Email" required>
+                                </div>
+                                <div class="mb-3">
+                                    <input type="text" class="form-control" id="subject" name="subject" placeholder="Subject" required>
+                                </div>
+                                <div class="mb-3">
+                                    <textarea class="form-control" id="message" name="message" placeholder="Your Message" required></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-send text-white" id="submitBtn">
+                                    <span id="btnText">Send Message</span>
+                                    <span id="btnLoader" class="d-none">Sending...</span>
+                                </button>
+                            </form>
+                        </div>
+                        <div class="text-center mt-4">
+                            <p style="color: rgba(255,255,255,0.7); margin-bottom: 0.5rem;"><i class="bi bi-geo-alt me-2"></i>Brisbane, Australia</p>
+                            <p style="color: rgba(255,255,255,0.7); margin-bottom: 1.5rem;"><i class="bi bi-clock me-2"></i>Response within 24-48 hours</p>
+                            <div class="social-links justify-content-center">
+                                <a href="https://www.facebook.com/profile.php?id=100033197287519" class="social-link"><i class="bi bi-facebook"></i></a>
+                                <a href="https://www.instagram.com/lachlan_nielsen_/" class="social-link"><i class="bi bi-instagram"></i></a>
+                                <a href="https://github.com/lachietech" class="social-link"><i class="bi bi-github"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="container">
+                <p class="mb-0">&copy; 2026 Nielsen Innovations. All rights reserved. Built with passion and innovation.</p>
+            </div>
+        </footer>
+
+        <script>
+            // Smooth scrolling
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                });
+            });
+
+            // Scroll animations
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
             };
 
-            const appearOnScroll = new IntersectionObserver(function(
-                entries,
-                observer
-            ) {
+            const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
-                if (!entry.isIntersecting) return;
-                entry.target.classList.add('visible');
-                observer.unobserve(entry.target);
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        observer.unobserve(entry.target);
+                    }
                 });
-            }, appearOptions);
+            }, observerOptions);
 
-            faders.forEach(fader => {
-                appearOnScroll.observe(fader);
+            document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+            // Contact form handling
+            const contactForm = document.getElementById('contactForm');
+            const formMessage = document.getElementById('formMessage');
+            const submitBtn = document.getElementById('submitBtn');
+            const btnText = document.getElementById('btnText');
+            const btnLoader = document.getElementById('btnLoader');
+
+            contactForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                // Disable button and show loader
+                submitBtn.disabled = true;
+                btnText.classList.add('d-none');
+                btnLoader.classList.remove('d-none');
+                formMessage.innerHTML = '';
+
+                const formData = {
+                    name: document.getElementById('name').value,
+                    email: document.getElementById('email').value,
+                    subject: document.getElementById('subject').value,
+                    message: document.getElementById('message').value
+                };
+
+                try {
+                    const response = await fetch('/contact', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(formData)
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        formMessage.innerHTML = `<div class="alert alert-success">${data.message}</div>`;
+                        contactForm.reset();
+                    } else {
+                        formMessage.innerHTML = `<div class="alert alert-danger">${data.message}</div>`;
+                    }
+                } catch (error) {
+                    formMessage.innerHTML = '<div class="alert alert-danger">An error occurred. Please try again later.</div>';
+                } finally {
+                    // Re-enable button
+                    submitBtn.disabled = false;
+                    btnText.classList.remove('d-none');
+                    btnLoader.classList.add('d-none');
+                }
+            });
+
+            // Navbar background on scroll
+            window.addEventListener('scroll', () => {
+                const navbar = document.querySelector('.navbar');
+                if (window.scrollY > 50) {
+                    navbar.style.background = 'rgba(15, 23, 42, 1)';
+                } else {
+                    navbar.style.background = 'rgba(15, 23, 42, 0.95)';
+                }
             });
         </script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
     </body>
 </html>
