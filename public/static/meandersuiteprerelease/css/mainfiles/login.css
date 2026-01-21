@@ -1,0 +1,28 @@
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #eef5ff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+.form-container {
+    background: white;
+    padding: 3rem;
+    border-radius: 12px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    width: 80%;
+    max-width: 600px;
+}
+.logo-fixed {
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    width: 150px;
+    height: auto;
+    z-index: 999;
+}
+.form-floating > label {
+    left: 1rem;
+}
