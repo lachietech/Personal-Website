@@ -1,9 +1,9 @@
 import express from'express';
 import path from 'path';
-import { isAuthenticated } from '../middleware/auth.js';
-import { registerUserWithWeather, loginUser, updateWeatherForUser, updateUserLocation } from '../modules/userController.js';
-import { runCWISAnalysis } from '../modules/msw.js';
-import UserWeatherRecord from '../models/users.js';
+import { isAuthenticated } from './middleware/auth.js';
+import { registerUserWithWeather, loginUser, updateWeatherForUser, updateUserLocation } from './modules/userController.js';
+import { runCWISAnalysis } from './modules/msw.js';
+import UserWeatherRecord from './models/users.js';
 
 const router = express.Router();
 
@@ -60,8 +60,7 @@ router.post('/login', async (req, res) => {
         }
     } catch (error) {
         console.error('Login error:', error);
-        res.redirect('/meandersuite/suite');
-        res.status(500).send('Internal server error');
+        res.status(401).send('Invalid username or password');
     }
 });
 

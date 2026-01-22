@@ -1,9 +1,9 @@
 import express from 'express';
 import path from 'path';
-import User from '../models/superchat/users.js';
-import Message from '../models/superchat/message.js';
+import User from './models/users.js';
+import Message from './models/message.js';
 import bcrypt from 'bcrypt';
-import { generateKeyPairRSA, vigenereEncrypt, vigenereDecrypt } from '../middleware/encryption.js';
+import { generateKeyPairRSA, vigenereEncrypt, vigenereDecrypt } from './middleware/encryption.js';
 
 
 const router = express.Router();

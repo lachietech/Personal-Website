@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { superchatDb } from '../../databases.js';
 
 /**
  * Message Schema for storing encrypted chat messages in MongoDB.
@@ -29,5 +30,5 @@ const messageSchema = new mongoose.Schema({
 
 // Create and export the Message model from the schema.
 // This will map to the "messages" collection in MongoDB.
-const Message = mongoose.model('SuperChatMessage', messageSchema);
+const Message = superchatDb.model('Message', messageSchema);
 export default Message;

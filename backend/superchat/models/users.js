@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { superchatDb } from '../../databases.js';
 
 /**
  * User Schema for storing registered users in MongoDB.
@@ -31,5 +32,5 @@ const userSchema = new mongoose.Schema({
 );
 
 // Create and export the User model (maps to "users" collection in MongoDB).
-const User = mongoose.model('SuperChatUser', userSchema);
+const User = superchatDb.model('User', userSchema);
 export default User;

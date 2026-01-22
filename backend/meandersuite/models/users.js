@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { meandersuiteDb } from '../../databases.js';
 
 const locationSchema = new mongoose.Schema({
     local: { type: String, required: true },
@@ -18,4 +19,4 @@ const userWeatherRecordSchema = new mongoose.Schema({
     data: { type: mongoose.Schema.Types.Mixed } // stores full API JSON response
 });
 
-export default mongoose.model("UserWeatherRecord", userWeatherRecordSchema);
+export default meandersuiteDb.model("UserWeatherRecord", userWeatherRecordSchema);

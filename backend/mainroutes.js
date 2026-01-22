@@ -10,7 +10,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 // Home page
 router.get('/', (req, res) => {
-    res.sendFile(path.join(import.meta.dirname, '../../public/templates/main/index.html'));
+    res.sendFile(path.join(import.meta.dirname, '../public/templates/main/index.html'));
 });
 
 // Contact form submission
