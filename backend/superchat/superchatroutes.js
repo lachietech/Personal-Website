@@ -4,7 +4,7 @@ import User from './models/users.js';
 import Message from './models/message.js';
 import bcrypt from 'bcrypt';
 import { generateKeyPairRSA, vigenereEncrypt, vigenereDecrypt } from './middleware/encryption.js';
-
+import { authLimiter, apiLimiter, getLimiter } from '../ratelimits.js';
 
 const router = express.Router();
 
@@ -39,7 +39,7 @@ router.get('/register', (req, res) => {
  * - Decrypt and load user's private key
  * - Store user details in session
  */
-router.post('/login', async (req, res) => {
+router.post('/login', authLimiter, async (req, res) => {
     try {
         const { username, password } = req.body;
 
@@ -88,7 +88,7 @@ router.post('/login', async (req, res) => {
  * - Save new user in DB
  * - Store session details and log them in automatically
  */
-router.post('/register', async (req, res) => {
+router.post('/register', authLimiter, async (req, res) => {
     try {
         const { firstname, lastname, email, username, password, passwordconfirm } = req.body;
 
@@ -161,7 +161,7 @@ router.get('/app', isAuthenticated, (req, res) => {
  * - privateKey
  * These are pulled from the session object after login.
  */
-router.get('/api/session-data', isAuthenticated, (req, res) => {
+router.get('/api/session-data', getLimiter, isAuthenticated, (req, res) => {
     res.json({
         username: req.session.username, 
         publicKey: req.session.publicKey, 
@@ -174,7 +174,7 @@ router.get('/api/session-data', isAuthenticated, (req, res) => {
  * Lookup and return the public key of another user by username.
  * Used when encrypting messages for a recipient.
  */
-router.get('/api/userkey', isAuthenticated, async (req, res) => {
+router.get('/api/userkey', getLimiter, isAuthenticated, async (req, res) => {
     const recipientusername = req.query.name;
     try {
         const user = await User.findOne({ username: recipientusername });
@@ -193,7 +193,7 @@ router.get('/api/userkey', isAuthenticated, async (req, res) => {
  * Saves an encrypted message to the database.
  * Expects body fields: user, recipient, message, timestamp, iv, key1, key2.
  */
-router.post('/api/send-message', isAuthenticated, async (req, res) => {
+router.post('/api/send-message', apiLimiter, isAuthenticated, async (req, res) => {
     try {
         const { user, recipient, message, timestamp, iv, key1, key2 } = req.body;
 
@@ -218,7 +218,7 @@ router.post('/api/send-message', isAuthenticated, async (req, res) => {
  * Fetch the full conversation between the logged-in user and another user.
  * Messages are sorted by timestamp in ascending order.
  */
-router.get('/api/messages', isAuthenticated, async (req, res) => {
+router.get('/api/messages', getLimiter, isAuthenticated, async (req, res) => {
     const recipientusername = req.query.chat;
     try {
         const username = req.session.username;
@@ -248,7 +248,7 @@ router.get('/api/messages', isAuthenticated, async (req, res) => {
  * Fetch all users except the currently logged-in one.
  * Only returns usernames (not sensitive fields).
  */
-router.get('/api/users', isAuthenticated, async (req, res) => {
+router.get('/api/users', getLimiter, isAuthenticated, async (req, res) => {
     try {
         const users = await User.find({ username: { $ne: req.session.username } }).select('username');
         res.json(users.map(u => u.username));

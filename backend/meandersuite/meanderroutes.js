@@ -4,6 +4,7 @@ import { isAuthenticated } from './middleware/auth.js';
 import { registerUserWithWeather, loginUser, updateWeatherForUser, updateUserLocation } from './modules/userController.js';
 import { runCWISAnalysis } from './modules/msw.js';
 import UserWeatherRecord from './models/users.js';
+import { authLimiter, getLimiter } from '../ratelimits.js';
 
 const router = express.Router();
 
@@ -16,7 +17,7 @@ router.get('/', (req, res) => {
 router.get('/register', (req, res) => {
     res.sendFile(path.join(import.meta.dirname, '../../public/templates/meandersuiteprerelease/mainfiles/register.html'));
 });
-router.post('/register', async (req, res) => {
+router.post('/register', authLimiter, async (req, res) => {
     const { username, password, email, first_name, last_name, locationl, locations, locationc  } = req.body;
 
     try {
@@ -47,7 +48,7 @@ router.post('/register', async (req, res) => {
 router.get('/login', (req, res) => {
     res.sendFile(path.join(import.meta.dirname, '../../public/templates/meandersuiteprerelease/mainfiles/login.html'));
 });
-router.post('/login', async (req, res) => {
+router.post('/login', authLimiter, async (req, res) => {
     const { username, password } = req.body;
     try {
         const user = await loginUser({username, password});
@@ -70,7 +71,7 @@ router.get('/suite', isAuthenticated, async (req, res) => {
     res.sendFile(path.join(import.meta.dirname, '../../public/templates/meandersuiteprerelease/suitefiles/index.html'));
 });
 
-router.get('/suite/suitedata',  async (req, res) => {
+router.get('/suite/suitedata', getLimiter, async (req, res) => {
     const username = req.session.username;
     const user = await UserWeatherRecord.findOne({ username });
     const cwis = runCWISAnalysis(user);

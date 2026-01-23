@@ -2,6 +2,7 @@ import express from'express';
 import path from 'path';
 import { Resend } from 'resend';
 import dotenv from 'dotenv';
+import { contactLimiter } from './ratelimits.js';
 
 dotenv.config();
 
@@ -14,7 +15,7 @@ router.get('/', (req, res) => {
 });
 
 // Contact form submission
-router.post('/contact', async (req, res) => {
+router.post('/contact', contactLimiter, async (req, res) => {
     try {
         const { name, email, subject, message } = req.body;
 
