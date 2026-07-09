@@ -3,6 +3,7 @@ import path from 'path';
 import { Resend } from 'resend';
 import dotenv from 'dotenv';
 import { contactLimiter } from './ratelimits.js';
+import { InputError, escapeHtml, getEmail, getMessage, getRequiredString } from './security.js';
 
 dotenv.config();
 
@@ -17,24 +18,15 @@ router.get('/', (req, res) => {
 // Contact form submission
 router.post('/contact', contactLimiter, async (req, res) => {
     try {
-        const { name, email, subject, message } = req.body;
+        const name = getRequiredString(req.body.name, 'Name', 120);
+        const email = getEmail(req.body.email);
+        const subject = getRequiredString(req.body.subject, 'Subject', 160);
+        const message = getMessage(req.body.message);
 
-        // Validate input
-        if (!name || !email || !subject || !message) {
-            return res.status(400).json({ 
-                success: false, 
-                message: 'All fields are required' 
-            });
-        }
-
-        // Email validation regex
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
-            return res.status(400).json({ 
-                success: false, 
-                message: 'Invalid email address' 
-            });
-        }
+        const safeName = escapeHtml(name);
+        const safeEmail = escapeHtml(email);
+        const safeSubject = escapeHtml(subject);
+        const safeMessage = escapeHtml(message).replaceAll('\n', '<br>');
 
         // Send email using Resend
         const { data, error } = await resend.emails.send({
@@ -45,13 +37,13 @@ router.post('/contact', contactLimiter, async (req, res) => {
                 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
                     <h2 style="color: #333;">New Contact Form Submission</h2>
                     <div style="background: #f5f5f5; padding: 20px; border-radius: 5px; margin: 20px 0;">
-                        <p><strong>Name:</strong> ${name}</p>
-                        <p><strong>Email:</strong> ${email}</p>
-                        <p><strong>Subject:</strong> ${subject}</p>
+                        <p><strong>Name:</strong> ${safeName}</p>
+                        <p><strong>Email:</strong> ${safeEmail}</p>
+                        <p><strong>Subject:</strong> ${safeSubject}</p>
                     </div>
                     <div style="margin: 20px 0;">
                         <h3 style="color: #333;">Message:</h3>
-                        <p style="line-height: 1.6;">${message}</p>
+                        <p style="line-height: 1.6;">${safeMessage}</p>
                     </div>
                     <hr style="border: none; border-top: 1px solid #ddd; margin: 30px 0;">
                     <p style="color: #999; font-size: 12px;">This email was sent from the Nielsen Innovations contact form.</p>
@@ -73,6 +65,13 @@ router.post('/contact', contactLimiter, async (req, res) => {
             message: 'Message sent successfully! We\'ll get back to you soon.' 
         });
     } catch (error) {
+        if (error instanceof InputError) {
+            return res.status(400).json({
+                success: false,
+                message: error.message
+            });
+        }
+
         console.error('Contact form error:', error);
         res.status(500).json({ 
             success: false, 

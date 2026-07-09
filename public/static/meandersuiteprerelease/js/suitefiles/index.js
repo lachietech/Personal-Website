@@ -28,6 +28,6 @@ async function getCWIS() {
         document.getElementById('notes').innerText = `${data.Notes}`;
     } catch (err) {
         console.error('Fetch failed:', err);
-        document.getElementById('hi').innerHTML = 'Error fetching CWIS.';
+        document.getElementById('hi').textContent = 'Error fetching CWIS.';
     }
 }

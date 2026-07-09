@@ -5,6 +5,7 @@
     --dark: #0f172a;
     --light: #f8fafc;
     --gray: #64748b;
+    --navbar-offset: 96px;
     --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
     --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
@@ -27,6 +28,15 @@ body {
     background: var(--light);
     line-height: 1.6;
     overflow-x: hidden;
+    padding-top: var(--navbar-offset);
+}
+
+html {
+    scroll-padding-top: var(--navbar-offset);
+}
+
+[id] {
+    scroll-margin-top: var(--navbar-offset);
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -197,7 +207,6 @@ h1, h2, h3, h4, h5, h6 {
     border-radius: 20px;
     overflow: hidden;
     box-shadow: 0 20px 50px rgba(0,0,0,0.15);
-    max-height: 450px;
 }
 
 .about-img img {

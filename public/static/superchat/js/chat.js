@@ -1,55 +1,88 @@
 // --------------------------- chat.js Functions -------------------------------
-// -- This file contains the JavaScript logic for the chat application page.  --
-// -- It handles fetching data from api's, loading and sending messages, and  --
-// -- performing client-side encryption/decryption using the Web Crypto API.  --
+// Handles chat API calls, user list rendering, and browser-side encryption.
 
-// ----------------------------- initialisation --------------------------------
-fetch('api/session-data')
-    .then(r => r.json())
-    .then(data => {
-    sessionStorage.setItem('username', data.username);
-    sessionStorage.setItem('privateKey', data.privateKey); // ⚠ sensitive
-    sessionStorage.setItem('publicKey', data.publicKey);
-    })
-    .catch(err => console.error('Error fetching session data:', err));
-
-let user = sessionStorage.getItem('username') || 'user';
+let sessionData = null;
 let currentConversation = null;
 let lastMessageTimestamp = 0;
 let conversation = [];
+let csrfTokenPromise;
 
-const chatList   = document.getElementById('chatList');
-const search     = document.querySelector('input[name="userSearch"]');
+const chatList = document.getElementById('chatList');
+const search = document.querySelector('input[name="userSearch"]');
 const messagesEl = document.getElementById('messages');
-const composer   = document.getElementById('composer');
+const composer = document.getElementById('composer');
 const messageInp = document.getElementById('messageInput');
 const activeName = document.getElementById('activeName');
 
-// ------------------------------ UI/UX helpers --------------------------------
+function getCsrfToken() {
+    if (!csrfTokenPromise) {
+        csrfTokenPromise = fetch('/csrf-token', { credentials: 'same-origin' })
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error('Unable to fetch CSRF token');
+                }
+                return response.json();
+            })
+            .then((data) => data.csrfToken);
+    }
 
-fetch('api/users')
-    .then(r => r.json())
-    .then(users => {
-    users.forEach(u => {
+    return csrfTokenPromise;
+}
+
+async function apiFetch(url, options = {}) {
+    const method = options.method || 'GET';
+    const headers = new Headers(options.headers || {});
+
+    if (method.toUpperCase() !== 'GET') {
+        headers.set('x-csrf-token', await getCsrfToken());
+    }
+
+    const response = await fetch(url, {
+        ...options,
+        method,
+        headers,
+        credentials: 'same-origin'
+    });
+
+    if (!response.ok) {
+        throw new Error(`Request failed with ${response.status}`);
+    }
+
+    return response;
+}
+
+async function initialise() {
+    try {
+        sessionData = await apiFetch('api/session-data').then((response) => response.json());
+        await loadUsers();
+    } catch (error) {
+        console.error('Error initialising chat:', error);
+        messagesEl.textContent = 'Failed to initialise chat.';
+    }
+}
+
+async function loadUsers() {
+    const users = await apiFetch('api/users').then((response) => response.json());
+    chatList.textContent = '';
+    users.forEach((username) => {
         const div = document.createElement('div');
         div.className = 'chat-item';
-        div.id = u;
-        div.textContent = u;
+        div.id = username;
+        div.textContent = username;
         chatList.appendChild(div);
     });
-    })
-    .catch(err => console.error('Error fetching users:', err));
+}
 
 search.addEventListener('input', function () {
-    const q = this.value.toLowerCase().trim();
-    Array.from(chatList.children).forEach(ci => {
-    const name = (ci.id || '').toLowerCase();
-    ci.style.display = name.includes(q) ? '' : 'none';
+    const query = this.value.toLowerCase().trim();
+    Array.from(chatList.children).forEach((chatItem) => {
+        const name = (chatItem.id || '').toLowerCase();
+        chatItem.style.display = name.includes(query) ? '' : 'none';
     });
 });
 
-chatList.addEventListener('click', (e) => {
-    const row = e.target.closest('.chat-item');
+chatList.addEventListener('click', (event) => {
+    const row = event.target.closest('.chat-item');
     if (!row) return;
     setActive(row.id);
 });
@@ -57,9 +90,9 @@ chatList.addEventListener('click', (e) => {
 function setActive(name) {
     currentConversation = name;
     activeName.textContent = name;
-    Array.from(chatList.children).forEach(ci =>
-    ci.classList.toggle('active', ci.id === name)
-    );
+    Array.from(chatList.children).forEach((chatItem) => {
+        chatItem.classList.toggle('active', chatItem.id === name);
+    });
 
     loadMessages(name, true);
 }
@@ -69,239 +102,195 @@ messageInp.addEventListener('input', function() {
     this.style.height = Math.min(this.scrollHeight, 100) + 'px';
 });
 
-messageInp.addEventListener('keydown', function(e) {
-    if (e.key === 'Enter' && !e.shiftKey) {
-    e.preventDefault();
-    composer.requestSubmit();
+messageInp.addEventListener('keydown', function(event) {
+    if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault();
+        composer.requestSubmit();
     }
 });
 
-
-
-// ---------------------------- Helper functions -------------------------------
-// --- These functions are for the frontend cryptography and are used in the ---
-// -- chat application. They handle key import, caching, and Base64 encoding. --
-
-// -------- Base64 <-> Uint8Array helpers (safe for large buffers) -------------
-function base64ToUint8Array(b64) {
-    const bin = atob(b64);
-    const len = bin.length;
-    const out = new Uint8Array(len);
-    for (let i = 0; i < len; i++) out[i] = bin.charCodeAt(i);
-    return out;
-}
-function uint8ArrayToBase64(u8) {
-    // Chunked to avoid call stack issues with very large arrays
-    let s = '';
-    const CHUNK = 0x8000; // 32KB
-    for (let i = 0; i < u8.length; i += CHUNK) {
-    s += String.fromCharCode.apply(null, u8.subarray(i, i + CHUNK));
+function base64ToUint8Array(base64) {
+    const binary = atob(base64);
+    const output = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) {
+        output[i] = binary.charCodeAt(i);
     }
-    return btoa(s);
+    return output;
 }
 
-// ----------------------- CryptoKey import utilities --------------------------
+function uint8ArrayToBase64(bytes) {
+    let value = '';
+    const chunkSize = 0x8000;
+    for (let i = 0; i < bytes.length; i += chunkSize) {
+        value += String.fromCharCode.apply(null, bytes.subarray(i, i + chunkSize));
+    }
+    return btoa(value);
+}
+
 async function importRsaPrivateKey(base64Pkcs8) {
     const der = base64ToUint8Array(base64Pkcs8).buffer;
-    return await window.crypto.subtle.importKey(
-    'pkcs8',
-    der,
-    { name: 'RSA-OAEP', hash: 'SHA-256' },
-    false,
-    ['decrypt']
+    return window.crypto.subtle.importKey(
+        'pkcs8',
+        der,
+        { name: 'RSA-OAEP', hash: 'SHA-256' },
+        false,
+        ['decrypt']
     );
 }
+
 async function importRsaPublicKey(base64Spki) {
     const clean = (base64Spki || '').replace(/[\r\n\s]/g, '');
-    if (!clean) throw new Error('Public key is empty!');
+    if (!clean) throw new Error('Public key is empty');
     const der = base64ToUint8Array(clean).buffer;
-    return await window.crypto.subtle.importKey(
-    'spki',
-    der,
-    { name: 'RSA-OAEP', hash: 'SHA-256' },
-    false,
-    ['encrypt']
+    return window.crypto.subtle.importKey(
+        'spki',
+        der,
+        { name: 'RSA-OAEP', hash: 'SHA-256' },
+        false,
+        ['encrypt']
     );
 }
 
-// ------------------------------ CryptoKey cache ------------------------------
-let _cachedPrivateKey = null;
-let _cachedPrivateKeyB64 = null;
-
-let _cachedMyPublicKey = null;
-let _cachedMyPublicKeyB64 = null;
-
-// Cache of recipient username -> CryptoKey
-const _recipientPubKeyCache = new Map();
+let cachedPrivateKey = null;
+let cachedPrivateKeyValue = null;
+let cachedPublicKey = null;
+let cachedPublicKeyValue = null;
+const recipientPublicKeyCache = new Map();
 
 async function getPrivateKeyCryptoKey() {
-    const b64 = sessionStorage.getItem('privateKey');
-    if (_cachedPrivateKey && _cachedPrivateKeyB64 === b64) return _cachedPrivateKey;
-    const key = await importRsaPrivateKey(b64);
-    _cachedPrivateKey = key;
-    _cachedPrivateKeyB64 = b64;
-    return key;
+    const value = sessionData.privateKey;
+    if (cachedPrivateKey && cachedPrivateKeyValue === value) return cachedPrivateKey;
+    cachedPrivateKey = await importRsaPrivateKey(value);
+    cachedPrivateKeyValue = value;
+    return cachedPrivateKey;
 }
 
 async function getMyPublicKeyCryptoKey() {
-    const b64 = sessionStorage.getItem('publicKey');
-    if (_cachedMyPublicKey && _cachedMyPublicKeyB64 === b64) return _cachedMyPublicKey;
-    const key = await importRsaPublicKey(b64);
-    _cachedMyPublicKey = key;
-    _cachedMyPublicKeyB64 = b64;
-    return key;
+    const value = sessionData.publicKey;
+    if (cachedPublicKey && cachedPublicKeyValue === value) return cachedPublicKey;
+    cachedPublicKey = await importRsaPublicKey(value);
+    cachedPublicKeyValue = value;
+    return cachedPublicKey;
 }
 
 async function getRecipientPublicKeyCryptoKey(username) {
-    if (_recipientPubKeyCache.has(username)) return _recipientPubKeyCache.get(username);
-    const b64 = await fetch(`api/userkey?name=${encodeURIComponent(username)}`).then(r => r.text());
-    const key = await importRsaPublicKey(b64);
-    _recipientPubKeyCache.set(username, key);
+    if (recipientPublicKeyCache.has(username)) {
+        return recipientPublicKeyCache.get(username);
+    }
+
+    const base64Key = await apiFetch(`api/userkey?name=${encodeURIComponent(username)}`)
+        .then((response) => response.text());
+    const key = await importRsaPublicKey(base64Key);
+    recipientPublicKeyCache.set(username, key);
     return key;
 }
 
-
-
-
-
-// ------------------------------- Load messages -------------------------------
-// --- This is the function that decrypts and displays messages from the db. ---
-
 async function loadMessages(name, forceScroll = false) {
     try {
-    const messages = await fetch('api/messages?chat=' + encodeURIComponent(name)).then(r => r.json());
+        const messages = await apiFetch(`api/messages?chat=${encodeURIComponent(name)}`)
+            .then((response) => response.json());
 
-    // Import RSA private key once per load (then reused for every message).
-    const myPrivateKey = await getPrivateKeyCryptoKey();
+        const myPrivateKey = await getPrivateKeyCryptoKey();
+        const decryptedMessages = [];
 
-    const decryptedMessages = [];
-    for (const msg of messages) {
-        const { user, recipient, message, timestamp, iv, key1, key2 } = msg;
+        for (const msg of messages) {
+            const { user, recipient, message, timestamp, iv, key1, key2 } = msg;
+            const fromMe = user === sessionData.username;
+            const toMe = recipient === sessionData.username;
 
-        const me = sessionStorage.getItem('username');
-        const fromMe = user === me;
-        const toMe   = recipient === me;
+            let encryptedAesKey;
+            if (fromMe) encryptedAesKey = key1;
+            else if (toMe) encryptedAesKey = key2;
+            else continue;
 
-        let aesKeyEncryptedB64;
-        if (fromMe) aesKeyEncryptedB64 = key1;
-        else if (toMe) aesKeyEncryptedB64 = key2;
-        else continue; // not part of our conversation (defensive)
+            const rawAesKey = await window.crypto.subtle.decrypt(
+                { name: 'RSA-OAEP' },
+                myPrivateKey,
+                base64ToUint8Array(encryptedAesKey).buffer
+            );
+            const aesKey = await window.crypto.subtle.importKey('raw', rawAesKey, { name: 'AES-GCM' }, false, ['decrypt']);
+            const decrypted = await window.crypto.subtle.decrypt(
+                { name: 'AES-GCM', iv: base64ToUint8Array(iv) },
+                aesKey,
+                base64ToUint8Array(message).buffer
+            );
 
-        // Decode wire fields
-        const encAesKey = base64ToUint8Array(aesKeyEncryptedB64).buffer;
-        const ivBuf     = base64ToUint8Array(iv);                 // 12 bytes for GCM
-        const ctBuf     = base64ToUint8Array(message).buffer;
+            decryptedMessages.push({
+                from: user,
+                text: new TextDecoder().decode(decrypted),
+                timestamp
+            });
+        }
 
-        // Unwrap AES key with our RSA private key
-        const rawAesKey = await window.crypto.subtle.decrypt(
-        { name: 'RSA-OAEP' },
-        myPrivateKey,
-        encAesKey
-        );
+        const latestTimestamp = decryptedMessages.length
+            ? new Date(decryptedMessages[decryptedMessages.length - 1].timestamp).getTime()
+            : 0;
+        const hasNew = latestTimestamp > lastMessageTimestamp;
+        conversation = decryptedMessages;
+        lastMessageTimestamp = latestTimestamp;
 
-        // Import AES key and decrypt payload
-        const aesKey = await window.crypto.subtle.importKey('raw', rawAesKey, { name: 'AES-GCM' }, false, ['decrypt']);
-        const decryptedBuf = await window.crypto.subtle.decrypt({ name: 'AES-GCM', iv: ivBuf }, aesKey, ctBuf);
+        messagesEl.textContent = '';
+        for (const msg of conversation) {
+            const div = document.createElement('div');
+            div.className = msg.from === sessionData.username ? 'message-sent' : 'message-received';
+            div.textContent = msg.text;
+            messagesEl.appendChild(div);
+        }
 
-        const text = new TextDecoder().decode(decryptedBuf);
-        decryptedMessages.push({ from: user, text, timestamp });
-    }
-
-    // Normalize timestamp to number for comparison
-    const latestTimestamp = decryptedMessages.length
-        ? (typeof decryptedMessages[decryptedMessages.length - 1].timestamp === 'number'
-            ? decryptedMessages[decryptedMessages.length - 1].timestamp
-            : new Date(decryptedMessages[decryptedMessages.length - 1].timestamp).getTime())
-        : 0;
-
-    const hasNew = latestTimestamp > lastMessageTimestamp;
-    conversation = decryptedMessages;
-    lastMessageTimestamp = latestTimestamp;
-
-    // Render
-    messagesEl.innerHTML = '';
-    const me = sessionStorage.getItem('username');
-    for (const msg of decryptedMessages) {
-        const div = document.createElement('div');
-        div.className = msg.from === me ? 'message-sent' : 'message-received';
-        div.textContent = msg.text;
-        messagesEl.appendChild(div);
-    }
-
-    if (forceScroll || hasNew) messagesEl.scrollTop = messagesEl.scrollHeight;
-    } catch (err) {
-    console.error('Error fetching/decrypting messages:', err);
-    messagesEl.innerHTML = 'Failed to load messages.';
+        if (forceScroll || hasNew) {
+            messagesEl.scrollTop = messagesEl.scrollHeight;
+        }
+    } catch (error) {
+        console.error('Error fetching/decrypting messages:', error);
+        messagesEl.textContent = 'Failed to load messages.';
     }
 }
 
-
-
-
-
-// ------------------------------- send messages -------------------------------
-// ----- This is the function that encrypts and sends messages to the db.  -----
-
-composer.addEventListener('submit', async (e) => {
-    e.preventDefault();
+composer.addEventListener('submit', async (event) => {
+    event.preventDefault();
 
     const text = messageInp.value.trim();
-    if (!text || !currentConversation) return;
+    if (!text || !currentConversation || !sessionData) return;
 
-    // Generate per-message AES-GCM key
     const aesKey = await window.crypto.subtle.generateKey(
-    { name: 'AES-GCM', length: 256 },
-    true,
-    ['encrypt', 'decrypt']
+        { name: 'AES-GCM', length: 256 },
+        true,
+        ['encrypt', 'decrypt']
     );
 
-    // Encrypt plaintext
     const iv = window.crypto.getRandomValues(new Uint8Array(12));
     const ciphertext = await window.crypto.subtle.encrypt(
-    { name: 'AES-GCM', iv },
-    aesKey,
-    new TextEncoder().encode(text)
+        { name: 'AES-GCM', iv },
+        aesKey,
+        new TextEncoder().encode(text)
     );
 
-    // Import our public key and the recipient’s (from cache/remote)
-    const myPubKey        = await getMyPublicKeyCryptoKey();
-    const recipPubKey     = await getRecipientPublicKeyCryptoKey(currentConversation);
-
-    // Export raw AES key to wrap
+    const myPublicKey = await getMyPublicKeyCryptoKey();
+    const recipientPublicKey = await getRecipientPublicKeyCryptoKey(currentConversation);
     const rawAesKey = await window.crypto.subtle.exportKey('raw', aesKey);
+    const aesKeyForMe = await window.crypto.subtle.encrypt({ name: 'RSA-OAEP' }, myPublicKey, rawAesKey);
+    const aesKeyForRecipient = await window.crypto.subtle.encrypt({ name: 'RSA-OAEP' }, recipientPublicKey, rawAesKey);
 
-    // Wrap AES key for both parties with RSA-OAEP
-    const aesKeyForMe        = await window.crypto.subtle.encrypt({ name: 'RSA-OAEP' }, myPubKey,    rawAesKey);
-    const aesKeyForRecipient = await window.crypto.subtle.encrypt({ name: 'RSA-OAEP' }, recipPubKey, rawAesKey);
-
-    // Build payload using safe Base64 helpers
-    const payload = {
-    user: sessionStorage.getItem('username'),
-    recipient: currentConversation,
-    message:  uint8ArrayToBase64(new Uint8Array(ciphertext)),
-    timestamp: Date.now(),
-    iv:       uint8ArrayToBase64(iv),
-    key1:     uint8ArrayToBase64(new Uint8Array(aesKeyForMe)),
-    key2:     uint8ArrayToBase64(new Uint8Array(aesKeyForRecipient))
-    };
-
-    // Send to server
-    await fetch('api/send-message', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
+    await apiFetch('api/send-message', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            recipient: currentConversation,
+            message: uint8ArrayToBase64(new Uint8Array(ciphertext)),
+            timestamp: Date.now(),
+            iv: uint8ArrayToBase64(iv),
+            key1: uint8ArrayToBase64(new Uint8Array(aesKeyForMe)),
+            key2: uint8ArrayToBase64(new Uint8Array(aesKeyForRecipient))
+        })
     });
 
-    // UI tidy + refresh
     messageInp.value = '';
     messageInp.style.height = 'auto';
     loadMessages(currentConversation, true);
 });
 
-
-
-
-// ------------------------------ Poll for updates -----------------------------
 setInterval(() => {
     if (currentConversation) loadMessages(currentConversation);
-}, 500);
+}, 1000);
+
+initialise();

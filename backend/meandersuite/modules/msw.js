@@ -1,9 +1,5 @@
-import { registerUserWithWeather, loginUser, updateWeatherForUser, updateUserLocation } from './userController.js';
+import { updateWeatherForUser } from './userController.js';
 import zonePresets from '../presets/zonepresets.json' with { type: 'json' };
-import dotenv from 'dotenv';
-dotenv.config();
-
-const WEATHER_API_KEY = process.env.API_KEY;
 
 export function calculateCWIS(user) {
     const { data, zone } = user;
@@ -51,12 +47,12 @@ export function interpretCWIS(score) {
     return { Tier: 'Severe Warning', Mood: 'Crisis Zone', Behaviour: 'Unsafe behaviours likely', Notes: 'Full intervention recommended.' };
 }
 
-export function runCWISAnalysis(user) {
+export async function runCWISAnalysis(user) {
     const now = new Date();
     const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
 
     if (!user.timestamp || new Date(user.timestamp) < oneHourAgo) {
-        updateWeatherForUser(user.username);
+        user = await updateWeatherForUser(user.username);
     }
 
     const score = calculateCWIS(user);

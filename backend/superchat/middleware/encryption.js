@@ -1,4 +1,6 @@
-﻿import crypto from "crypto";
+import crypto from 'crypto';
+
+const PRIVATE_KEY_PREFIX = 'aes256gcm:v1';
 
 /**
  * Generate an RSA key pair (public/private).
@@ -6,58 +8,67 @@
  * @returns {Object} { publicKey, privateKey } as Base64 strings
  */
 export function generateKeyPairRSA() {
-    // Generate RSA key pair with 2048-bit modulus length
     const { publicKey, privateKey } = crypto.generateKeyPairSync('rsa', {
-        modulusLength: 2048, // key size in bits (2048 is secure & common)
+        modulusLength: 2048,
         publicKeyEncoding: {
-            type: 'spki',     // standard format for public keys
-            format: 'der',    // binary DER encoding
+            type: 'spki',
+            format: 'der',
         },
         privateKeyEncoding: {
-            type: 'pkcs8',    // standard format for private keys
-            format: 'der',    // binary DER encoding
+            type: 'pkcs8',
+            format: 'der',
         },
     });
 
-    // Convert binary keys into Base64 strings for easier storage/transmission
-    const cleankey1 = publicKey.toString('base64');
-    const cleankey2 = privateKey.toString('base64');
-
-    return { publicKey: cleankey1, privateKey: cleankey2 };
+    return {
+        publicKey: publicKey.toString('base64'),
+        privateKey: privateKey.toString('base64')
+    };
 }
 
-/**
- * Encrypt plaintext using the Vigenère cipher.
- * Operates on raw character codes with simple modular addition.
- * @param {string} key - The key string used for encryption
- * @param {string} plaintext - The input text to encrypt
- * @returns {string} The encrypted ciphertext
- */
-export function vigenereEncrypt(key, plaintext) {
-    let ciphertext = '';
-    for (let i = 0; i < plaintext.length; i++) {
-        const P = plaintext.charCodeAt(i);         // numeric value of plaintext char
-        const k = key.charCodeAt(i % key.length); // repeat key cyclically
-        const C = (P + k) % 256;                  // modular addition (byte range)
-        ciphertext += String.fromCharCode(C);     // convert back to char
+export function encryptPrivateKeyWithPassword(password, plaintext) {
+    const salt = crypto.randomBytes(16);
+    const iv = crypto.randomBytes(12);
+    const key = crypto.scryptSync(password, salt, 32);
+    const cipher = crypto.createCipheriv('aes-256-gcm', key, iv);
+    const encrypted = Buffer.concat([
+        cipher.update(plaintext, 'utf8'),
+        cipher.final()
+    ]);
+    const authTag = cipher.getAuthTag();
+
+    return [
+        PRIVATE_KEY_PREFIX,
+        salt.toString('base64'),
+        iv.toString('base64'),
+        authTag.toString('base64'),
+        encrypted.toString('base64')
+    ].join(':');
+}
+
+export function decryptPrivateKeyWithPassword(password, ciphertext) {
+    if (!ciphertext.startsWith(`${PRIVATE_KEY_PREFIX}:`)) {
+        return decryptLegacyPrivateKey(password, ciphertext);
     }
-    return ciphertext;
+
+    const [, , salt, iv, authTag, encrypted] = ciphertext.split(':');
+    const key = crypto.scryptSync(password, Buffer.from(salt, 'base64'), 32);
+    const decipher = crypto.createDecipheriv('aes-256-gcm', key, Buffer.from(iv, 'base64'));
+    decipher.setAuthTag(Buffer.from(authTag, 'base64'));
+
+    return Buffer.concat([
+        decipher.update(Buffer.from(encrypted, 'base64')),
+        decipher.final()
+    ]).toString('utf8');
 }
 
-/**
- * Decrypt ciphertext encrypted with the Vigenère cipher.
- * Reverses the encryption step by modular subtraction.
- * @param {string} key - The key string used for decryption
- * @param {string} ciphertext - The encrypted input text
- * @returns {string} The decrypted plaintext
- */
-export function vigenereDecrypt(key, ciphertext) {
+function decryptLegacyPrivateKey(key, ciphertext) {
     let plaintext = '';
     for (let i = 0; i < ciphertext.length; i++) {
-        const C = ciphertext.charCodeAt(i);        // numeric value of ciphertext char
-        const k = key.charCodeAt(i % key.length);  // repeat key cyclically
-        const P = (C - k + 256) % 256;             // modular subtraction; +256 avoids negatives
-        plaintext += String.fromCharCode(P);       // convert back to char
+        const C = ciphertext.charCodeAt(i);
+        const k = key.charCodeAt(i % key.length);
+        const P = (C - k + 256) % 256;
+        plaintext += String.fromCharCode(P);
     }
     return plaintext;
 }

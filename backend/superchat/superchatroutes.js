@@ -3,8 +3,9 @@ import path from 'path';
 import User from './models/users.js';
 import Message from './models/message.js';
 import bcrypt from 'bcrypt';
-import { generateKeyPairRSA, vigenereEncrypt, vigenereDecrypt } from './middleware/encryption.js';
+import { decryptPrivateKeyWithPassword, encryptPrivateKeyWithPassword, generateKeyPairRSA } from './middleware/encryption.js';
 import { authLimiter, apiLimiter, getLimiter } from '../ratelimits.js';
+import { InputError, getEmail, getPassword, getRequiredString, getUsername, regenerateSession } from '../security.js';
 
 const router = express.Router();
 
@@ -41,12 +42,8 @@ router.get('/register', (req, res) => {
  */
 router.post('/login', authLimiter, async (req, res) => {
     try {
-        const { username, password } = req.body;
-
-        // Ensure required fields are provided
-        if (!username || !password) {
-            return res.status(400).send('Username and password required');
-        }
+        const username = getUsername(req.body.username);
+        const password = getPassword(req.body.password);
 
         // Lookup user in DB
         const user = await User.findOne({ username });
@@ -61,17 +58,24 @@ router.post('/login', authLimiter, async (req, res) => {
         }
 
         // Decrypt the stored private key using the password
-        const privateKey = vigenereDecrypt(password, user.privateKey);
+        const privateKey = decryptPrivateKeyWithPassword(password, user.privateKey);
 
         // Store session details
-        req.session.privateKey = privateKey;
-        req.session.logged_in = true;
-        req.session.username = username;
-        req.session.publicKey = user.publicKey;
+        await regenerateSession(req, {
+            app: 'superchat',
+            privateKey,
+            logged_in: true,
+            username,
+            publicKey: user.publicKey
+        });
 
         // Redirect to chat app
         res.redirect('/superchat/app');
     } catch (err) {
+        if (err instanceof InputError) {
+            return res.status(400).send(err.message);
+        }
+
         console.error('Login error:', err);
         res.status(500).send('Server error');
     }
@@ -90,7 +94,12 @@ router.post('/login', authLimiter, async (req, res) => {
  */
 router.post('/register', authLimiter, async (req, res) => {
     try {
-        const { firstname, lastname, email, username, password, passwordconfirm } = req.body;
+        const firstname = getRequiredString(req.body.firstname, 'First name', 80);
+        const lastname = getRequiredString(req.body.lastname, 'Last name', 80);
+        const email = getEmail(req.body.email);
+        const username = getUsername(req.body.username);
+        const password = getPassword(req.body.password);
+        const passwordconfirm = getPassword(req.body.passwordconfirm);
 
         // Ensure passwords match
         if (password !== passwordconfirm) {
@@ -115,18 +124,25 @@ router.post('/register', authLimiter, async (req, res) => {
             username,
             password: hashedPassword,
             publicKey,
-            privateKey: vigenereEncrypt(password, privateKey) // private key encrypted with password
+            privateKey: encryptPrivateKeyWithPassword(password, privateKey)
         });
         await user.save();
 
         // Create user session (auto-login after registration)
-        req.session.logged_in = true;
-        req.session.username = username;
-        req.session.privateKey = privateKey; // decrypted key available in session
-        req.session.publicKey = publicKey;
+        await regenerateSession(req, {
+            app: 'superchat',
+            logged_in: true,
+            username,
+            privateKey,
+            publicKey
+        });
 
         res.redirect('/superchat/app');
     } catch (err) {
+        if (err instanceof InputError) {
+            return res.status(400).send(err.message);
+        }
+
         console.error('Register error:', err);
         res.status(500).send('Server error');
     }
@@ -137,10 +153,10 @@ router.post('/register', authLimiter, async (req, res) => {
  * If not logged in, redirect them to the login page.
  */
 function isAuthenticated(req, res, next) {
-    if (req.session.logged_in) {
+    if (req.session.logged_in && req.session.app === 'superchat') {
         next(); // proceed to the next middleware/route handler
     } else {
-        res.redirect('superchat/login'); // send them back to login
+        res.redirect('/superchat/login'); // send them back to login
     }
 }
 
@@ -175,15 +191,19 @@ router.get('/api/session-data', getLimiter, isAuthenticated, (req, res) => {
  * Used when encrypting messages for a recipient.
  */
 router.get('/api/userkey', getLimiter, isAuthenticated, async (req, res) => {
-    const recipientusername = req.query.name;
     try {
+        const recipientusername = getUsername(req.query.name);
         const user = await User.findOne({ username: recipientusername });
         if (user === null) {
             return res.status(404).send('User not found');
         }
         res.send(user.publicKey);
     } catch (err) {
-        console.log('Server error while fetching key for ' + recipientusername);
+        if (err instanceof InputError) {
+            return res.status(400).send(err.message);
+        }
+
+        console.error('Server error while fetching key');
         res.status(500).send('Server error');
     }
 });
@@ -195,19 +215,34 @@ router.get('/api/userkey', getLimiter, isAuthenticated, async (req, res) => {
  */
 router.post('/api/send-message', apiLimiter, isAuthenticated, async (req, res) => {
     try {
-        const { user, recipient, message, timestamp, iv, key1, key2 } = req.body;
+        const sender = req.session.username;
+        const recipient = getUsername(req.body.recipient);
+        const message = getRequiredString(req.body.message, 'Message', 20000);
+        const iv = getRequiredString(req.body.iv, 'IV', 128);
+        const key1 = getRequiredString(req.body.key1, 'Key', 2048);
+        const key2 = getRequiredString(req.body.key2, 'Key', 2048);
+        const timestamp = new Date(Number(req.body.timestamp));
 
         // Validate required fields
-        if (!user || !recipient || !message || !timestamp || !iv || !key1 || !key2) {
+        if (Number.isNaN(timestamp.getTime())) {
             return res.status(400).send('Missing fields');
         }
 
+        const recipientUser = await User.exists({ username: recipient });
+        if (!recipientUser) {
+            return res.status(404).send('Recipient not found');
+        }
+
         // Create and save the message document
-        const newMessage = new Message({ user, recipient, message, timestamp, iv, key1, key2 });
+        const newMessage = new Message({ user: sender, recipient, message, timestamp, iv, key1, key2 });
         await newMessage.save();
 
         res.status(200).send('Message sent');
     } catch (err) {
+        if (err instanceof InputError) {
+            return res.status(400).send(err.message);
+        }
+
         console.error('Error saving message:', err);
         res.status(500).send('Server error');
     }
@@ -219,9 +254,9 @@ router.post('/api/send-message', apiLimiter, isAuthenticated, async (req, res) =
  * Messages are sorted by timestamp in ascending order.
  */
 router.get('/api/messages', getLimiter, isAuthenticated, async (req, res) => {
-    const recipientusername = req.query.chat;
     try {
         const username = req.session.username;
+        const recipientusername = getUsername(req.query.chat);
         if (!recipientusername) {
             return res.status(400).send('Missing chat parameter');
         }
@@ -238,6 +273,10 @@ router.get('/api/messages', getLimiter, isAuthenticated, async (req, res) => {
 
         res.json(messages);
     } catch (err) {
+        if (err instanceof InputError) {
+            return res.status(400).send(err.message);
+        }
+
         console.error('Error fetching messages:', err);
         res.status(500).send('Server error');
     }
@@ -250,7 +289,7 @@ router.get('/api/messages', getLimiter, isAuthenticated, async (req, res) => {
  */
 router.get('/api/users', getLimiter, isAuthenticated, async (req, res) => {
     try {
-        const users = await User.find({ username: { $ne: req.session.username } }).select('username');
+        const users = await User.find({ username: { $ne: req.session.username } }).select('username').lean();
         res.json(users.map(u => u.username));
     } catch (err) {
         console.error('Error fetching users:', err);

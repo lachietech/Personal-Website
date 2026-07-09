@@ -1,12 +1,15 @@
 import rateLimit from 'express-rate-limit';
 
+const staticAssetPattern = /\.(?:css|js|map|png|jpg|jpeg|gif|webp|svg|ico|woff2?|ttf|mp4)$/i;
+
 // General rate limiter for all routes
 export const generalLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100, // Limit each IP to 100 requests per 15 minutes
+    max: 1000, // Keep broad abuse protection without punishing normal app use.
     message: 'Too many requests from this IP, please try again later.',
     standardHeaders: true,
     legacyHeaders: false,
+    skip: (req) => req.path.startsWith('/hfssuniformsapp') || (req.method === 'GET' && staticAssetPattern.test(req.path)),
 });
 
 // Rate limiter for authentication routes (login/register)
@@ -30,7 +33,7 @@ export const contactLimiter = rateLimit({
 // Rate limiter for API routes
 export const apiLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 50, // Limit each IP to 50 API requests per 15 minutes
+    max: 300, // SPA screens can legitimately make many API calls.
     message: 'Too many API requests, please try again later.',
     standardHeaders: true,
     legacyHeaders: false,

@@ -1,13 +1,41 @@
-// Smooth scrolling
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+const navbar = document.querySelector('.navbar');
+
+function getNavbarOffset() {
+    return navbar ? navbar.offsetHeight + 16 : 96;
+}
+
+function syncNavbarOffsetVar() {
+    document.documentElement.style.setProperty('--navbar-offset', `${getNavbarOffset()}px`);
+}
+
+// Smooth scrolling with fixed-navbar offset support.
+document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
     anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
-        if (target) {
-            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        const href = this.getAttribute('href');
+        if (!href || href === '#') {
+            return;
         }
+
+        const target = document.querySelector(href);
+        if (!target) {
+            return;
+        }
+
+        e.preventDefault();
+        const top = target.getBoundingClientRect().top + window.scrollY - getNavbarOffset();
+        window.scrollTo({ top: Math.max(top, 0), behavior: 'smooth' });
     });
 });
+
+syncNavbarOffsetVar();
+window.addEventListener('resize', syncNavbarOffsetVar);
+window.addEventListener('load', syncNavbarOffsetVar);
+
+const navbarCollapse = document.getElementById('navbarNav');
+if (navbarCollapse) {
+    navbarCollapse.addEventListener('shown.bs.collapse', syncNavbarOffsetVar);
+    navbarCollapse.addEventListener('hidden.bs.collapse', syncNavbarOffsetVar);
+}
 
 // Scroll animations
 const observerOptions = {
@@ -32,6 +60,30 @@ const formMessage = document.getElementById('formMessage');
 const submitBtn = document.getElementById('submitBtn');
 const btnText = document.getElementById('btnText');
 const btnLoader = document.getElementById('btnLoader');
+let csrfTokenPromise;
+
+function getCsrfToken() {
+    if (!csrfTokenPromise) {
+        csrfTokenPromise = fetch('/csrf-token', { credentials: 'same-origin' })
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error('Unable to fetch CSRF token');
+                }
+                return response.json();
+            })
+            .then((data) => data.csrfToken);
+    }
+
+    return csrfTokenPromise;
+}
+
+function showFormMessage(type, message) {
+    formMessage.textContent = '';
+    const alert = document.createElement('div');
+    alert.className = `alert alert-${type}`;
+    alert.textContent = message;
+    formMessage.appendChild(alert);
+}
 
 contactForm.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -40,7 +92,7 @@ contactForm.addEventListener('submit', async (e) => {
     submitBtn.disabled = true;
     btnText.classList.add('d-none');
     btnLoader.classList.remove('d-none');
-    formMessage.innerHTML = '';
+    formMessage.textContent = '';
 
     const formData = {
         name: document.getElementById('name').value,
@@ -50,10 +102,13 @@ contactForm.addEventListener('submit', async (e) => {
     };
 
     try {
+        const csrfToken = await getCsrfToken();
         const response = await fetch('/contact', {
             method: 'POST',
+            credentials: 'same-origin',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'x-csrf-token': csrfToken
             },
             body: JSON.stringify(formData)
         });
@@ -61,13 +116,13 @@ contactForm.addEventListener('submit', async (e) => {
         const data = await response.json();
 
         if (data.success) {
-            formMessage.innerHTML = `<div class="alert alert-success">${data.message}</div>`;
+            showFormMessage('success', data.message);
             contactForm.reset();
         } else {
-            formMessage.innerHTML = `<div class="alert alert-danger">${data.message}</div>`;
+            showFormMessage('danger', data.message);
         }
     } catch (error) {
-        formMessage.innerHTML = '<div class="alert alert-danger">An error occurred. Please try again later.</div>';
+        showFormMessage('danger', 'An error occurred. Please try again later.');
     } finally {
         // Re-enable button
         submitBtn.disabled = false;
@@ -78,7 +133,6 @@ contactForm.addEventListener('submit', async (e) => {
 
 // Navbar background on scroll
 window.addEventListener('scroll', () => {
-    const navbar = document.querySelector('.navbar');
     if (window.scrollY > 50) {
         navbar.style.background = 'rgba(15, 23, 42, 1)';
     } else {
