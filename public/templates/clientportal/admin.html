@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Admin Portal | Nielsen Innovations</title>
+        <link href="../../../static/main/img/favicon.png" rel="icon">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+        <link href="../../../static/main/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+        <link href="../../../static/clientportal/css/styles.css" rel="stylesheet">
+    </head>
+    <body>
+        <header class="portal-shell">
+            <nav class="topbar" aria-label="Admin portal navigation">
+                <a class="brand" href="/">
+                    <span class="brand-mark">NI</span>
+                    <span>Nielsen Innovations</span>
+                </a>
+                <div class="topbar-actions">
+                    <button class="icon-button" type="button" id="printInvoiceButton" title="Print selected invoice" aria-label="Print selected invoice">
+                        <i class="bi bi-printer"></i>
+                    </button>
+                    <button class="home-link button-link" type="button" id="logoutButton">Sign out</button>
+                </div>
+            </nav>
+            <section class="portal-header compact-header">
+                <div>
+                    <p class="eyebrow">Admin Portal</p>
+                    <h1>Manage clients, logins, and itemised invoices.</h1>
+                </div>
+            </section>
+        </header>
+
+        <main class="portal-main admin-main">
+            <section class="notice warning" id="passwordNotice" hidden>
+                Temporary admin credentials are active. Update the admin username and password before sharing this portal.
+            </section>
+
+            <div class="tabbar" role="tablist" aria-label="Admin sections">
+                <button class="tab-button active" type="button" data-tab="clients" role="tab" aria-selected="true"><i class="bi bi-people"></i>Clients</button>
+                <button class="tab-button" type="button" data-tab="invoices" role="tab" aria-selected="false"><i class="bi bi-receipt"></i>Invoices</button>
+                <button class="tab-button" type="button" data-tab="preview" role="tab" aria-selected="false"><i class="bi bi-eye"></i>Preview</button>
+                <button class="tab-button" type="button" data-tab="emails" role="tab" aria-selected="false"><i class="bi bi-envelope"></i>Email</button>
+                <button class="tab-button" type="button" data-tab="billing" role="tab" aria-selected="false"><i class="bi bi-bank"></i>Billing</button>
+                <button class="tab-button" type="button" data-tab="security" role="tab" aria-selected="false"><i class="bi bi-shield-lock"></i>Security</button>
+            </div>
+
+            <section class="workspace admin-workspace">
+                <aside class="client-panel" aria-label="Client management">
+                    <div class="panel-heading">
+                        <div>
+                            <p class="eyebrow">Accounts</p>
+                            <h2>Clients</h2>
+                        </div>
+                        <button class="icon-button" type="button" id="newClientButton" title="New client" aria-label="New client">
+                            <i class="bi bi-plus-lg"></i>
+                        </button>
+                    </div>
+                    <label class="field-label" for="clientSearch">Search clients</label>
+                    <input class="search-input" type="search" id="clientSearch" placeholder="Name, business, email, username">
+                    <div class="client-list" id="clientList"></div>
+                </aside>
+
+                <section class="admin-panels">
+                    <section class="invoice-panel" data-tab-panel="clients">
+                        <div class="panel-heading">
+                            <div>
+                                <p class="eyebrow">Client Setup</p>
+                                <h2 id="clientFormTitle">Create client</h2>
+                            </div>
+                            <button class="danger-button" type="button" id="deleteClientButton" hidden>Delete client</button>
+                        </div>
+                        <form id="clientForm" class="stack-form">
+                            <div class="form-grid">
+                                <label>Business name<input type="text" id="clientBusiness" required></label>
+                                <label>Contact name<input type="text" id="clientContact" required></label>
+                                <label>Email<input type="email" id="clientEmail" required></label>
+                                <label>Client username<input type="text" id="clientUsername" autocomplete="off" required></label>
+                            </div>
+                            <label>Temporary password<input type="password" id="clientPassword" autocomplete="new-password"></label>
+                            <label>Notes<textarea id="clientNotes" rows="3"></textarea></label>
+                            <label class="checkbox-label"><input type="checkbox" id="clientActive" checked> Active login</label>
+                            <button class="action-button" type="submit">
+                                <i class="bi bi-save"></i>
+                                Save client
+                            </button>
+                            <p id="clientMessage" class="form-message" role="status"></p>
+                        </form>
+                    </section>
+
+                    <section class="invoice-panel" data-tab-panel="invoices" hidden>
+                        <div class="panel-heading">
+                            <div>
+                                <p class="eyebrow">Invoices</p>
+                                <h2 id="invoiceFormTitle">Create invoice</h2>
+                            </div>
+                            <button class="danger-button" type="button" id="deleteInvoiceButton" hidden>Delete invoice</button>
+                        </div>
+                        <div class="invoice-layout">
+                            <div class="invoice-list" id="invoiceList"></div>
+                            <form id="invoiceForm" class="stack-form">
+                                <div class="form-grid">
+                                    <label>Invoice number<input type="text" id="invoiceNumber" required></label>
+                                    <label>Status<select id="invoiceStatus"><option value="draft">Draft</option><option value="sent">Sent</option><option value="overdue">Overdue</option><option value="paid">Paid</option></select></label>
+                                    <label>Issued<input type="date" id="invoiceIssued" required></label>
+                                    <label>Due<input type="date" id="invoiceDue" required></label>
+                                    <label>GST rate<input type="number" id="invoiceTaxRate" min="0" max="1" step="0.01" value="0.1"></label>
+                                </div>
+                                <label>Invoice notes<textarea id="invoiceNotes" rows="3"></textarea></label>
+                                <div class="line-editor-heading">
+                                    <h3>Line items</h3>
+                                    <button class="icon-button" type="button" id="addLineButton" title="Add line item" aria-label="Add line item">
+                                        <i class="bi bi-plus-lg"></i>
+                                    </button>
+                                </div>
+                                <div id="lineItemsEditor"></div>
+                                <div class="line-editor-heading hours-heading">
+                                    <div>
+                                        <h3>Hours breakdown</h3>
+                                        <span id="hoursTotal" class="total-chip">0.00 hours</span>
+                                    </div>
+                                    <button class="icon-button" type="button" id="addHourButton" title="Add hours" aria-label="Add hours">
+                                        <i class="bi bi-plus-lg"></i>
+                                    </button>
+                                </div>
+                                <div id="hoursEditor"></div>
+                                <button class="action-button" type="submit">
+                                    <i class="bi bi-receipt"></i>
+                                    Save invoice
+                                </button>
+                                <p id="invoiceMessage" class="form-message" role="status"></p>
+                            </form>
+                        </div>
+                    </section>
+
+                    <section class="invoice-panel" data-tab-panel="preview" hidden>
+                        <div class="panel-heading">
+                            <div>
+                                <p class="eyebrow">Preview</p>
+                                <h2>Selected invoice</h2>
+                            </div>
+                        </div>
+                        <article class="invoice-detail" id="invoiceDetail"></article>
+                    </section>
+
+                    <section class="invoice-panel" data-tab-panel="emails" hidden>
+                        <div class="panel-heading">
+                            <div>
+                                <p class="eyebrow">Email</p>
+                                <h2>Client notifications</h2>
+                            </div>
+                        </div>
+                        <div class="email-actions">
+                            <button class="action-button" type="button" id="sendAccountEmailButton">
+                                <i class="bi bi-person-check"></i>
+                                Send account invite
+                            </button>
+                            <button class="action-button" type="button" id="sendInvoiceEmailButton">
+                                <i class="bi bi-envelope-paper"></i>
+                                Send invoice
+                            </button>
+                            <button class="action-button" type="button" id="sendReminderEmailButton">
+                                <i class="bi bi-bell"></i>
+                                Send reminder
+                            </button>
+                        </div>
+                        <p id="emailMessage" class="form-message" role="status"></p>
+                    </section>
+
+                    <section class="invoice-panel" data-tab-panel="billing" hidden>
+                        <div class="panel-heading">
+                            <div>
+                                <p class="eyebrow">Billing</p>
+                                <h2>ABN and bank details</h2>
+                            </div>
+                        </div>
+                        <form id="billingForm" class="stack-form">
+                            <div class="form-grid">
+                                <label>Business name<input type="text" id="billingBusinessName"></label>
+                                <label>ABN<input type="text" id="billingAbn"></label>
+                                <label>Bank name<input type="text" id="billingBankName"></label>
+                                <label>Account name<input type="text" id="billingAccountName"></label>
+                                <label>BSB<input type="text" id="billingBsb"></label>
+                                <label>Account number<input type="text" id="billingAccountNumber"></label>
+                            </div>
+                            <label>Payment reference<input type="text" id="billingPaymentReference"></label>
+                            <label>Payment terms<textarea id="billingPaymentTerms" rows="3"></textarea></label>
+                            <button class="action-button" type="submit">
+                                <i class="bi bi-save"></i>
+                                Save billing details
+                            </button>
+                            <p id="billingMessage" class="form-message" role="status"></p>
+                        </form>
+                    </section>
+
+                    <section class="invoice-panel" data-tab-panel="security" hidden>
+                        <div class="panel-heading">
+                            <div>
+                                <p class="eyebrow">Security</p>
+                                <h2>Admin account</h2>
+                            </div>
+                        </div>
+                        <form id="accountForm" class="stack-form">
+                            <div class="form-grid">
+                                <label>Username<input type="text" id="accountUsername" autocomplete="username" required></label>
+                                <label>Current password<input type="password" id="currentPassword" autocomplete="current-password" required></label>
+                                <label>New password<input type="password" id="newPassword" autocomplete="new-password"></label>
+                                <label>Confirm new password<input type="password" id="confirmPassword" autocomplete="new-password"></label>
+                            </div>
+                            <button class="action-button" type="submit">
+                                <i class="bi bi-shield-lock"></i>
+                                Update account
+                            </button>
+                            <p id="accountMessage" class="form-message" role="status"></p>
+                        </form>
+                    </section>
+                </section>
+            </section>
+        </main>
+
+        <template id="lineItemTemplate">
+            <div class="line-item-row">
+                <input type="text" data-line-field="description" placeholder="Description" required>
+                <input type="number" data-line-field="quantity" min="0" step="0.25" placeholder="Qty" required>
+                <input type="number" data-line-field="rate" min="0" step="0.01" placeholder="Rate" required>
+                <button class="icon-button danger-icon" type="button" data-remove-line title="Remove line item" aria-label="Remove line item">
+                    <i class="bi bi-trash3"></i>
+                </button>
+            </div>
+        </template>
+
+        <template id="hourEntryTemplate">
+            <div class="hour-entry-row">
+                <input type="date" data-hour-field="date" required>
+                <input type="number" data-hour-field="hours" min="0" step="0.25" placeholder="Hours" required>
+                <input type="text" data-hour-field="work" placeholder="What you worked on" required>
+                <button class="icon-button danger-icon" type="button" data-remove-hour title="Remove hours" aria-label="Remove hours">
+                    <i class="bi bi-trash3"></i>
+                </button>
+            </div>
+        </template>
+
+        <script src="../../../static/clientportal/js/api.js"></script>
+        <script src="../../../static/clientportal/js/admin.js"></script>
+    </body>
+</html>

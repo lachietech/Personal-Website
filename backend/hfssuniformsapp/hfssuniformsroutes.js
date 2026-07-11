@@ -1,7 +1,7 @@
 import express from "express";
 import path from "path";
 import fs from "fs";
-import csrf from "csurf";
+import { doubleCsrf } from "csrf-csrf";
 import rateLimit from "express-rate-limit";
 import salesRoutes from "./routes/sales.js";
 import Sales from "./models/Sales.js";
@@ -83,19 +83,23 @@ uniformsDb.once("connected", () => {
 router.use(express.static(path.join(import.meta.dirname, "../../public/static/hfssuniformsapp")));
 router.use(generalLimiter);
 
-const csrfProtection = csrf({
-  cookie: {
-    key: "uniform_shop_csrf_secret",
+const { generateCsrfToken, doubleCsrfProtection } = doubleCsrf({
+  getSecret: () => process.env.CSRF_SECRET,
+  getSessionIdentifier: (req) => req.sessionID,
+  cookieName: "uniform_shop_csrf_secret",
+  cookieOptions: {
     httpOnly: true,
     sameSite: "strict",
     secure: process.env.NODE_ENV === "production",
     path: basePath
-  }
+  },
+  ignoredMethods: ["GET", "HEAD", "OPTIONS"],
+  getCsrfTokenFromRequest: (req) => req.headers["x-csrf-token"]
 });
 
-router.use(csrfProtection);
-router.use((req, res, next) => {
-  const csrfToken = req.csrfToken();
+function exposeCsrfToken(req, res) {
+  req.session.csrfReady = true;
+  const csrfToken = generateCsrfToken(req, res);
   res.cookie("uniform_shop_csrf_token", csrfToken, {
     httpOnly: false,
     sameSite: "strict",
@@ -103,11 +107,44 @@ router.use((req, res, next) => {
     path: basePath
   });
   res.setHeader("X-CSRF-Token", csrfToken);
-  next();
+  return csrfToken;
+}
+
+function saveSession(req, res, next) {
+  req.session.save((error) => {
+    if (error) {
+      next(error);
+      return;
+    }
+
+    next();
+  });
+}
+
+router.use((req, res, next) => {
+  if (["GET", "HEAD", "OPTIONS"].includes(req.method)) {
+    if (req.path !== "/api/csrf-token") {
+      exposeCsrfToken(req, res);
+      saveSession(req, res, next);
+      return;
+    }
+    next();
+    return;
+  }
+
+  doubleCsrfProtection(req, res, next);
 });
 
 router.get("/api/csrf-token", (req, res) => {
-  res.json({ csrfToken: req.csrfToken() });
+  const csrfToken = exposeCsrfToken(req, res);
+  req.session.save((error) => {
+    if (error) {
+      res.status(500).json({ error: "Unable to create CSRF token" });
+      return;
+    }
+
+    res.json({ csrfToken });
+  });
 });
 
 router.use(pageRoutes);
@@ -117,7 +154,7 @@ router.use("/api/pos/products", uniformsApiLimiter, requireAuth, requirePassword
 router.use("/api/pos/orders", uniformsApiLimiter, requireAuth, requirePasswordChangeResolved, posOrdersRoutes);
 
 router.use((error, req, res, next) => {
-  if (error?.code === "EBADCSRFTOKEN") {
+  if (error?.code === "EBADCSRFTOKEN" || error?.code === "INVALID_CSRF_TOKEN") {
     return res.status(403).json({ error: "Invalid CSRF token" });
   }
   return next(error);

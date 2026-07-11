@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Client Portal Login | Nielsen Innovations</title>
+        <link href="../../../static/main/img/favicon.png" rel="icon">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+        <link href="../../../static/main/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+        <link href="../../../static/clientportal/css/styles.css" rel="stylesheet">
+    </head>
+    <body class="login-body">
+        <main class="login-shell">
+            <section class="login-panel">
+                <a class="brand" href="/">
+                    <span class="brand-mark">NI</span>
+                    <span>Nielsen Innovations</span>
+                </a>
+                <p class="eyebrow">Client Portal</p>
+                <h1>Sign in</h1>
+                <p class="login-copy">Access invoices, balances, and client billing updates.</p>
+                <form id="loginForm" class="stack-form">
+                    <label>
+                        Username
+                        <input type="text" id="username" autocomplete="username" required>
+                    </label>
+                    <label>
+                        Password
+                        <input type="password" id="password" autocomplete="current-password" required>
+                    </label>
+                    <button class="action-button" type="submit">
+                        <i class="bi bi-box-arrow-in-right"></i>
+                        Sign in
+                    </button>
+                    <p id="loginMessage" class="form-message" role="status"></p>
+                </form>
+            </section>
+        </main>
+        <script src="../../../static/clientportal/js/api.js"></script>
+        <script src="../../../static/clientportal/js/login.js"></script>
+    </body>
+</html>

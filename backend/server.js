@@ -11,6 +11,7 @@ import meanderroutes from'./meandersuite/meanderroutes.js';
 import superchatroutes from'./superchat/superchatroutes.js';
 import pinpointroutes from'./pinpoint/pinpointroutes.js';
 import hfssuniformsroutes from './hfssuniformsapp/hfssuniformsroutes.js';
+import clientportalroutes from './clientportal/clientportalroutes.js';
 
 dotenv.config();
 const app = express();
@@ -103,6 +104,7 @@ app.use((req, res, next) => {
 
 // Routes with specific rate limiters
 app.use('/', mainroutes);
+app.use('/clientportal', clientportalroutes);
 app.use('/meandersuite', meanderroutes);
 app.use('/superchat', superchatroutes);
 app.use('/hfssuniformsapp', hfssuniformsroutes);

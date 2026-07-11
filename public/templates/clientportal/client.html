@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>My Invoices | Nielsen Innovations</title>
+        <link href="../../../static/main/img/favicon.png" rel="icon">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+        <link href="../../../static/main/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+        <link href="../../../static/clientportal/css/styles.css" rel="stylesheet">
+    </head>
+    <body>
+        <header class="portal-shell">
+            <nav class="topbar" aria-label="Client navigation">
+                <a class="brand" href="/">
+                    <span class="brand-mark">NI</span>
+                    <span>Nielsen Innovations</span>
+                </a>
+                <div class="topbar-actions">
+                    <button class="icon-button" type="button" id="printInvoiceButton" title="Print selected invoice" aria-label="Print selected invoice">
+                        <i class="bi bi-printer"></i>
+                    </button>
+                    <button class="home-link button-link" type="button" id="logoutButton">Sign out</button>
+                </div>
+            </nav>
+            <section class="portal-header compact-header">
+                <div>
+                    <p class="eyebrow">Client Portal</p>
+                    <h1 id="clientHeading">Your invoices and balance.</h1>
+                </div>
+            </section>
+        </header>
+
+        <main class="portal-main">
+            <section class="notice warning" id="passwordNotice" hidden>
+                Your account is using a temporary password. Update it in the account section below.
+            </section>
+
+            <section class="summary-grid" aria-label="Account summary">
+                <article class="summary-panel primary">
+                    <span class="summary-label">Total owing</span>
+                    <strong id="totalOwing">$0.00</strong>
+                    <small id="nextDue">No due invoices</small>
+                </article>
+                <article class="summary-panel">
+                    <span class="summary-label">Open invoices</span>
+                    <strong id="openInvoices">0</strong>
+                    <small id="paidInvoices">0 paid invoices</small>
+                </article>
+                <article class="summary-panel">
+                    <span class="summary-label">Contact</span>
+                    <strong id="currentClientName">-</strong>
+                    <small id="currentClientEmail">-</small>
+                </article>
+            </section>
+
+            <div class="tabbar" role="tablist" aria-label="Client sections">
+                <button class="tab-button active" type="button" data-tab="invoices" role="tab" aria-selected="true"><i class="bi bi-receipt"></i>Invoices</button>
+                <button class="tab-button" type="button" data-tab="account" role="tab" aria-selected="false"><i class="bi bi-shield-lock"></i>Account</button>
+            </div>
+
+            <section class="workspace client-workspace">
+                <aside class="client-panel">
+                    <div class="panel-heading">
+                        <div>
+                            <p class="eyebrow">Invoices</p>
+                            <h2>History</h2>
+                        </div>
+                    </div>
+                    <div class="invoice-list" id="invoiceList"></div>
+                </aside>
+                <section class="admin-panels">
+                    <article class="invoice-detail" id="invoiceDetail" data-tab-panel="invoices"></article>
+                    <section class="invoice-panel" data-tab-panel="account" hidden>
+                        <div class="panel-heading">
+                            <div>
+                                <p class="eyebrow">Security</p>
+                                <h2>Account</h2>
+                            </div>
+                        </div>
+                        <form id="accountForm" class="stack-form">
+                            <div class="form-grid">
+                                <label>Username<input type="text" id="accountUsername" autocomplete="username" required></label>
+                                <label>Current password<input type="password" id="currentPassword" autocomplete="current-password" required></label>
+                                <label>New password<input type="password" id="newPassword" autocomplete="new-password"></label>
+                                <label>Confirm new password<input type="password" id="confirmPassword" autocomplete="new-password"></label>
+                            </div>
+                            <button class="action-button" type="submit">
+                                <i class="bi bi-shield-lock"></i>
+                                Update account
+                            </button>
+                            <p id="accountMessage" class="form-message" role="status"></p>
+                        </form>
+                    </section>
+                </section>
+            </section>
+        </main>
+
+        <script src="../../../static/clientportal/js/api.js"></script>
+        <script src="../../../static/clientportal/js/client.js"></script>
+    </body>
+</html>

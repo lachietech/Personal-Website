@@ -1,0 +1,57 @@
+import mongoose from "mongoose";
+import { clientPortalDb } from "../../databases.js";
+
+const userSchema = new mongoose.Schema(
+  {
+    username: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
+      lowercase: true,
+      minlength: 3,
+      maxlength: 32
+    },
+    passwordHash: {
+      type: String,
+      required: true
+    },
+    role: {
+      type: String,
+      enum: ["admin", "client"],
+      required: true
+    },
+    clientId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "PortalClient",
+      default: null
+    },
+    active: {
+      type: Boolean,
+      default: true
+    },
+    failedLoginCount: {
+      type: Number,
+      default: 0
+    },
+    lockUntil: {
+      type: Date,
+      default: null
+    },
+    mustChangePassword: {
+      type: Boolean,
+      default: false
+    },
+    passwordChangedAt: {
+      type: Date,
+      default: null
+    },
+    lastLoginAt: {
+      type: Date,
+      default: null
+    }
+  },
+  { timestamps: true }
+);
+
+export default clientPortalDb.model("PortalUser", userSchema);
