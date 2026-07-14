@@ -144,7 +144,11 @@ els.logoutButton.addEventListener('click', async () => {
     window.location.assign('/clientportal/login');
 });
 
-els.printInvoiceButton.addEventListener('click', () => window.print());
+els.printInvoiceButton.addEventListener('click', () => {
+    if (selectedInvoice()) {
+        Portal.printInvoice(els.invoiceDetail);
+    }
+});
 
 setActiveTab('invoices');
 loadDashboard().catch((error) => {

@@ -96,6 +96,23 @@
         element.className = `form-message ${type}`.trim();
     }
 
+    function printInvoice(container) {
+        if (!container || container.querySelector('.empty-state')) {
+            return false;
+        }
+
+        const cleanup = () => {
+            window.removeEventListener('afterprint', cleanup);
+            document.body.classList.remove('invoice-printing');
+        };
+
+        document.body.classList.add('invoice-printing');
+        window.addEventListener('afterprint', cleanup, { once: true });
+        window.print();
+        window.setTimeout(cleanup, 5000);
+        return true;
+    }
+
     function renderBillingDetails(billing, invoice) {
         if (!billing) {
             return '';
@@ -209,6 +226,7 @@
 
     window.Portal = {
         request,
+        csrfToken: getCsrfToken,
         money,
         formatDate,
         escapeHtml,
@@ -216,6 +234,7 @@
         invoiceHours,
         amountOwing,
         setMessage,
+        printInvoice,
         renderInvoiceDetail
     };
 })();

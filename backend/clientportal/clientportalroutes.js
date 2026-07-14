@@ -5,6 +5,8 @@ import rateLimit from "express-rate-limit";
 import { Resend } from "resend";
 import dotenv from "dotenv";
 import { clientPortalDb } from "../databases.js";
+import BookkeepingRule from "./models/BookkeepingRule.js";
+import BookkeepingTransaction from "./models/BookkeepingTransaction.js";
 import Client from "./models/Client.js";
 import Settings from "./models/Settings.js";
 import User from "./models/User.js";
@@ -29,6 +31,42 @@ const MAX_FAILED_ATTEMPTS = 5;
 const LOCK_MINUTES = 15;
 const MAX_LINE_ITEMS = 60;
 const MAX_HOUR_ENTRIES = 120;
+const MAX_IMPORT_TRANSACTIONS = 500;
+
+const BOOKKEEPING_CATEGORIES = [
+  "Client Income",
+  "Software/Subscriptions",
+  "Office Supplies",
+  "Travel",
+  "Meals",
+  "Professional Services",
+  "Equipment",
+  "Marketing",
+  "Bank Fees",
+  "Taxes/Estimated Payments",
+  "Uncategorized"
+];
+
+const BOOKKEEPING_ACCOUNTS = [
+  "Business Checking",
+  "Business Savings",
+  "Credit Card",
+  "Cash",
+  "PayPal/Stripe",
+  "Accounts Receivable",
+  "Client Income",
+  "Software/Subscriptions",
+  "Office Supplies",
+  "Travel",
+  "Meals",
+  "Professional Services",
+  "Equipment",
+  "Marketing",
+  "Bank Fees",
+  "Taxes/Estimated Payments",
+  "Owner Draw",
+  "Other"
+];
 
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -247,6 +285,147 @@ function getInvoicePayload(body) {
       }))
       .filter((entry) => entry.hours > 0 && entry.work)
   };
+}
+
+function bookkeepingOwner(user) {
+  return {
+    ownerUserId: user.id,
+    ownerClientId: user.role === "client" ? user.clientId : null
+  };
+}
+
+function bookkeepingOwnerQuery(user) {
+  const owner = bookkeepingOwner(user);
+  return owner.ownerClientId
+    ? { ownerClientId: owner.ownerClientId }
+    : { ownerUserId: owner.ownerUserId, ownerClientId: null };
+}
+
+function serializeBookkeepingTransaction(transaction) {
+  const debitAccount = transaction.debitAccount || (transaction.type === "income" ? transaction.account : transaction.category);
+  const creditAccount = transaction.creditAccount || (transaction.type === "income" ? transaction.category : transaction.account);
+  return {
+    id: transaction._id.toString(),
+    date: dateOnly(transaction.date),
+    amount: transaction.amount,
+    description: transaction.description,
+    category: transaction.category || "",
+    account: transaction.account || "",
+    debitAccount: debitAccount || "",
+    creditAccount: creditAccount || "",
+    type: transaction.type,
+    reviewed: Boolean(transaction.reviewed),
+    source: transaction.source || "manual",
+    importFingerprint: transaction.importFingerprint || "",
+    receipt: transaction.receipt?.filename
+      ? {
+          filename: transaction.receipt.filename,
+          uploadedAt: transaction.receipt.uploadedAt || null
+        }
+      : null
+  };
+}
+
+function serializeBookkeepingRule(rule) {
+  return {
+    id: rule._id.toString(),
+    contains: rule.contains,
+    category: rule.category,
+    account: rule.account || ""
+  };
+}
+
+function getBookkeepingTransactionPayload(body, source = "manual") {
+  const type = ["income", "expense"].includes(body?.type) ? body.type : "";
+  if (!type) {
+    throw new Error("Transaction type is required");
+  }
+  const amount = Math.max(0, Number(body?.amount || 0));
+  if (amount <= 0) {
+    throw new Error("Amount must be greater than zero");
+  }
+
+  return {
+    date: getDate(body?.date, "Transaction date"),
+    amount,
+    description: getRequiredText(body?.description, "Description", 280),
+    category: getOptionalText(body?.category, 120),
+    account: getOptionalText(body?.account, 120) || "Business Checking",
+    debitAccount: getOptionalText(body?.debitAccount, 120) || (type === "income" ? getOptionalText(body?.account, 120) || "Business Checking" : getOptionalText(body?.category, 120) || "Uncategorized"),
+    creditAccount: getOptionalText(body?.creditAccount, 120) || (type === "income" ? getOptionalText(body?.category, 120) || "Client Income" : getOptionalText(body?.account, 120) || "Business Checking"),
+    type,
+    reviewed: Boolean(body?.reviewed),
+    source,
+    importFingerprint: getOptionalText(body?.importFingerprint, 220)
+  };
+}
+
+function getBookkeepingRulePayload(body) {
+  return {
+    contains: getRequiredText(body?.contains, "Rule text", 120).toLowerCase(),
+    category: getRequiredText(body?.category, "Rule category", 120),
+    account: getOptionalText(body?.account, 120)
+  };
+}
+
+function parseMultipartReceipt(req, maxBytes = 2 * 1024 * 1024) {
+  return new Promise((resolve, reject) => {
+    const contentType = req.headers["content-type"] || "";
+    const boundaryMatch = contentType.match(/boundary=(?:"([^"]+)"|([^;]+))/i);
+    if (!boundaryMatch) {
+      reject(new Error("Receipt upload must be multipart form data"));
+      return;
+    }
+
+    const boundary = `--${boundaryMatch[1] || boundaryMatch[2]}`;
+    const chunks = [];
+    let totalBytes = 0;
+
+    req.on("data", (chunk) => {
+      totalBytes += chunk.length;
+      if (totalBytes > maxBytes) {
+        req.destroy(new Error("Receipt file must be under 2MB"));
+        return;
+      }
+      chunks.push(chunk);
+    });
+    req.on("error", reject);
+    req.on("end", () => {
+      const body = Buffer.concat(chunks);
+      const boundaryBuffer = Buffer.from(boundary);
+      let offset = body.indexOf(boundaryBuffer);
+
+      while (offset >= 0) {
+        const nextOffset = body.indexOf(boundaryBuffer, offset + boundaryBuffer.length);
+        if (nextOffset < 0) {
+          break;
+        }
+
+        const part = body.subarray(offset + boundaryBuffer.length + 2, nextOffset - 2);
+        const headerEnd = part.indexOf(Buffer.from("\r\n\r\n"));
+        if (headerEnd >= 0) {
+          const headers = part.subarray(0, headerEnd).toString("utf8");
+          const fileData = part.subarray(headerEnd + 4);
+          const filenameMatch = headers.match(/filename="([^"]+)"/i);
+          const nameMatch = headers.match(/name="([^"]+)"/i);
+          const typeMatch = headers.match(/content-type:\s*([^\r\n]+)/i);
+
+          if (nameMatch?.[1] === "receipt" && filenameMatch?.[1] && fileData.length) {
+            resolve({
+              filename: path.basename(filenameMatch[1]).slice(0, 180),
+              contentType: (typeMatch?.[1] || "application/octet-stream").trim().slice(0, 100),
+              data: fileData
+            });
+            return;
+          }
+        }
+
+        offset = nextOffset;
+      }
+
+      reject(new Error("Receipt file is required"));
+    });
+  });
 }
 
 function invoiceSubtotal(invoice) {
@@ -823,6 +1002,234 @@ router.post("/api/admin/clients/:clientId/invoices/:invoiceId/reminder", adminAp
   } catch (error) {
     res.status(500).json({ error: error.message || "Unable to send reminder email" });
   }
+});
+
+router.post("/api/admin/clients/:clientId/invoices/:invoiceId/receipt", adminApiLimiter, requirePortalAuth, requirePortalAdmin, async (req, res) => {
+  try {
+    const client = await Client.findById(req.params.clientId);
+    if (!client) {
+      return res.status(404).json({ error: "Client not found" });
+    }
+
+    const invoice = client.invoices.id(req.params.invoiceId);
+    if (!invoice) {
+      return res.status(404).json({ error: "Invoice not found" });
+    }
+
+    if (invoice.status !== "paid") {
+      return res.status(400).json({ error: "Mark the invoice paid before sending a receipt" });
+    }
+
+    const billing = serializeBilling(await getBillingSettings());
+    const result = await sendPortalEmail({
+      to: client.email,
+      subject: `Receipt for invoice ${invoice.number}`,
+      html: invoiceEmailHtml(client, invoice, "Thanks, payment has been received for this invoice. This email is your receipt.", billing)
+    });
+
+    res.json({ ok: true, email: result });
+  } catch (error) {
+    res.status(500).json({ error: error.message || "Unable to send receipt email" });
+  }
+});
+
+router.get("/api/bookkeeping", adminApiLimiter, requirePortalAuth, requirePortalAdmin, async (req, res) => {
+  const query = bookkeepingOwnerQuery(req.portalUser);
+  const [transactions, rules] = await Promise.all([
+    BookkeepingTransaction.find(query).sort({ date: -1, createdAt: -1 }).limit(2000),
+    BookkeepingRule.find(query).sort({ contains: 1 })
+  ]);
+
+  res.json({
+    categories: BOOKKEEPING_CATEGORIES,
+    accounts: BOOKKEEPING_ACCOUNTS,
+    transactions: transactions.map(serializeBookkeepingTransaction),
+    rules: rules.map(serializeBookkeepingRule)
+  });
+});
+
+router.post("/api/bookkeeping/transactions", adminApiLimiter, requirePortalAuth, requirePortalAdmin, async (req, res) => {
+  try {
+    const transaction = await BookkeepingTransaction.create({
+      ...bookkeepingOwner(req.portalUser),
+      ...getBookkeepingTransactionPayload(req.body, "manual")
+    });
+    res.status(201).json({ transaction: serializeBookkeepingTransaction(transaction) });
+  } catch (error) {
+    res.status(400).json({ error: error.message || "Unable to create transaction" });
+  }
+});
+
+router.put("/api/bookkeeping/transactions/:transactionId", adminApiLimiter, requirePortalAuth, requirePortalAdmin, async (req, res) => {
+  try {
+    const transaction = await BookkeepingTransaction.findOne({
+      ...bookkeepingOwnerQuery(req.portalUser),
+      _id: req.params.transactionId
+    });
+    if (!transaction) {
+      return res.status(404).json({ error: "Transaction not found" });
+    }
+
+    Object.assign(transaction, getBookkeepingTransactionPayload(req.body, transaction.source || "manual"));
+    await transaction.save();
+    res.json({ transaction: serializeBookkeepingTransaction(transaction) });
+  } catch (error) {
+    res.status(400).json({ error: error.message || "Unable to update transaction" });
+  }
+});
+
+router.delete("/api/bookkeeping/transactions/:transactionId", adminApiLimiter, requirePortalAuth, requirePortalAdmin, async (req, res) => {
+  const transaction = await BookkeepingTransaction.findOne({
+    ...bookkeepingOwnerQuery(req.portalUser),
+    _id: req.params.transactionId
+  });
+  if (!transaction) {
+    return res.status(404).json({ error: "Transaction not found" });
+  }
+
+  await BookkeepingTransaction.deleteOne({ _id: transaction._id });
+  res.json({ ok: true });
+});
+
+router.post("/api/bookkeeping/transactions/bulk-categorize", adminApiLimiter, requirePortalAuth, requirePortalAdmin, async (req, res) => {
+  try {
+    const ids = Array.isArray(req.body?.ids) ? req.body.ids.slice(0, 500) : [];
+    const category = getRequiredText(req.body?.category, "Category", 120);
+    const account = getOptionalText(req.body?.account, 120);
+    const transactionsToUpdate = await BookkeepingTransaction.find({ ...bookkeepingOwnerQuery(req.portalUser), _id: { $in: ids } });
+    await Promise.all(transactionsToUpdate.map((transaction) => {
+      transaction.category = category;
+      transaction.reviewed = req.body?.reviewed !== false;
+      if (account) {
+        transaction.account = account;
+      }
+      const moneyAccount = account || transaction.account || "Business Checking";
+      if (transaction.type === "income") {
+        transaction.debitAccount = moneyAccount;
+        transaction.creditAccount = category;
+      } else {
+        transaction.debitAccount = category;
+        transaction.creditAccount = moneyAccount;
+      }
+      return transaction.save();
+    }));
+
+    const transactions = await BookkeepingTransaction.find(bookkeepingOwnerQuery(req.portalUser)).sort({ date: -1, createdAt: -1 }).limit(2000);
+    res.json({ transactions: transactions.map(serializeBookkeepingTransaction) });
+  } catch (error) {
+    res.status(400).json({ error: error.message || "Unable to update transactions" });
+  }
+});
+
+router.post("/api/bookkeeping/import", adminApiLimiter, requirePortalAuth, requirePortalAdmin, async (req, res) => {
+  try {
+    const rows = Array.isArray(req.body?.transactions) ? req.body.transactions.slice(0, MAX_IMPORT_TRANSACTIONS) : [];
+    const owner = bookkeepingOwner(req.portalUser);
+    const query = bookkeepingOwnerQuery(req.portalUser);
+    const fingerprints = rows
+      .map((row) => getOptionalText(row?.importFingerprint, 220))
+      .filter(Boolean);
+    const existingFingerprints = new Set(
+      fingerprints.length
+        ? (await BookkeepingTransaction.find({ ...query, importFingerprint: { $in: fingerprints } }).select("importFingerprint"))
+            .map((transaction) => transaction.importFingerprint)
+        : []
+    );
+    const payloads = rows
+      .map((row) => getBookkeepingTransactionPayload(row, "import"))
+      .filter((row) => !row.importFingerprint || !existingFingerprints.has(row.importFingerprint))
+      .map((row) => ({ ...owner, ...row, reviewed: false, source: "import" }));
+
+    const inserted = payloads.length ? await BookkeepingTransaction.insertMany(payloads, { ordered: false }) : [];
+    const transactions = await BookkeepingTransaction.find(query).sort({ date: -1, createdAt: -1 }).limit(2000);
+
+    res.status(201).json({
+      imported: inserted.length,
+      skipped: rows.length - inserted.length,
+      transactions: transactions.map(serializeBookkeepingTransaction)
+    });
+  } catch (error) {
+    res.status(400).json({ error: error.message || "Unable to import transactions" });
+  }
+});
+
+router.post("/api/bookkeeping/rules", adminApiLimiter, requirePortalAuth, requirePortalAdmin, async (req, res) => {
+  try {
+    const payload = getBookkeepingRulePayload(req.body);
+    const rule = await BookkeepingRule.findOneAndUpdate(
+      { ...bookkeepingOwnerQuery(req.portalUser), contains: payload.contains },
+      { $set: { ...bookkeepingOwner(req.portalUser), ...payload } },
+      { new: true, upsert: true, setDefaultsOnInsert: true }
+    );
+    res.status(201).json({ rule: serializeBookkeepingRule(rule) });
+  } catch (error) {
+    res.status(400).json({ error: error.message || "Unable to save rule" });
+  }
+});
+
+router.delete("/api/bookkeeping/rules/:ruleId", adminApiLimiter, requirePortalAuth, requirePortalAdmin, async (req, res) => {
+  const rule = await BookkeepingRule.findOne({
+    ...bookkeepingOwnerQuery(req.portalUser),
+    _id: req.params.ruleId
+  });
+  if (!rule) {
+    return res.status(404).json({ error: "Rule not found" });
+  }
+
+  await BookkeepingRule.deleteOne({ _id: rule._id });
+  res.json({ ok: true });
+});
+
+router.post("/api/bookkeeping/transactions/:transactionId/receipt", adminApiLimiter, requirePortalAuth, requirePortalAdmin, async (req, res) => {
+  try {
+    const transaction = await BookkeepingTransaction.findOne({
+      ...bookkeepingOwnerQuery(req.portalUser),
+      _id: req.params.transactionId
+    });
+    if (!transaction) {
+      return res.status(404).json({ error: "Transaction not found" });
+    }
+
+    const receipt = await parseMultipartReceipt(req);
+    transaction.receipt = {
+      filename: receipt.filename,
+      contentType: receipt.contentType,
+      data: receipt.data,
+      uploadedAt: new Date()
+    };
+    await transaction.save();
+    res.json({ transaction: serializeBookkeepingTransaction(transaction) });
+  } catch (error) {
+    res.status(400).json({ error: error.message || "Unable to upload receipt" });
+  }
+});
+
+router.get("/api/bookkeeping/transactions/:transactionId/receipt", adminApiLimiter, requirePortalAuth, requirePortalAdmin, async (req, res) => {
+  const transaction = await BookkeepingTransaction.findOne({
+    ...bookkeepingOwnerQuery(req.portalUser),
+    _id: req.params.transactionId
+  });
+  if (!transaction?.receipt?.data) {
+    return res.status(404).json({ error: "Receipt not found" });
+  }
+
+  res.setHeader("Content-Type", transaction.receipt.contentType || "application/octet-stream");
+  res.setHeader("Content-Disposition", `inline; filename="${encodeURIComponent(transaction.receipt.filename || "receipt")}"`);
+  res.send(transaction.receipt.data);
+});
+
+router.delete("/api/bookkeeping/transactions/:transactionId/receipt", adminApiLimiter, requirePortalAuth, requirePortalAdmin, async (req, res) => {
+  const transaction = await BookkeepingTransaction.findOne({
+    ...bookkeepingOwnerQuery(req.portalUser),
+    _id: req.params.transactionId
+  });
+  if (!transaction) {
+    return res.status(404).json({ error: "Transaction not found" });
+  }
+
+  transaction.receipt = { filename: "", contentType: "", data: null, uploadedAt: null };
+  await transaction.save();
+  res.json({ transaction: serializeBookkeepingTransaction(transaction) });
 });
 
 router.get("/api/client/dashboard", requirePortalAuth, requirePortalClient, async (req, res) => {

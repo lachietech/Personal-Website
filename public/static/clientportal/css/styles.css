@@ -17,6 +17,10 @@
     box-sizing: border-box;
 }
 
+[hidden] {
+    display: none !important;
+}
+
 body {
     margin: 0;
     min-height: 100vh;
@@ -539,6 +543,13 @@ h2 {
     background: var(--blue-dark);
 }
 
+.action-button:disabled,
+.icon-button:disabled,
+.danger-button:disabled {
+    cursor: not-allowed;
+    opacity: 0.48;
+}
+
 .icon-button {
     width: 42px;
     color: var(--ink);
@@ -745,6 +756,224 @@ body.admin-mode .admin-only {
     margin-top: 18px;
 }
 
+.bookkeeping-panel {
+    display: grid;
+    gap: 18px;
+}
+
+.bookkeeping-dashboard {
+    background: #f8fafc;
+}
+
+.bookkeeping-summary {
+    margin: 0;
+}
+
+.bookkeeping-summary .summary-panel {
+    min-height: 104px;
+    box-shadow: none;
+}
+
+.bookkeeping-grid {
+    display: grid;
+    grid-template-columns: minmax(300px, 0.8fr) minmax(0, 1.2fr);
+    gap: 16px;
+    align-items: start;
+}
+
+.bookkeeping-card {
+    display: grid;
+    gap: 14px;
+    padding: 16px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #fff;
+}
+
+.transaction-entry-card {
+    position: sticky;
+    top: 16px;
+}
+
+.bookkeeping-card h3 {
+    margin-bottom: 0;
+    font-size: 1rem;
+}
+
+.filter-grid,
+.mapping-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.filter-grid label,
+.mapping-grid label {
+    display: grid;
+    gap: 6px;
+    color: var(--muted);
+    font-size: 0.78rem;
+    font-weight: 800;
+}
+
+.filter-grid input,
+.filter-grid select,
+.mapping-grid select,
+.rule-form input,
+.rule-form select,
+.bulk-actions select {
+    width: 100%;
+    height: 40px;
+    padding: 0 10px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    color: var(--ink);
+    background: #fff;
+}
+
+.file-input {
+    max-width: 260px;
+    color: var(--muted);
+    font-size: 0.82rem;
+    font-weight: 700;
+}
+
+.bulk-actions,
+.rule-form {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.rule-form {
+    display: grid;
+    grid-template-columns: minmax(140px, 1fr) minmax(140px, 1fr) minmax(120px, 0.8fr) auto;
+}
+
+.table-wrap {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.compact-table {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+}
+
+.data-table th,
+.data-table td {
+    padding: 10px 8px;
+    border-bottom: 1px solid var(--line);
+    text-align: left;
+    vertical-align: top;
+}
+
+.data-table th {
+    color: var(--muted);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.data-table .number-cell {
+    text-align: right;
+    white-space: nowrap;
+}
+
+.data-table .row-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 6px;
+}
+
+.data-table a {
+    color: var(--blue-dark);
+    font-weight: 800;
+    text-decoration: none;
+}
+
+.mini-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border: 0;
+    border-radius: 8px;
+    color: var(--ink);
+    background: var(--soft);
+}
+
+.rule-list {
+    display: grid;
+    gap: 8px;
+}
+
+.rule-item {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 10px;
+    align-items: center;
+    padding: 10px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+}
+
+.rule-item p {
+    margin-bottom: 0;
+    color: var(--muted);
+    font-size: 0.86rem;
+}
+
+.report-summary {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.report-metric {
+    padding: 12px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--soft);
+}
+
+.report-metric span {
+    display: block;
+    color: var(--muted);
+    font-size: 0.72rem;
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+.report-metric strong {
+    display: block;
+    margin-top: 6px;
+    font-size: 1.25rem;
+}
+
+.duplicate-flag {
+    color: var(--amber);
+    font-weight: 900;
+}
+
+.needs-review {
+    color: var(--red);
+    font-weight: 900;
+}
+
+.reviewed {
+    color: var(--green);
+    font-weight: 900;
+}
+
 .hours-summary {
     margin-top: 24px;
 }
@@ -836,7 +1065,12 @@ body.admin-mode .admin-only {
     .form-grid,
     .line-item-row,
     .hour-entry-row,
-    .billing-details {
+    .billing-details,
+    .bookkeeping-grid,
+    .filter-grid,
+    .mapping-grid,
+    .report-summary,
+    .rule-form {
         grid-template-columns: 1fr;
     }
 
@@ -858,6 +1092,60 @@ body.admin-mode .admin-only {
 @media print {
     body {
         background: #fff;
+    }
+
+    body.invoice-printing * {
+        visibility: hidden !important;
+    }
+
+    body.invoice-printing [data-tab-panel][hidden] {
+        display: block !important;
+    }
+
+    body.invoice-printing #invoiceDetail,
+    body.invoice-printing #invoiceDetail * {
+        visibility: visible !important;
+    }
+
+    body.invoice-printing #invoiceDetail {
+        position: absolute;
+        top: 0;
+        left: 0;
+        display: block;
+        width: 100%;
+        min-height: 0;
+        border: 0;
+        box-shadow: none;
+        padding: 0;
+    }
+
+    body.invoice-printing #invoiceDetail .action-button {
+        display: none !important;
+    }
+
+    body.report-printing * {
+        visibility: hidden !important;
+    }
+
+    body.report-printing #bkReportArea,
+    body.report-printing #bkReportArea * {
+        visibility: visible !important;
+    }
+
+    body.report-printing #bkReportArea {
+        position: absolute;
+        top: 0;
+        left: 0;
+        display: block;
+        width: 100%;
+        border: 0;
+        box-shadow: none;
+        padding: 0;
+    }
+
+    body.report-printing #bkReportArea .bulk-actions,
+    body.report-printing #bkReportArea .filter-grid {
+        display: none !important;
     }
 
     .portal-shell,

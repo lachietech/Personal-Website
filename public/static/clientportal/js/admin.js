@@ -49,6 +49,7 @@ const els = {
     sendAccountEmailButton: document.getElementById('sendAccountEmailButton'),
     sendInvoiceEmailButton: document.getElementById('sendInvoiceEmailButton'),
     sendReminderEmailButton: document.getElementById('sendReminderEmailButton'),
+    sendReceiptEmailButton: document.getElementById('sendReceiptEmailButton'),
     emailMessage: document.getElementById('emailMessage'),
     billingForm: document.getElementById('billingForm'),
     billingBusinessName: document.getElementById('billingBusinessName'),
@@ -269,6 +270,11 @@ function render() {
     renderClients();
     renderInvoices();
     Portal.renderInvoiceDetail(els.invoiceDetail, client, invoice, true, state.billing);
+    const receiptReady = invoice?.status === 'paid';
+    els.sendReceiptEmailButton.disabled = !receiptReady;
+    els.sendReceiptEmailButton.title = receiptReady
+        ? 'Send receipt for selected paid invoice'
+        : 'Mark the invoice paid before sending a receipt';
 }
 
 async function loadAdmin() {
@@ -562,6 +568,10 @@ els.sendReminderEmailButton.addEventListener('click', () => {
     sendEmailAction('/clientportal/api/admin/clients/:clientId/invoices/:invoiceId/reminder', 'Sending reminder...', 'Reminder email processed.');
 });
 
+els.sendReceiptEmailButton.addEventListener('click', () => {
+    sendEmailAction('/clientportal/api/admin/clients/:clientId/invoices/:invoiceId/receipt', 'Sending receipt...', 'Receipt email processed.');
+});
+
 els.billingForm.addEventListener('submit', async (event) => {
     event.preventDefault();
     Portal.setMessage(els.billingMessage, 'Saving billing details...');
@@ -610,7 +620,13 @@ els.logoutButton.addEventListener('click', async () => {
     window.location.assign('/clientportal/login');
 });
 
-els.printInvoiceButton.addEventListener('click', () => window.print());
+els.printInvoiceButton.addEventListener('click', () => {
+    if (!selectedInvoice()) {
+        Portal.setMessage(els.emailMessage, 'Select an invoice first.', 'error');
+        return;
+    }
+    Portal.printInvoice(els.invoiceDetail);
+});
 
 resetInvoiceForm();
 setActiveTab('clients');

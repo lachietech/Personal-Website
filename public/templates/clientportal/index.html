@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Client Portal | Nielsen Innovations</title>
+        <meta name="description" content="Nielsen Innovations client portal for balances, invoices, and project billing updates.">
+        <link href="../../../static/main/img/favicon.png" rel="icon">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+        <link href="../../../static/main/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+        <link href="../../../static/clientportal/css/styles.css" rel="stylesheet">
+    </head>
+    <body>
+        <header class="portal-shell">
+            <nav class="topbar" aria-label="Client portal navigation">
+                <a class="brand" href="/">
+                    <span class="brand-mark">NI</span>
+                    <span>Nielsen Innovations</span>
+                </a>
+                <div class="topbar-actions">
+                    <button class="icon-button" type="button" id="printInvoiceButton" title="Print selected invoice" aria-label="Print selected invoice">
+                        <i class="bi bi-printer"></i>
+                    </button>
+                    <a class="home-link" href="/">Back to site</a>
+                </div>
+            </nav>
+
+            <section class="portal-header">
+                <div>
+                    <p class="eyebrow">Client Portal</p>
+                    <h1>Balances, invoices, and project billing in one place.</h1>
+                </div>
+                <div class="mode-switch" role="tablist" aria-label="Portal mode">
+                    <button class="mode-button active" type="button" data-mode="client" role="tab" aria-selected="true">
+                        <i class="bi bi-person"></i>
+                        Client
+                    </button>
+                    <button class="mode-button" type="button" data-mode="admin" role="tab" aria-selected="false">
+                        <i class="bi bi-pencil-square"></i>
+                        Owner
+                    </button>
+                </div>
+            </section>
+        </header>
+
+        <main class="portal-main">
+            <section class="summary-grid" aria-label="Account summary">
+                <article class="summary-panel primary">
+                    <span class="summary-label">Total owing</span>
+                    <strong id="totalOwing">$0.00</strong>
+                    <small id="nextDue">No due invoices</small>
+                </article>
+                <article class="summary-panel">
+                    <span class="summary-label">Open invoices</span>
+                    <strong id="openInvoices">0</strong>
+                    <small id="paidInvoices">0 paid invoices</small>
+                </article>
+                <article class="summary-panel">
+                    <span class="summary-label">Current client</span>
+                    <strong id="currentClientName">-</strong>
+                    <small id="currentClientEmail">-</small>
+                </article>
+            </section>
+
+            <section class="workspace">
+                <aside class="client-panel" aria-label="Client list">
+                    <div class="panel-heading">
+                        <div>
+                            <p class="eyebrow">Accounts</p>
+                            <h2>Clients</h2>
+                        </div>
+                        <button class="icon-button admin-only" type="button" id="addClientButton" title="Add client" aria-label="Add client">
+                            <i class="bi bi-plus-lg"></i>
+                        </button>
+                    </div>
+                    <label class="field-label" for="clientSearch">Search clients</label>
+                    <input class="search-input" type="search" id="clientSearch" placeholder="Name, business, or email">
+                    <div class="client-list" id="clientList"></div>
+                </aside>
+
+                <section class="invoice-panel" aria-label="Invoice details">
+                    <div class="panel-heading invoice-heading">
+                        <div>
+                            <p class="eyebrow">Invoices</p>
+                            <h2 id="invoicePanelTitle">Select a client</h2>
+                        </div>
+                        <button class="action-button admin-only" type="button" id="addInvoiceButton">
+                            <i class="bi bi-file-earmark-plus"></i>
+                            Add invoice
+                        </button>
+                    </div>
+
+                    <div class="invoice-layout">
+                        <div class="invoice-list" id="invoiceList"></div>
+                        <article class="invoice-detail" id="invoiceDetail">
+                            <div class="empty-state">
+                                <i class="bi bi-receipt"></i>
+                                <h3>No invoice selected</h3>
+                                <p>Choose a client and invoice to view itemised billing details.</p>
+                            </div>
+                        </article>
+                    </div>
+                </section>
+            </section>
+        </main>
+
+        <dialog class="editor-dialog" id="clientDialog">
+            <form method="dialog" class="editor-form" id="clientForm">
+                <div class="dialog-heading">
+                    <h2 id="clientDialogTitle">Client</h2>
+                    <button class="icon-button" type="button" data-close-dialog="clientDialog" title="Close" aria-label="Close">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
+                <input type="hidden" id="clientId">
+                <label>
+                    Business name
+                    <input type="text" id="clientBusiness" required>
+                </label>
+                <label>
+                    Contact name
+                    <input type="text" id="clientContact" required>
+                </label>
+                <label>
+                    Email
+                    <input type="email" id="clientEmail" required>
+                </label>
+                <label>
+                    Notes
+                    <textarea id="clientNotes" rows="4"></textarea>
+                </label>
+                <div class="dialog-actions">
+                    <button class="danger-button" type="button" id="deleteClientButton">Delete</button>
+                    <button class="action-button" type="submit">Save client</button>
+                </div>
+            </form>
+        </dialog>
+
+        <dialog class="editor-dialog wide" id="invoiceDialog">
+            <form method="dialog" class="editor-form" id="invoiceForm">
+                <div class="dialog-heading">
+                    <h2 id="invoiceDialogTitle">Invoice</h2>
+                    <button class="icon-button" type="button" data-close-dialog="invoiceDialog" title="Close" aria-label="Close">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
+                <input type="hidden" id="invoiceId">
+                <div class="form-grid">
+                    <label>
+                        Invoice number
+                        <input type="text" id="invoiceNumber" required>
+                    </label>
+                    <label>
+                        Status
+                        <select id="invoiceStatus">
+                            <option value="draft">Draft</option>
+                            <option value="sent">Sent</option>
+                            <option value="overdue">Overdue</option>
+                            <option value="paid">Paid</option>
+                        </select>
+                    </label>
+                    <label>
+                        Issued
+                        <input type="date" id="invoiceIssued" required>
+                    </label>
+                    <label>
+                        Due
+                        <input type="date" id="invoiceDue" required>
+                    </label>
+                </div>
+                <label>
+                    Invoice notes
+                    <textarea id="invoiceNotes" rows="3"></textarea>
+                </label>
+                <div class="line-editor">
+                    <div class="line-editor-heading">
+                        <h3>Line items</h3>
+                        <button class="icon-button" type="button" id="addLineButton" title="Add line item" aria-label="Add line item">
+                            <i class="bi bi-plus-lg"></i>
+                        </button>
+                    </div>
+                    <div id="lineItemsEditor"></div>
+                </div>
+                <div class="dialog-actions">
+                    <button class="danger-button" type="button" id="deleteInvoiceButton">Delete</button>
+                    <button class="action-button" type="submit">Save invoice</button>
+                </div>
+            </form>
+        </dialog>
+
+        <template id="lineItemTemplate">
+            <div class="line-item-row">
+                <input type="text" data-line-field="description" placeholder="Description" required>
+                <input type="number" data-line-field="quantity" min="0" step="0.25" placeholder="Qty" required>
+                <input type="number" data-line-field="rate" min="0" step="0.01" placeholder="Rate" required>
+                <button class="icon-button danger-icon" type="button" data-remove-line title="Remove line item" aria-label="Remove line item">
+                    <i class="bi bi-trash3"></i>
+                </button>
+            </div>
+        </template>
+
+        <script src="../../../static/clientportal/js/app.js"></script>
+    </body>
+</html>
