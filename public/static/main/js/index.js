@@ -1,16 +1,25 @@
 const navbar = document.querySelector('.navbar');
+const navbarCollapse = document.getElementById('navbarNav');
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 function getNavbarOffset() {
-    return navbar ? navbar.offsetHeight + 16 : 96;
+    return navbar ? navbar.offsetHeight + 12 : 86;
 }
 
 function syncNavbarOffsetVar() {
     document.documentElement.style.setProperty('--navbar-offset', `${getNavbarOffset()}px`);
 }
 
-// Smooth scrolling with fixed-navbar offset support.
+function updateNavbar() {
+    if (!navbar) {
+        return;
+    }
+
+    navbar.classList.toggle('scrolled', window.scrollY > 24);
+}
+
 document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
-    anchor.addEventListener('click', function (e) {
+    anchor.addEventListener('click', function (event) {
         const href = this.getAttribute('href');
         if (!href || href === '#') {
             return;
@@ -21,40 +30,92 @@ document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
             return;
         }
 
-        e.preventDefault();
-        const top = target.getBoundingClientRect().top + window.scrollY - getNavbarOffset();
-        window.scrollTo({ top: Math.max(top, 0), behavior: 'smooth' });
+        event.preventDefault();
+        const targetTop = target.getBoundingClientRect().top + window.scrollY - getNavbarOffset();
+        window.scrollTo({
+            top: Math.max(targetTop, 0),
+            behavior: prefersReducedMotion ? 'auto' : 'smooth'
+        });
+
+        if (navbarCollapse?.classList.contains('show') && window.bootstrap?.Collapse) {
+            window.bootstrap.Collapse.getOrCreateInstance(navbarCollapse).hide();
+        }
     });
 });
 
 syncNavbarOffsetVar();
-window.addEventListener('resize', syncNavbarOffsetVar);
-window.addEventListener('load', syncNavbarOffsetVar);
+updateNavbar();
 
-const navbarCollapse = document.getElementById('navbarNav');
+window.addEventListener('resize', syncNavbarOffsetVar, { passive: true });
+window.addEventListener('load', syncNavbarOffsetVar);
+window.addEventListener('scroll', updateNavbar, { passive: true });
+
 if (navbarCollapse) {
     navbarCollapse.addEventListener('shown.bs.collapse', syncNavbarOffsetVar);
     navbarCollapse.addEventListener('hidden.bs.collapse', syncNavbarOffsetVar);
 }
 
-// Scroll animations
-const observerOptions = {
-    threshold: 0.1,
-    rootMargin: '0px 0px -50px 0px'
-};
+// Reveal content progressively as it enters the viewport.
+const revealElements = document.querySelectorAll('.fade-up');
+revealElements.forEach((element, index) => {
+    element.style.transitionDelay = `${Math.min(index % 4, 3) * 55}ms`;
+});
 
-const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
+if (prefersReducedMotion || !('IntersectionObserver' in window)) {
+    revealElements.forEach((element) => element.classList.add('visible'));
+} else {
+    const revealObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach((entry) => {
+            if (!entry.isIntersecting) {
+                return;
+            }
+
             entry.target.classList.add('visible');
             observer.unobserve(entry.target);
-        }
+        });
+    }, {
+        threshold: 0.12,
+        rootMargin: '0px 0px -45px 0px'
     });
-}, observerOptions);
 
-document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+    revealElements.forEach((element) => revealObserver.observe(element));
+}
 
-// Contact form handling
+// Keep the active navigation link aligned with the section in view.
+const sectionLinks = new Map(
+    Array.from(document.querySelectorAll('.navbar .nav-link[href^="#"]'))
+        .map((link) => [link.getAttribute('href').slice(1), link])
+);
+const observedSections = Array.from(document.querySelectorAll('main section[id]'))
+    .filter((section) => sectionLinks.has(section.id));
+
+if ('IntersectionObserver' in window && observedSections.length) {
+    const sectionObserver = new IntersectionObserver((entries) => {
+        const visibleSection = entries
+            .filter((entry) => entry.isIntersecting)
+            .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+
+        if (!visibleSection) {
+            return;
+        }
+
+        sectionLinks.forEach((link, id) => {
+            link.classList.toggle('active', id === visibleSection.target.id);
+        });
+    }, {
+        rootMargin: '-24% 0px -58% 0px',
+        threshold: [0, 0.1, 0.25]
+    });
+
+    observedSections.forEach((section) => sectionObserver.observe(section));
+}
+
+const currentYear = document.getElementById('currentYear');
+if (currentYear) {
+    currentYear.textContent = new Date().getFullYear();
+}
+
+// Contact form handling.
 const contactForm = document.getElementById('contactForm');
 const formMessage = document.getElementById('formMessage');
 const submitBtn = document.getElementById('submitBtn');
@@ -71,13 +132,21 @@ function getCsrfToken() {
                 }
                 return response.json();
             })
-            .then((data) => data.csrfToken);
+            .then((data) => data.csrfToken)
+            .catch((error) => {
+                csrfTokenPromise = undefined;
+                throw error;
+            });
     }
 
     return csrfTokenPromise;
 }
 
 function showFormMessage(type, message) {
+    if (!formMessage) {
+        return;
+    }
+
     formMessage.textContent = '';
     const alert = document.createElement('div');
     alert.className = `alert alert-${type}`;
@@ -85,57 +154,49 @@ function showFormMessage(type, message) {
     formMessage.appendChild(alert);
 }
 
-contactForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
+if (contactForm && submitBtn && btnText && btnLoader) {
+    contactForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
 
-    // Disable button and show loader
-    submitBtn.disabled = true;
-    btnText.classList.add('d-none');
-    btnLoader.classList.remove('d-none');
-    formMessage.textContent = '';
-
-    const formData = {
-        name: document.getElementById('name').value,
-        email: document.getElementById('email').value,
-        subject: document.getElementById('subject').value,
-        message: document.getElementById('message').value
-    };
-
-    try {
-        const csrfToken = await getCsrfToken();
-        const response = await fetch('/contact', {
-            method: 'POST',
-            credentials: 'same-origin',
-            headers: {
-                'Content-Type': 'application/json',
-                'x-csrf-token': csrfToken
-            },
-            body: JSON.stringify(formData)
-        });
-
-        const data = await response.json();
-
-        if (data.success) {
-            showFormMessage('success', data.message);
-            contactForm.reset();
-        } else {
-            showFormMessage('danger', data.message);
+        submitBtn.disabled = true;
+        btnText.classList.add('d-none');
+        btnLoader.classList.remove('d-none');
+        if (formMessage) {
+            formMessage.textContent = '';
         }
-    } catch (error) {
-        showFormMessage('danger', 'An error occurred. Please try again later.');
-    } finally {
-        // Re-enable button
-        submitBtn.disabled = false;
-        btnText.classList.remove('d-none');
-        btnLoader.classList.add('d-none');
-    }
-});
 
-// Navbar background on scroll
-window.addEventListener('scroll', () => {
-    if (window.scrollY > 50) {
-        navbar.style.background = 'rgba(15, 23, 42, 1)';
-    } else {
-        navbar.style.background = 'rgba(15, 23, 42, 0.95)';
-    }
-});
+        const formData = {
+            name: document.getElementById('name').value.trim(),
+            email: document.getElementById('email').value.trim(),
+            subject: document.getElementById('subject').value.trim(),
+            message: document.getElementById('message').value.trim()
+        };
+
+        try {
+            const csrfToken = await getCsrfToken();
+            const response = await fetch('/contact', {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-csrf-token': csrfToken
+                },
+                body: JSON.stringify(formData)
+            });
+            const data = await response.json();
+
+            if (!response.ok || !data.success) {
+                throw new Error(data.message || 'Unable to send your message.');
+            }
+
+            showFormMessage('success', data.message || 'Thanks — your message has been sent.');
+            contactForm.reset();
+        } catch (error) {
+            showFormMessage('danger', error.message || 'Something went wrong. Please try again later.');
+        } finally {
+            submitBtn.disabled = false;
+            btnText.classList.remove('d-none');
+            btnLoader.classList.add('d-none');
+        }
+    });
+}
