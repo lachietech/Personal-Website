@@ -20,6 +20,6 @@ export const uniformsDb = mongoose.createConnection(process.env.MONGO_URI_UNIFOR
 uniformsDb.on('connected', () => console.log("Connected to HFSS Uniforms database."));
 uniformsDb.on('error', (err) => console.error("HFSS Uniforms DB error:", err.message));
 
-export const clientPortalDb = mongoose.createConnection(process.env.MONGO_URI_CLIENTPORTAL || process.env.MONGO_URI_UNIFORMS || process.env.MONGO_URI);
+export const clientPortalDb = mongoose.createConnection(process.env.MONGO_URI_CLIENT);
 clientPortalDb.on('connected', () => console.log("Connected to Client Portal database."));
 clientPortalDb.on('error', (err) => console.error("Client Portal DB error:", err.message));

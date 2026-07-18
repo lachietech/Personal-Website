@@ -74,7 +74,11 @@ function today() {
 }
 
 function selectedClient() {
-    return state.clients.find((client) => client.id === state.selectedClientId) || state.clients[0] || null;
+    if (!state.selectedClientId) {
+        return null;
+    }
+
+    return state.clients.find((client) => client.id === state.selectedClientId) || null;
 }
 
 function selectedInvoice() {
