@@ -3,7 +3,7 @@
     "version": "1.0.0",
     "main": "index.js",
     "scripts": {
-        "test": "node scripts/check-syntax.js",
+        "test": "node scripts/check-syntax.js && node --test",
         "db:clone-client-portal": "node scripts/clone-client-portal-db.js",
         "dev": "nodemon backend/server.js",
         "start": "node backend/server.js"

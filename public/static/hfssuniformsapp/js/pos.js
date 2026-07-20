@@ -1,4 +1,10 @@
+import { PosProductAdminController } from './pos/product-admin.js';
+
 const posApp = window.UniformShopApp;
+const productAdmin = new PosProductAdminController({
+    app: posApp,
+    refreshCatalog: () => loadPOSProducts()
+});
 
 function setupPOS() {
     const refreshBtn = document.getElementById('posRefreshBtn');
@@ -83,15 +89,15 @@ function setupPOS() {
         alert('Center Pay transaction recorded.');
     });
 
-    addProductBtn?.addEventListener('click', () => openPOSProductModal());
-    saveProductBtn?.addEventListener('click', savePOSProduct);
-    closeProductBtn?.addEventListener('click', closePOSProductModal);
-    cancelProductBtn?.addEventListener('click', closePOSProductModal);
+    addProductBtn?.addEventListener('click', () => productAdmin.open());
+    saveProductBtn?.addEventListener('click', () => productAdmin.save());
+    closeProductBtn?.addEventListener('click', () => productAdmin.close());
+    cancelProductBtn?.addEventListener('click', () => productAdmin.close());
 
     const modal = document.getElementById('posProductModal');
     if (modal) {
         window.addEventListener('click', (event) => {
-            if (event.target === modal) closePOSProductModal();
+            if (event.target === modal) productAdmin.close();
         });
     }
 
@@ -526,175 +532,9 @@ async function loadPOSOrders(date) {
     }
 }
 
-async function loadPOSProductsAdmin() {
-    const body = document.getElementById('posProductsAdminBody');
-    if (!body) return;
-    body.innerHTML = '<tr><td colspan="9" class="loading">Loading POS products...</td></tr>';
-
-    try {
-        const response = await fetch('/api/pos/products/all');
-        const products = await response.json();
-        if (!response.ok) throw new Error(products.error || 'Failed to load product admin');
-
-        if (!products.length) {
-            body.innerHTML = '<tr><td colspan="9" class="loading">No POS products found.</td></tr>';
-            return;
-        }
-
-        body.innerHTML = '';
-        products.forEach((product) => {
-            const row = document.createElement('tr');
-
-            const nameCell = document.createElement('td');
-            nameCell.textContent = product.name || '';
-            row.appendChild(nameCell);
-
-            const categoryCell = document.createElement('td');
-            categoryCell.textContent = product.category || '';
-            row.appendChild(categoryCell);
-
-            const sizeCell = document.createElement('td');
-            sizeCell.textContent = product.size || '';
-            row.appendChild(sizeCell);
-
-            const skuCell = document.createElement('td');
-            skuCell.textContent = product.sku || '';
-            row.appendChild(skuCell);
-
-            const priceCell = document.createElement('td');
-            priceCell.textContent = posApp.formatCurrency(product.price);
-            row.appendChild(priceCell);
-
-            const onHandCell = document.createElement('td');
-            onHandCell.textContent = String(Number(product.stockOnHand || 0));
-            row.appendChild(onHandCell);
-
-            const warehouseCell = document.createElement('td');
-            warehouseCell.textContent = String(Number(product.stockInWarehouse || 0));
-            row.appendChild(warehouseCell);
-
-            const statusCell = document.createElement('td');
-            const statusPill = document.createElement('span');
-            statusPill.className = `pos-status-pill ${product.active ? 'pos-status-active' : 'pos-status-inactive'}`;
-            statusPill.textContent = product.active ? 'Active' : 'Inactive';
-            statusCell.appendChild(statusPill);
-            row.appendChild(statusCell);
-
-            const actionsCell = document.createElement('td');
-            const editButton = document.createElement('button');
-            editButton.className = 'btn btn-secondary btn-small';
-            editButton.type = 'button';
-            editButton.textContent = 'Edit';
-            editButton.addEventListener('click', () => openPOSProductModal(product));
-            actionsCell.appendChild(editButton);
-
-            const toggleButton = document.createElement('button');
-            toggleButton.className = 'btn btn-danger btn-small';
-            toggleButton.type = 'button';
-            toggleButton.textContent = product.active ? 'Deactivate' : 'Activate';
-            toggleButton.addEventListener('click', async () => {
-                await fetch(`/api/pos/products/${product._id}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        name: product.name,
-                        category: product.category,
-                        size: product.size,
-                        sku: product.sku,
-                        price: product.price,
-                        stockOnHand: Number(product.stockOnHand || 0),
-                        stockInWarehouse: Number(product.stockInWarehouse || 0),
-                        active: !product.active
-                    })
-                });
-                await loadPOSProductsAdmin();
-                await loadPOSProducts();
-            });
-            actionsCell.appendChild(toggleButton);
-
-            row.appendChild(actionsCell);
-            body.appendChild(row);
-        });
-    } catch (error) {
-        body.innerHTML = `<tr><td colspan="9" style="color: #d9534f;">${posApp.escapeHtml(error.message)}</td></tr>`;
-    }
-}
-
-function openPOSProductModal(product = null) {
-    posApp.state.currentPosEditId = product?._id || null;
-    const titleEl = document.getElementById('posProductModalTitle');
-    const nameEl = document.getElementById('posProductName');
-    const categoryEl = document.getElementById('posProductCategory');
-    const sizeEl = document.getElementById('posProductSize');
-    const skuEl = document.getElementById('posProductSku');
-    const priceEl = document.getElementById('posProductPrice');
-    const onHandEl = document.getElementById('posProductStockOnHand');
-    const warehouseEl = document.getElementById('posProductStockWarehouse');
-    const modalEl = document.getElementById('posProductModal');
-    if (!titleEl || !nameEl || !categoryEl || !sizeEl || !skuEl || !priceEl || !onHandEl || !warehouseEl || !modalEl) {
-        return;
-    }
-
-    titleEl.textContent = posApp.state.currentPosEditId ? 'Edit POS Product' : 'Add POS Product';
-    nameEl.value = product?.name || '';
-    categoryEl.value = product?.category || '';
-    sizeEl.value = product?.size || '';
-    skuEl.value = product?.sku || '';
-    priceEl.value = product?.price ?? '';
-    onHandEl.value = product?.stockOnHand ?? 0;
-    warehouseEl.value = product?.stockInWarehouse ?? 0;
-    modalEl.classList.add('show');
-}
-
-function closePOSProductModal() {
-    posApp.state.currentPosEditId = null;
-    document.getElementById('posProductModal')?.classList.remove('show');
-}
-
-async function savePOSProduct() {
-    const name = document.getElementById('posProductName')?.value.trim();
-    const category = document.getElementById('posProductCategory')?.value.trim();
-    const size = document.getElementById('posProductSize')?.value.trim();
-    const sku = document.getElementById('posProductSku')?.value.trim();
-    const price = Number(document.getElementById('posProductPrice')?.value);
-    const stockOnHand = Number(document.getElementById('posProductStockOnHand')?.value || 0);
-    const stockInWarehouse = Number(document.getElementById('posProductStockWarehouse')?.value || 0);
-
-    if (!name || !category || Number.isNaN(price) || price < 0) {
-        alert('Name, category and a valid price are required.');
-        return;
-    }
-
-    if (!Number.isFinite(stockOnHand) || stockOnHand < 0 || !Number.isFinite(stockInWarehouse) || stockInWarehouse < 0) {
-        alert('Stock values must be zero or greater.');
-        return;
-    }
-
-    const url = posApp.state.currentPosEditId
-        ? `/api/pos/products/${posApp.state.currentPosEditId}`
-        : '/api/pos/products';
-    const method = posApp.state.currentPosEditId ? 'PUT' : 'POST';
-
-    const response = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, category, size, sku, price, stockOnHand, stockInWarehouse })
-    });
-    const data = await response.json();
-    if (!response.ok) {
-        alert(data.error || 'Failed to save product');
-        return;
-    }
-
-    closePOSProductModal();
-    await posApp.loadStockSection?.();
-    await loadPOSProductsAdmin();
-    await loadPOSProducts();
-}
-
 posApp.setupPOS = setupPOS;
 posApp.renderPOSCart = renderPOSCart;
 posApp.loadPOSSection = loadPOSSection;
 posApp.loadPOSOrders = loadPOSOrders;
-posApp.loadPOSProductsAdmin = loadPOSProductsAdmin;
-posApp.openPOSProductModal = openPOSProductModal;
+posApp.loadPOSProductsAdmin = () => productAdmin.load();
+posApp.openPOSProductModal = (product) => productAdmin.open(product);

@@ -1,25 +1,32 @@
 import mongoose from "mongoose";
-import dotenv from "dotenv";
+import "./config/environment.js";
 
-dotenv.config();
 mongoose.set('sanitizeFilter', true);
 
-export const meandersuiteDb = mongoose.createConnection(process.env.MONGO_URI_MEANDERSUITE);
-meandersuiteDb.on('connected', () => console.log("Connected to MeanderSuite database."));
-meandersuiteDb.on('error', (err) => console.error("MeanderSuite DB error:", err.message));
+function createDatabaseConnection(label, uri) {
+  const connection = mongoose.createConnection(uri);
+  connection.on("connected", () => console.log(`Connected to ${label} database.`));
+  connection.on("error", (error) => console.error(`${label} DB error:`, error.message));
+  return connection;
+}
 
-export const pinpointDb = mongoose.createConnection(process.env.MONGO_URI_PINPOINT);
-pinpointDb.on('connected', () => console.log("Connected to Pinpoint database."));
-pinpointDb.on('error', (err) => console.error("Pinpoint DB error:", err.message));
-
-export const superchatDb = mongoose.createConnection(process.env.MONGO_URI_SCV1);
-superchatDb.on('connected', () => console.log("Connected to SuperChat database."));
-superchatDb.on('error', (err) => console.error("SuperChat DB error:", err.message));
-
-export const uniformsDb = mongoose.createConnection(process.env.MONGO_URI_UNIFORMS || process.env.MONGO_URI);
-uniformsDb.on('connected', () => console.log("Connected to HFSS Uniforms database."));
-uniformsDb.on('error', (err) => console.error("HFSS Uniforms DB error:", err.message));
-
-export const clientPortalDb = mongoose.createConnection(process.env.MONGO_URI_CLIENT);
-clientPortalDb.on('connected', () => console.log("Connected to Client Portal database."));
-clientPortalDb.on('error', (err) => console.error("Client Portal DB error:", err.message));
+export const meandersuiteDb = createDatabaseConnection(
+  "MeanderSuite",
+  process.env.MONGO_URI_MEANDERSUITE
+);
+export const pinpointDb = createDatabaseConnection(
+  "Pinpoint",
+  process.env.MONGO_URI_PINPOINT
+);
+export const superchatDb = createDatabaseConnection(
+  "SuperChat",
+  process.env.MONGO_URI_SCV1
+);
+export const uniformsDb = createDatabaseConnection(
+  "HFSS Uniforms",
+  process.env.MONGO_URI_UNIFORMS
+);
+export const clientPortalDb = createDatabaseConnection(
+  "Client Portal",
+  process.env.MONGO_URI_CLIENT
+);

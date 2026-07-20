@@ -1,3 +1,6 @@
+import { BookkeepingImportController } from './bookkeeping/import-controller.js';
+import { downloadCsv, reportTotals } from './bookkeeping/report-utils.js';
+
 (function () {
     const panel = document.getElementById('bookkeepingPanel');
     if (!panel) {
@@ -78,17 +81,6 @@
         exportReportPdf: document.getElementById('bkExportReportPdf')
     };
 
-    const mappingFields = [
-        ['date', 'Date'],
-        ['description', 'Description'],
-        ['amount', 'Signed amount'],
-        ['debit', 'Debit/withdrawal'],
-        ['credit', 'Credit/deposit'],
-        ['type', 'Type'],
-        ['account', 'Account'],
-        ['category', 'Category']
-    ];
-
     function today() {
         return new Date().toISOString().slice(0, 10);
     }
@@ -103,46 +95,6 @@
 
     function setMessage(element, message, type = '') {
         Portal.setMessage(element, message, type);
-    }
-
-    function normalizeText(value) {
-        return String(value || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
-    }
-
-    function normalizeCompact(value) {
-        return String(value || '').toLowerCase().replace(/[^a-z0-9]+/g, '');
-    }
-
-    function cleanAmount(value) {
-        const raw = String(value || '').trim();
-        const negative = /^\(.*\)$/.test(raw) || raw.startsWith('-');
-        const number = Number(raw.replace(/[()$,]/g, ''));
-        if (!Number.isFinite(number)) {
-            return 0;
-        }
-        return negative ? -Math.abs(number) : number;
-    }
-
-    function normalizeDate(value) {
-        const raw = String(value || '').trim();
-        if (!raw) {
-            return '';
-        }
-        if (/^\d{4}-\d{1,2}-\d{1,2}$/.test(raw)) {
-            const [year, month, day] = raw.split('-');
-            return `${year.padStart(4, '0')}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
-        }
-        const slash = raw.match(/^(\d{1,2})[/-](\d{1,2})[/-](\d{2,4})$/);
-        if (slash) {
-            const first = Number(slash[1]);
-            const second = Number(slash[2]);
-            const year = slash[3].length === 2 ? `20${slash[3]}` : slash[3];
-            const day = first > 12 ? first : second;
-            const month = first > 12 ? second : first;
-            return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-        }
-        const parsed = new Date(raw);
-        return Number.isNaN(parsed.getTime()) ? '' : parsed.toISOString().slice(0, 10);
     }
 
     function selectedTransaction() {
@@ -398,241 +350,6 @@
         renderAll();
     }
 
-    function parseCsv(text) {
-        const rows = [];
-        let row = [];
-        let cell = '';
-        let inQuotes = false;
-
-        for (let index = 0; index < text.length; index += 1) {
-            const char = text[index];
-            const next = text[index + 1];
-            if (char === '"' && inQuotes && next === '"') {
-                cell += '"';
-                index += 1;
-            } else if (char === '"') {
-                inQuotes = !inQuotes;
-            } else if (char === ',' && !inQuotes) {
-                row.push(cell);
-                cell = '';
-            } else if ((char === '\n' || char === '\r') && !inQuotes) {
-                if (char === '\r' && next === '\n') {
-                    index += 1;
-                }
-                row.push(cell);
-                if (row.some((value) => value.trim())) {
-                    rows.push(row);
-                }
-                row = [];
-                cell = '';
-            } else {
-                cell += char;
-            }
-        }
-
-        row.push(cell);
-        if (row.some((value) => value.trim())) {
-            rows.push(row);
-        }
-        return rows;
-    }
-
-    function guessColumn(field) {
-        const tests = {
-            date: [/date/, /posted/, /transaction/],
-            description: [/description/, /details/, /merchant/, /memo/, /payee/],
-            amount: [/^amount$/, /signed/, /value/],
-            debit: [/debit/, /withdrawal/, /paid out/, /outflow/],
-            credit: [/credit/, /deposit/, /paid in/, /inflow/],
-            type: [/type/],
-            account: [/account/],
-            category: [/category/]
-        };
-        return state.csvHeaders.findIndex((header) => tests[field]?.some((test) => test.test(header.toLowerCase())));
-    }
-
-    function renderMapping() {
-        const options = ['<option value="">None</option>']
-            .concat(state.csvHeaders.map((header, index) => `<option value="${index}">${escapeHtml(header || `Column ${index + 1}`)}</option>`))
-            .join('');
-        els.mappingGrid.innerHTML = mappingFields.map(([field, label]) => {
-            const guess = guessColumn(field);
-            return `
-                <label>${escapeHtml(label)}
-                    <select data-bk-map="${escapeHtml(field)}">
-                        ${options}
-                    </select>
-                </label>
-            `.replace(`value="${guess}"`, `value="${guess}" selected`);
-        }).join('');
-    }
-
-    function mappingValue(field) {
-        const select = els.mappingGrid.querySelector(`[data-bk-map="${field}"]`);
-        return select?.value === '' ? -1 : Number(select.value);
-    }
-
-    function rowValue(row, index) {
-        return index >= 0 ? String(row[index] || '').trim() : '';
-    }
-
-    function applyRules(description) {
-        const normalized = normalizeText(description);
-        const rule = state.rules.find((item) => normalized.includes(normalizeText(item.contains)));
-        return rule || null;
-    }
-
-    function importFingerprint(transaction) {
-        return [
-            transaction.date,
-            transaction.type,
-            Number(transaction.amount || 0).toFixed(2),
-            normalizeCompact(transaction.description),
-            normalizeCompact(transaction.debitAccount || ''),
-            normalizeCompact(transaction.creditAccount || '')
-        ].join('|').slice(0, 220);
-    }
-
-    function descriptionOverlap(a, b) {
-        const left = new Set(normalizeText(a).split(' ').filter((word) => word.length > 2));
-        const right = new Set(normalizeText(b).split(' ').filter((word) => word.length > 2));
-        if (!left.size || !right.size) {
-            return 0;
-        }
-        const shared = [...left].filter((word) => right.has(word)).length;
-        return shared / Math.max(left.size, right.size);
-    }
-
-    function looksDuplicate(transaction) {
-        const compact = normalizeCompact(transaction.description);
-        return state.transactions.some((existing) => {
-            if (existing.date !== transaction.date || existing.type !== transaction.type) {
-                return false;
-            }
-            if (Math.abs(Number(existing.amount || 0) - Number(transaction.amount || 0)) > 0.01) {
-                return false;
-            }
-            const existingCompact = normalizeCompact(existing.description);
-            return compact === existingCompact
-                || (compact.length > 6 && existingCompact.includes(compact))
-                || (existingCompact.length > 6 && compact.includes(existingCompact))
-                || descriptionOverlap(transaction.description, existing.description) >= 0.6;
-        });
-    }
-
-    function buildImportPreview() {
-        if (!state.csvRows.length) {
-            setMessage(els.importMessage, 'Choose a CSV file first.', 'error');
-            return;
-        }
-
-        const indexes = {
-            date: mappingValue('date'),
-            description: mappingValue('description'),
-            amount: mappingValue('amount'),
-            debit: mappingValue('debit'),
-            credit: mappingValue('credit'),
-            type: mappingValue('type'),
-            account: mappingValue('account'),
-            category: mappingValue('category')
-        };
-
-        if (indexes.date < 0 || indexes.description < 0 || (indexes.amount < 0 && indexes.debit < 0 && indexes.credit < 0)) {
-            setMessage(els.importMessage, 'Map date, description, and either amount or debit/credit columns.', 'error');
-            return;
-        }
-
-        state.importSelected.clear();
-        state.importPreview = state.csvRows.map((row, index) => {
-            const signedAmount = cleanAmount(rowValue(row, indexes.amount));
-            const debit = cleanAmount(rowValue(row, indexes.debit));
-            const credit = cleanAmount(rowValue(row, indexes.credit));
-            const typeText = rowValue(row, indexes.type).toLowerCase();
-            let type = signedAmount < 0 || debit > 0 ? 'expense' : 'income';
-            if (/expense|debit|withdraw|payment|purchase/.test(typeText)) {
-                type = 'expense';
-            }
-            if (/income|credit|deposit|sale|revenue/.test(typeText)) {
-                type = 'income';
-            }
-
-            const amount = indexes.amount >= 0 ? Math.abs(signedAmount) : Math.max(debit, credit);
-            const description = rowValue(row, indexes.description);
-            const rule = applyRules(description);
-            const account = rowValue(row, indexes.account) || rule?.account || state.accounts[0] || 'Business Checking';
-            const category = rowValue(row, indexes.category) || rule?.category || '';
-            const transaction = {
-                date: normalizeDate(rowValue(row, indexes.date)),
-                description,
-                type,
-                amount,
-                account,
-                category,
-                debitAccount: defaultDebitAccount(type, account, category || (type === 'income' ? 'Client Income' : 'Uncategorized')),
-                creditAccount: defaultCreditAccount(type, account, category || (type === 'income' ? 'Client Income' : 'Uncategorized')),
-                reviewed: false
-            };
-            transaction.importFingerprint = importFingerprint(transaction);
-            const duplicate = looksDuplicate(transaction);
-            const valid = Boolean(transaction.date && transaction.description && transaction.amount > 0);
-            if (valid && !duplicate) {
-                state.importSelected.add(String(index));
-            }
-            return { id: String(index), transaction, duplicate, valid };
-        });
-
-        renderImportPreview();
-        setMessage(els.importMessage, `${state.importPreview.length} rows parsed. Duplicates are unchecked by default.`);
-    }
-
-    function renderImportPreview() {
-        if (!state.importPreview.length) {
-            els.importPreviewBody.innerHTML = '<tr><td colspan="7">No import preview yet.</td></tr>';
-            els.commitImport.disabled = true;
-            return;
-        }
-
-        els.importPreviewBody.innerHTML = state.importPreview.map((row) => `
-            <tr>
-                <td><input type="checkbox" data-bk-import-select="${escapeHtml(row.id)}" ${state.importSelected.has(row.id) ? 'checked' : ''} ${row.valid ? '' : 'disabled'} aria-label="Select import row"></td>
-                <td>${escapeHtml(row.transaction.date || '-')}</td>
-                <td>${escapeHtml(row.transaction.description || '-')}</td>
-                <td>${escapeHtml(row.transaction.type)}</td>
-                <td class="number-cell">${money(row.transaction.amount)}</td>
-                <td>${escapeHtml(row.transaction.category || 'Uncategorized')}</td>
-                <td>${row.duplicate ? '<span class="duplicate-flag">Duplicate?</span>' : row.valid ? 'Ready' : '<span class="needs-review">Invalid</span>'}</td>
-            </tr>
-        `).join('');
-        els.importSelectAll.checked = state.importPreview.filter((row) => row.valid).every((row) => state.importSelected.has(row.id));
-        els.commitImport.disabled = state.importSelected.size === 0;
-    }
-
-    async function commitImport() {
-        const transactions = state.importPreview
-            .filter((row) => state.importSelected.has(row.id) && row.valid)
-            .map((row) => row.transaction);
-        if (!transactions.length) {
-            setMessage(els.importMessage, 'Select at least one valid row to import.', 'error');
-            return;
-        }
-
-        setMessage(els.importMessage, 'Importing transactions...');
-        try {
-            const data = await Portal.request('/clientportal/api/bookkeeping/import', {
-                method: 'POST',
-                body: { transactions }
-            });
-            state.transactions = data.transactions || state.transactions;
-            state.importPreview = [];
-            state.importSelected.clear();
-            renderAll();
-            renderImportPreview();
-            setMessage(els.importMessage, `Imported ${data.imported} transaction${data.imported === 1 ? '' : 's'}; skipped ${data.skipped}.`, 'success');
-        } catch (error) {
-            setMessage(els.importMessage, error.message, 'error');
-        }
-    }
-
     function renderRules() {
         if (!state.rules.length) {
             els.ruleList.innerHTML = '<p class="form-message">No rules yet.</p>';
@@ -695,12 +412,6 @@
         });
     }
 
-    function reportTotals(transactions) {
-        const income = transactions.filter((item) => item.type === 'income').reduce((total, item) => total + Number(item.amount || 0), 0);
-        const expenses = transactions.filter((item) => item.type === 'expense').reduce((total, item) => total + Number(item.amount || 0), 0);
-        return { income, expenses, net: income - expenses };
-    }
-
     function renderReports() {
         const transactions = reportTransactions();
         const totals = reportTotals(transactions);
@@ -731,24 +442,6 @@
             .sort((a, b) => b[0].localeCompare(a[0]))
             .map(([year, values]) => `<tr><td>${year}</td><td class="number-cell">${money(values.income)}</td><td class="number-cell">${money(values.expenses)}</td><td class="number-cell">${money(values.income - values.expenses)}</td></tr>`)
             .join('') || '<tr><td colspan="4">No yearly data yet.</td></tr>';
-    }
-
-    function csvEscape(value) {
-        const text = String(value ?? '');
-        return /[",\n\r]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text;
-    }
-
-    function downloadCsv(filename, rows) {
-        const csv = rows.map((row) => row.map(csvEscape).join(',')).join('\n');
-        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = filename;
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
-        URL.revokeObjectURL(url);
     }
 
     function exportTransactionsCsv() {
@@ -889,44 +582,6 @@
     els.bulkCategorize.addEventListener('click', () => {
         bulkCategorize().catch((error) => window.alert(error.message));
     });
-    els.csvFile.addEventListener('change', async () => {
-        const file = els.csvFile.files?.[0];
-        if (!file) {
-            return;
-        }
-        const rows = parseCsv(await file.text());
-        state.csvHeaders = rows[0] || [];
-        state.csvRows = rows.slice(1);
-        state.importPreview = [];
-        state.importSelected.clear();
-        renderMapping();
-        renderImportPreview();
-        setMessage(els.importMessage, `${state.csvRows.length} CSV rows loaded.`);
-    });
-    els.buildPreview.addEventListener('click', buildImportPreview);
-    els.commitImport.addEventListener('click', commitImport);
-    els.importPreviewBody.addEventListener('change', (event) => {
-        const checkbox = event.target.closest('[data-bk-import-select]');
-        if (!checkbox) {
-            return;
-        }
-        if (checkbox.checked) {
-            state.importSelected.add(checkbox.dataset.bkImportSelect);
-        } else {
-            state.importSelected.delete(checkbox.dataset.bkImportSelect);
-        }
-        renderImportPreview();
-    });
-    els.importSelectAll.addEventListener('change', () => {
-        state.importPreview.filter((row) => row.valid).forEach((row) => {
-            if (els.importSelectAll.checked) {
-                state.importSelected.add(row.id);
-            } else {
-                state.importSelected.delete(row.id);
-            }
-        });
-        renderImportPreview();
-    });
     els.ruleForm.addEventListener('submit', saveRule);
     els.ruleList.addEventListener('click', async (event) => {
         const button = event.target.closest('[data-bk-rule-delete]');
@@ -951,8 +606,17 @@
     els.exportReportCsv.addEventListener('click', exportReportCsv);
     els.exportReportPdf.addEventListener('click', printReportPdf);
 
-    renderMapping();
-    renderImportPreview();
+    const importController = new BookkeepingImportController({
+        state,
+        elements: els,
+        defaultDebitAccount,
+        defaultCreditAccount,
+        escapeHtml,
+        money,
+        renderAll,
+        setMessage
+    });
+    importController.initialize();
     loadBookkeeping().catch((error) => {
         panel.innerHTML = `<div class="empty-state"><h3>Unable to load bookkeeping</h3><p>${escapeHtml(error.message)}</p></div>`;
     });
