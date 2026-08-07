@@ -7,7 +7,7 @@ import {
   looksDuplicate,
   normalizeDate,
   parseCsv
-} from "../public/static/clientportal/js/bookkeeping/import-utils.js";
+} from "../src/apps/client-portal/bookkeeping/importUtils.js";
 
 test("CSV parsing supports escaped quotes and embedded commas", () => {
   const rows = parseCsv('Date,Description,Amount\n2026-01-02,"Coffee, ""team""",-12.50');

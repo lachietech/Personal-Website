@@ -1,11 +1,11 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { buildDashboardMetrics } from "../backend/hfssuniformsapp/services/salesAnalytics.js";
+import { buildDashboardMetrics } from "../src/backend/hfssuniformsapp/services/salesAnalytics.js";
 import {
   buildForecastFromSeries,
   getNextMonthLabel
-} from "../backend/hfssuniformsapp/services/salesForecast.js";
-import { validateSalesSeries } from "../backend/hfssuniformsapp/utils/salesValidation.js";
+} from "../src/backend/hfssuniformsapp/services/salesForecast.js";
+import { validateSalesSeries } from "../src/backend/hfssuniformsapp/utils/salesValidation.js";
 
 test("month labels advance across year boundaries", () => {
   assert.equal(getNextMonthLabel("Dec-25"), "Jan-26");

@@ -7,13 +7,25 @@ export default defineConfig({
   publicDir: false,
   define: { "process.env.NODE_ENV": JSON.stringify("production") },
   build: {
-    outDir: path.resolve(import.meta.dirname, "public/static/main/react"),
+    outDir: path.resolve(import.meta.dirname, "public/static/react"),
     emptyOutDir: true,
-    lib: {
-      entry: path.resolve(import.meta.dirname, "frontend/main/main.jsx"),
-      formats: ["es"],
-      fileName: () => "main.js"
+    rollupOptions: {
+      input: {
+        website: path.resolve(import.meta.dirname, "src/main.jsx"),
+        "client-portal": path.resolve(
+          import.meta.dirname,
+          "src/clientPortal.jsx",
+        ),
+        "hfss-uniforms": path.resolve(
+          import.meta.dirname,
+          "src/hfssUniforms.jsx",
+        ),
+      },
+      output: {
+        entryFileNames: "[name].js",
+        chunkFileNames: "chunks/[name]-[hash].js",
+        assetFileNames: "[name][extname]",
+      },
     },
-    rollupOptions: { output: { assetFileNames: "[name][extname]" } }
-  }
+  },
 });
