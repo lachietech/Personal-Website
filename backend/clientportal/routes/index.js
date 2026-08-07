@@ -6,12 +6,14 @@ import authRoutes from "./auth.js";
 import bookkeepingRoutes from "./bookkeeping.js";
 import clientRoutes from "./client.js";
 import pageRoutes from "./pages.js";
+import projectRoutes from "./projects.js";
 
 initialiseAdminBootstrap();
 
 const router = express.Router();
 router.use(preventCaching);
 router.use(pageRoutes);
+router.use("/api/projects", projectRoutes);
 router.use("/api/auth", authRoutes);
 router.use("/api/admin", adminRoutes);
 router.use("/api/bookkeeping", bookkeepingRoutes);

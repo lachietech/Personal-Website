@@ -40,6 +40,7 @@
 
             <div class="tabbar" role="tablist" aria-label="Admin sections">
                 <button class="tab-button active" type="button" data-tab="clients" role="tab" aria-selected="true"><i class="bi bi-people"></i>Clients</button>
+                <button class="tab-button" type="button" data-tab="projects" role="tab" aria-selected="false"><i class="bi bi-kanban"></i>Projects</button>
                 <button class="tab-button" type="button" data-tab="invoices" role="tab" aria-selected="false"><i class="bi bi-receipt"></i>Invoices</button>
                 <button class="tab-button" type="button" data-tab="preview" role="tab" aria-selected="false"><i class="bi bi-eye"></i>Preview</button>
                 <button class="tab-button" type="button" data-tab="emails" role="tab" aria-selected="false"><i class="bi bi-envelope"></i>Email</button>
@@ -65,6 +66,40 @@
                 </aside>
 
                 <section class="admin-panels">
+                    <section class="invoice-panel" data-tab-panel="projects" hidden>
+                        <div class="panel-heading">
+                            <div><p class="eyebrow">Website</p><h2>Projects</h2></div>
+                            <button class="action-button" type="button" id="newProjectButton"><i class="bi bi-plus-lg"></i> New project</button>
+                        </div>
+                        <form id="githubImportForm" class="stack-form project-import-form">
+                            <label>Import from GitHub
+                                <span class="field-help">Enter owner/repository or paste a GitHub repository URL.</span>
+                                <div class="inline-field"><input type="text" id="githubRepository" placeholder="lachietech/JANE" required><button class="action-button" type="submit"><i class="bi bi-github"></i> Import</button></div>
+                            </label>
+                        </form>
+                        <div class="project-admin-layout">
+                            <div class="client-list" id="projectList"></div>
+                            <form id="projectForm" class="stack-form">
+                                <input type="hidden" id="projectId">
+                                <div class="form-grid">
+                                    <label>Title<input type="text" id="projectTitle" maxlength="120" required></label>
+                                    <label>Slug<input type="text" id="projectSlug" maxlength="120" placeholder="generated-from-title"></label>
+                                    <label>Type<input type="text" id="projectType" maxlength="100" placeholder="Web application"></label>
+                                    <label>Status<input type="text" id="projectStatus" maxlength="60" placeholder="Live project"></label>
+                                    <label>Link<input type="text" id="projectUrl" maxlength="500" placeholder="/project or https://..."></label>
+                                    <label>Image path<input type="text" id="projectImage" maxlength="500" placeholder="/static/main/img/portfolio/..."></label>
+                                    <label>Display order<input type="number" id="projectSortOrder" min="0" max="10000" value="0"></label>
+                                </div>
+                                <label>Summary<textarea id="projectSummary" rows="3" maxlength="500"></textarea></label>
+                                <div class="form-grid">
+                                    <label class="checkbox-label"><input type="checkbox" id="projectFeatured"> Wide featured card</label>
+                                    <label class="checkbox-label"><input type="checkbox" id="projectPublished" checked> Published</label>
+                                </div>
+                                <div class="inline-actions"><button class="action-button" type="submit"><i class="bi bi-save"></i> Save project</button><button class="danger-button" type="button" id="deleteProjectButton" hidden>Delete project</button></div>
+                                <p id="projectMessage" class="form-message" role="status"></p>
+                            </form>
+                        </div>
+                    </section>
                     <section class="invoice-panel" data-tab-panel="clients">
                         <div class="panel-heading">
                             <div>
@@ -453,6 +488,7 @@
 
         <script src="../../../static/clientportal/js/api.js"></script>
         <script src="../../../static/clientportal/js/admin.js"></script>
+        <script src="../../../static/clientportal/js/projects.js"></script>
         <script type="module" src="../../../static/clientportal/js/bookkeeping.js"></script>
     </body>
 </html>

@@ -1173,3 +1173,10 @@ body.admin-mode .admin-only {
         padding: 0;
     }
 }
+/* Project management uses the portal's existing visual language. */
+.project-admin-layout { display: grid; grid-template-columns: minmax(220px, .75fr) minmax(0, 1.5fr); gap: 1.25rem; margin-top: 1.5rem; }
+.project-import-form { padding-bottom: 1.25rem; border-bottom: 1px solid var(--line, #dbe2ea); }
+.inline-field, .inline-actions { display: flex; align-items: center; gap: .75rem; }
+.inline-field input { flex: 1; }
+.field-help { display: block; margin: .25rem 0 .5rem; color: var(--muted, #667085); font-size: .85rem; font-weight: 400; }
+@media (max-width: 850px) { .project-admin-layout { grid-template-columns: 1fr; } .inline-field { align-items: stretch; flex-direction: column; } }

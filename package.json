@@ -3,6 +3,8 @@
     "version": "1.0.0",
     "main": "index.js",
     "scripts": {
+        "build": "vite build",
+        "build:watch": "vite build --watch",
         "test": "node scripts/check-syntax.js && node --test",
         "db:clone-client-portal": "node scripts/clone-client-portal-db.js",
         "dev": "nodemon backend/server.js",
@@ -25,9 +27,13 @@
         "helmet": "^8.1.0",
         "jsonwebtoken": "^9.0.3",
         "mongoose": "^8.24.1",
+        "react": "^19.2.8",
+        "react-dom": "^19.2.8",
         "resend": "^6.17.2"
     },
     "devDependencies": {
-        "nodemon": "^3.1.10"
+        "@vitejs/plugin-react": "^6.0.5",
+        "nodemon": "^3.1.10",
+        "vite": "^8.2.1"
     }
 }
