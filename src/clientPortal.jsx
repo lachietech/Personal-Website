@@ -1,5 +1,6 @@
 import { createRoot } from "react-dom/client";
 import { ClientPortalApp } from "./apps/client-portal/ClientPortalApp.jsx";
+import { trackPageView } from "./analytics.js";
 
 const rootElement = document.getElementById("root");
 
@@ -13,3 +14,4 @@ document.body.classList.toggle(
 );
 
 createRoot(rootElement).render(<ClientPortalApp />);
+trackPageView();

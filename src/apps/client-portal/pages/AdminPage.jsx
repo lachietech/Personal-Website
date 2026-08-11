@@ -3,6 +3,7 @@ import { portalRequest } from "../api/portalApi.js";
 import { printInvoice } from "../utils/portalUtils.js";
 import { useAdminPortal } from "../hooks/useAdminPortal.js";
 import { AccountForm } from "../components/AccountForm.jsx";
+import { AnalyticsPanel } from "../components/AnalyticsPanel.jsx";
 import { BillingForm } from "../components/BillingForm.jsx";
 import { BookkeepingPanel } from "../components/BookkeepingPanel.jsx";
 import { ClientForm } from "../components/ClientForm.jsx";
@@ -20,6 +21,7 @@ import { ProjectManager } from "../components/ProjectManager.jsx";
 const tabs = [
   { id: "clients", label: "Clients", icon: "bi-people" },
   { id: "projects", label: "Projects", icon: "bi-kanban" },
+  { id: "analytics", label: "Analytics", icon: "bi-graph-up-arrow" },
   { id: "invoices", label: "Invoices", icon: "bi-receipt" },
   { id: "preview", label: "Preview", icon: "bi-eye" },
   { id: "emails", label: "Email", icon: "bi-envelope" },
@@ -34,6 +36,7 @@ export function AdminPage() {
   const [createClient, setCreateClient] = useState(false);
   const usesClientSidebar = ![
     "projects",
+    "analytics",
     "bookkeeping",
     "billing",
     "security",
@@ -131,6 +134,8 @@ export function AdminPage() {
               setProjects={portal.setProjects}
             />
           )}
+
+          {activeTab === "analytics" && <AnalyticsPanel />}
 
           {activeTab === "invoices" && (
             <InvoiceForm
