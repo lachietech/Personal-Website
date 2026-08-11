@@ -36,6 +36,20 @@ function sanitizeOptionalText(value, fieldName, maxLength = 100) {
   return sanitizeTextInput(value, fieldName, maxLength);
 }
 
+function sanitizeNumber(value, fieldName, { integer = false } = {}) {
+  const number = Number(value);
+  if (
+    !Number.isFinite(number) ||
+    number < 0 ||
+    (integer && !Number.isInteger(number))
+  ) {
+    throw new Error(
+      `${fieldName} must be a non-negative ${integer ? "whole number" : "number"}`,
+    );
+  }
+  return number;
+}
+
 router.get("/", async (req, res) => {
   try {
     await syncPosProductsFromSalesRecords();
@@ -99,12 +113,18 @@ router.post("/", async (req, res) => {
 
     const product = new POSProduct({
       name: safeName,
-      price: parseFloat(price),
+      price: sanitizeNumber(price, "price"),
       category: safeCategory,
       size: safeSize,
       sku: safeSku,
-      stockOnHand: Number(stockOnHand || 0),
-      stockInWarehouse: Number(stockInWarehouse || 0),
+      stockOnHand: sanitizeNumber(stockOnHand ?? 0, "stockOnHand", {
+        integer: true,
+      }),
+      stockInWarehouse: sanitizeNumber(
+        stockInWarehouse ?? 0,
+        "stockInWarehouse",
+        { integer: true },
+      ),
       salesRecordId: salesRecordId || null,
     });
     await product.save();
@@ -132,17 +152,25 @@ router.put("/:id", async (req, res) => {
       salesRecordId,
     } = req.body;
 
-    const updatePayload = {
-      name: name === undefined ? undefined : sanitizeTextInput(name, "name"),
-      category:
-        category === undefined
-          ? undefined
-          : sanitizeTextInput(category, "category"),
-      size:
-        size === undefined ? undefined : sanitizeOptionalText(size, "size", 30),
-      sku: sku === undefined ? undefined : sanitizeOptionalText(sku, "sku", 50),
-      active,
-    };
+    const updatePayload = {};
+    if (name !== undefined) {
+      updatePayload.name = sanitizeTextInput(name, "name");
+    }
+    if (category !== undefined) {
+      updatePayload.category = sanitizeTextInput(category, "category");
+    }
+    if (size !== undefined) {
+      updatePayload.size = sanitizeOptionalText(size, "size", 30);
+    }
+    if (sku !== undefined) {
+      updatePayload.sku = sanitizeOptionalText(sku, "sku", 50);
+    }
+    if (active !== undefined) {
+      if (typeof active !== "boolean") {
+        throw new Error("active must be a boolean");
+      }
+      updatePayload.active = active;
+    }
 
     if (salesRecordId !== undefined) {
       if (salesRecordId && !validateObjectId(salesRecordId)) {
@@ -152,13 +180,19 @@ router.put("/:id", async (req, res) => {
     }
 
     if (price !== undefined) {
-      updatePayload.price = parseFloat(price);
+      updatePayload.price = sanitizeNumber(price, "price");
     }
     if (stockOnHand !== undefined) {
-      updatePayload.stockOnHand = Number(stockOnHand);
+      updatePayload.stockOnHand = sanitizeNumber(stockOnHand, "stockOnHand", {
+        integer: true,
+      });
     }
     if (stockInWarehouse !== undefined) {
-      updatePayload.stockInWarehouse = Number(stockInWarehouse);
+      updatePayload.stockInWarehouse = sanitizeNumber(
+        stockInWarehouse,
+        "stockInWarehouse",
+        { integer: true },
+      );
     }
 
     const product = await POSProduct.findByIdAndUpdate(

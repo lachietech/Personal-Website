@@ -62,7 +62,7 @@ router.post("/sales", async (req, res) => {
   try {
     const category = sanitizeSalesText(req.body.category, "category");
     const size = sanitizeSalesText(req.body.size, "size");
-    validateSalesSeries(req.body.months, req.body.sales);
+    const series = validateSalesSeries(req.body.months, req.body.sales);
 
     if (await Sales.exists({ category, size })) {
       return res.status(400).json({
@@ -73,8 +73,8 @@ router.post("/sales", async (req, res) => {
     const sale = await Sales.create({
       category,
       size,
-      months: req.body.months,
-      sales: req.body.sales,
+      months: series.months,
+      sales: series.sales,
     });
     await syncPosProductsFromSalesRecords();
     return res.status(201).json(sale);
@@ -93,9 +93,9 @@ router.put("/sales/:id", requireValidId, async (req, res) => {
       update.size = sanitizeSalesText(req.body.size, "size");
     }
     if (req.body.months !== undefined || req.body.sales !== undefined) {
-      validateSalesSeries(req.body.months, req.body.sales);
-      update.months = req.body.months;
-      update.sales = req.body.sales;
+      const series = validateSalesSeries(req.body.months, req.body.sales);
+      update.months = series.months;
+      update.sales = series.sales;
     }
 
     const sale = await Sales.findByIdAndUpdate(req.params.id, update, {

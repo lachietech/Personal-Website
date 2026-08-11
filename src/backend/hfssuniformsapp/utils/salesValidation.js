@@ -24,4 +24,21 @@ export function validateSalesSeries(months, sales) {
   if (months.length !== sales.length) {
     throw new Error("Months and sales arrays must have the same length");
   }
+
+  if (months.length > 120) {
+    throw new Error("Sales series cannot contain more than 120 months");
+  }
+
+  const safeMonths = months.map((month) =>
+    sanitizeSalesText(month, "month"),
+  );
+  const safeSales = sales.map((value) => {
+    const numericValue = Number(value);
+    if (!Number.isFinite(numericValue) || numericValue < 0) {
+      throw new Error("Sales values must be non-negative numbers");
+    }
+    return numericValue;
+  });
+
+  return { months: safeMonths, sales: safeSales };
 }
