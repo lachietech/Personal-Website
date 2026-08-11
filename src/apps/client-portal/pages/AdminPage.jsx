@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { portalRequest } from "../portalApi.js";
-import { printInvoice } from "../portalUtils.js";
+import { portalRequest } from "../api/portalApi.js";
+import { printInvoice } from "../utils/portalUtils.js";
 import { useAdminPortal } from "../hooks/useAdminPortal.js";
 import { AccountForm } from "../components/AccountForm.jsx";
 import { BillingForm } from "../components/BillingForm.jsx";

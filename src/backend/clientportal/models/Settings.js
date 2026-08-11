@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { clientPortalDb } from "../../databases.js";
+import { clientPortalDb } from "../../config/databases.js";
 
 const settingsSchema = new mongoose.Schema(
   {
@@ -7,58 +7,58 @@ const settingsSchema = new mongoose.Schema(
       type: String,
       required: true,
       unique: true,
-      trim: true
+      trim: true,
     },
     businessName: {
       type: String,
       trim: true,
       maxlength: 160,
-      default: "Nielsen Innovations"
+      default: "Nielsen Innovations",
     },
     abn: {
       type: String,
       trim: true,
       maxlength: 40,
-      default: ""
+      default: "",
     },
     bankName: {
       type: String,
       trim: true,
       maxlength: 120,
-      default: ""
+      default: "",
     },
     accountName: {
       type: String,
       trim: true,
       maxlength: 160,
-      default: ""
+      default: "",
     },
     bsb: {
       type: String,
       trim: true,
       maxlength: 20,
-      default: ""
+      default: "",
     },
     accountNumber: {
       type: String,
       trim: true,
       maxlength: 40,
-      default: ""
+      default: "",
     },
     paymentReference: {
       type: String,
       trim: true,
       maxlength: 120,
-      default: "Use the invoice number as payment reference"
+      default: "Use the invoice number as payment reference",
     },
     paymentTerms: {
       type: String,
       trim: true,
       maxlength: 1000,
-      default: "Payment due by the invoice due date."
-    }
+      default: "Payment due by the invoice due date.",
+    },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 export default clientPortalDb.model("PortalSettings", settingsSchema);

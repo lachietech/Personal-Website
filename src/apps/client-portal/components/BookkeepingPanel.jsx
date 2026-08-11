@@ -8,8 +8,8 @@ import {
   parseCsv,
 } from "../bookkeeping/importUtils.js";
 import { downloadCsv, reportTotals } from "../bookkeeping/reportUtils.js";
-import { portalRequest, portalUpload } from "../portalApi.js";
-import { money, today } from "../portalUtils.js";
+import { portalRequest, portalUpload } from "../api/portalApi.js";
+import { money, today } from "../utils/portalUtils.js";
 import { FormMessage } from "./PortalLayout.jsx";
 
 const emptyTransaction = {

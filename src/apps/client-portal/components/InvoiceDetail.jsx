@@ -5,7 +5,7 @@ import {
   invoiceTax,
   invoiceTotal,
   money,
-} from "../portalUtils.js";
+} from "../utils/portalUtils.js";
 
 function BillingDetails({ billing, invoice }) {
   return (

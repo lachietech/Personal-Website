@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { clientPortalDb } from "../../databases.js";
+import { clientPortalDb } from "../../config/databases.js";
 
 const bookkeepingRuleSchema = new mongoose.Schema(
   {
@@ -7,37 +7,40 @@ const bookkeepingRuleSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "PortalUser",
       required: true,
-      index: true
+      index: true,
     },
     ownerClientId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "PortalClient",
       default: null,
-      index: true
+      index: true,
     },
     contains: {
       type: String,
       required: true,
       trim: true,
       lowercase: true,
-      maxlength: 120
+      maxlength: 120,
     },
     category: {
       type: String,
       required: true,
       trim: true,
-      maxlength: 120
+      maxlength: 120,
     },
     account: {
       type: String,
       trim: true,
       maxlength: 120,
-      default: ""
-    }
+      default: "",
+    },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 bookkeepingRuleSchema.index({ ownerUserId: 1, contains: 1 });
 
-export default clientPortalDb.model("PortalBookkeepingRule", bookkeepingRuleSchema);
+export default clientPortalDb.model(
+  "PortalBookkeepingRule",
+  bookkeepingRuleSchema,
+);

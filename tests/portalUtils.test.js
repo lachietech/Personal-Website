@@ -6,7 +6,7 @@ import {
   invoiceSubtotal,
   invoiceTax,
   invoiceTotal,
-} from "../src/apps/client-portal/portalUtils.js";
+} from "../src/apps/client-portal/utils/portalUtils.js";
 
 const invoice = {
   status: "sent",

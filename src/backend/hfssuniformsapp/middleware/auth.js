@@ -16,10 +16,10 @@ export function createAuthToken(user) {
     {
       sub: user._id.toString(),
       username: user.username,
-      role: user.role
+      role: user.role,
     },
     getJwtSecret(),
-    { expiresIn: process.env.AUTH_TOKEN_TTL || "12h" }
+    { expiresIn: process.env.AUTH_TOKEN_TTL || "12h" },
   );
 }
 
@@ -29,7 +29,7 @@ export function setAuthCookie(res, token) {
     sameSite: "strict",
     secure: process.env.NODE_ENV === "production",
     maxAge: 1000 * 60 * 60 * 12,
-    path: AUTH_COOKIE_PATH
+    path: AUTH_COOKIE_PATH,
   });
 }
 
@@ -38,7 +38,7 @@ export function clearAuthCookie(res) {
     httpOnly: true,
     sameSite: "strict",
     secure: process.env.NODE_ENV === "production",
-    path: AUTH_COOKIE_PATH
+    path: AUTH_COOKIE_PATH,
   });
 }
 
@@ -50,7 +50,9 @@ export async function resolveAuthenticatedUser(req, res = null) {
     }
 
     const payload = jwt.verify(token, getJwtSecret());
-    const user = await User.findById(payload.sub).select("username role active mustChangePassword");
+    const user = await User.findById(payload.sub).select(
+      "username role active mustChangePassword",
+    );
     if (!user || !user.active) {
       if (res) {
         clearAuthCookie(res);
@@ -63,7 +65,7 @@ export async function resolveAuthenticatedUser(req, res = null) {
       username: user.username,
       role: user.role,
       active: user.active,
-      mustChangePassword: user.mustChangePassword
+      mustChangePassword: user.mustChangePassword,
     };
   } catch (error) {
     if (res) {
@@ -87,7 +89,7 @@ export function requirePasswordChangeResolved(req, res, next) {
   if (req.user?.mustChangePassword) {
     return res.status(403).json({
       error: "You must change your password before using the platform",
-      code: "PASSWORD_CHANGE_REQUIRED"
+      code: "PASSWORD_CHANGE_REQUIRED",
     });
   }
   next();

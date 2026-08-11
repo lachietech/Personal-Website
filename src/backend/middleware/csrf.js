@@ -11,7 +11,7 @@ const csrf = doubleCsrf({
     sameSite: "strict",
     path: "/",
     secure: environment.isProduction,
-    httpOnly: true
+    httpOnly: true,
   },
   size: 64,
   ignoredMethods: ["GET", "HEAD", "OPTIONS"],
@@ -21,7 +21,7 @@ const csrf = doubleCsrf({
       return req.body?._csrf;
     }
     return req.headers["x-csrf-token"];
-  }
+  },
 });
 
 export const generateCsrfToken = csrf.generateCsrfToken;

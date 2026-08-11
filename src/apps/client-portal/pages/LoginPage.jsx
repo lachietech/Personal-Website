@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { portalRequest } from "../portalApi.js";
+import { portalRequest } from "../api/portalApi.js";
 import { PortalBrand } from "../components/PortalBrand.jsx";
 
 export function LoginPage() {

@@ -1,9 +1,12 @@
-import { compareCategoryThenSize, compareSizeValues } from "../utils/sizeOrder.js";
+import {
+  compareCategoryThenSize,
+  compareSizeValues,
+} from "../utils/sizeOrder.js";
 import {
   buildForecastFromSeries,
   buildRecordForecast,
   parseMonthLabel,
-  roundValue
+  roundValue,
 } from "./salesForecast.js";
 
 export function buildDashboardMetrics(records) {
@@ -19,7 +22,7 @@ export function buildDashboardMetrics(records) {
         yearOverYearDelta: null,
         yearOverYearPercent: null,
         yearOverYearMonth: null,
-        yearOverYearTotal: null
+        yearOverYearTotal: null,
       },
       monthlySeries: [],
       categoryBreakdown: [],
@@ -27,7 +30,7 @@ export function buildDashboardMetrics(records) {
       forecastSummary: {
         forecastHorizon: 12,
         projectedYearTotal: 0,
-        projectedAverageMonthly: 0
+        projectedAverageMonthly: 0,
       },
       projectionVsCurrentProgress: {
         currentYear: null,
@@ -36,7 +39,7 @@ export function buildDashboardMetrics(records) {
         actualToDateTotal: 0,
         remainingToProjection: 0,
         completionPercent: null,
-        categoryBreakdown: []
+        categoryBreakdown: [],
       },
       yearProjectionComparison: {
         currentYear: null,
@@ -46,9 +49,9 @@ export function buildDashboardMetrics(records) {
         delta: 0,
         deltaPercent: null,
         sizeBreakdown: [],
-        monthly: []
+        monthly: [],
       },
-      forecast: []
+      forecast: [],
     };
   }
 
@@ -66,19 +69,26 @@ export function buildDashboardMetrics(records) {
   const currentTotal = currentPoint?.total || 0;
   const previousTotal = previousPoint?.total || 0;
   const monthOverMonthDelta = currentTotal - previousTotal;
-  const monthOverMonthPercent = previousTotal === 0 ? null : roundValue((monthOverMonthDelta / previousTotal) * 100);
+  const monthOverMonthPercent =
+    previousTotal === 0
+      ? null
+      : roundValue((monthOverMonthDelta / previousTotal) * 100);
 
   let yearOverYearPoint = null;
   if (currentPoint) {
     const [currentMonthName, currentYearText] = currentPoint.month.split("-");
     const priorYearLabel = `${currentMonthName}-${String(Number(currentYearText) - 1).padStart(2, "0")}`;
-    yearOverYearPoint = monthlySeries.find((entry) => entry.month === priorYearLabel) || null;
+    yearOverYearPoint =
+      monthlySeries.find((entry) => entry.month === priorYearLabel) || null;
   }
 
-  const yearOverYearDelta = yearOverYearPoint ? currentTotal - yearOverYearPoint.total : null;
-  const yearOverYearPercent = yearOverYearPoint && yearOverYearPoint.total !== 0
-    ? roundValue((yearOverYearDelta / yearOverYearPoint.total) * 100)
+  const yearOverYearDelta = yearOverYearPoint
+    ? currentTotal - yearOverYearPoint.total
     : null;
+  const yearOverYearPercent =
+    yearOverYearPoint && yearOverYearPoint.total !== 0
+      ? roundValue((yearOverYearDelta / yearOverYearPoint.total) * 100)
+      : null;
 
   const currentMonthIndex = canonicalMonths.length - 1;
   const yearOverYearIndex = yearOverYearPoint
@@ -88,9 +98,17 @@ export function buildDashboardMetrics(records) {
   const categoryBreakdown = [];
   const byCategory = new Map();
   for (const record of records) {
-    const currentValue = Number(record.sales?.[canonicalMonths.length - 1] || 0);
-    const previousValue = Number(record.sales?.[canonicalMonths.length - 2] || 0);
-    const categoryEntry = byCategory.get(record.category) || { category: record.category, currentTotal: 0, previousTotal: 0 };
+    const currentValue = Number(
+      record.sales?.[canonicalMonths.length - 1] || 0,
+    );
+    const previousValue = Number(
+      record.sales?.[canonicalMonths.length - 2] || 0,
+    );
+    const categoryEntry = byCategory.get(record.category) || {
+      category: record.category,
+      currentTotal: 0,
+      previousTotal: 0,
+    };
     categoryEntry.currentTotal += currentValue;
     categoryEntry.previousTotal += previousValue;
     byCategory.set(record.category, categoryEntry);
@@ -103,24 +121,36 @@ export function buildDashboardMetrics(records) {
       currentTotal: roundValue(entry.currentTotal),
       previousTotal: roundValue(entry.previousTotal),
       delta: roundValue(delta),
-      deltaPercent: entry.previousTotal === 0 ? null : roundValue((delta / entry.previousTotal) * 100)
+      deltaPercent:
+        entry.previousTotal === 0
+          ? null
+          : roundValue((delta / entry.previousTotal) * 100),
     });
   }
 
-  categoryBreakdown.sort((left, right) => right.currentTotal - left.currentTotal);
+  categoryBreakdown.sort(
+    (left, right) => right.currentTotal - left.currentTotal,
+  );
 
   const sizeSnapshot = records.map((record) => {
     const currentValue = Number(record.sales?.[currentMonthIndex] || 0);
-    const yearAgoValue = yearOverYearIndex >= 0 ? Number(record.sales?.[yearOverYearIndex] || 0) : null;
+    const yearAgoValue =
+      yearOverYearIndex >= 0
+        ? Number(record.sales?.[yearOverYearIndex] || 0)
+        : null;
     const delta = yearAgoValue === null ? null : currentValue - yearAgoValue;
 
     return {
       category: record.category,
       size: record.size,
       currentTotal: roundValue(currentValue),
-      yearOverYearTotal: yearAgoValue === null ? null : roundValue(yearAgoValue),
+      yearOverYearTotal:
+        yearAgoValue === null ? null : roundValue(yearAgoValue),
       delta: delta === null ? null : roundValue(delta),
-      deltaPercent: yearAgoValue === null || yearAgoValue === 0 ? null : roundValue((delta / yearAgoValue) * 100)
+      deltaPercent:
+        yearAgoValue === null || yearAgoValue === 0
+          ? null
+          : roundValue((delta / yearAgoValue) * 100),
     };
   });
 
@@ -130,12 +160,33 @@ export function buildDashboardMetrics(records) {
 
   const forecast = buildForecastFromSeries(monthlySeries, 12);
 
-  const projectedYearTotal = roundValue(forecast.reduce((sum, item) => sum + item.projectedTotal, 0));
-  const projectedAverageMonthly = forecast.length ? roundValue(projectedYearTotal / forecast.length) : 0;
+  const projectedYearTotal = roundValue(
+    forecast.reduce((sum, item) => sum + item.projectedTotal, 0),
+  );
+  const projectedAverageMonthly = forecast.length
+    ? roundValue(projectedYearTotal / forecast.length)
+    : 0;
 
-  const monthlyActualMap = new Map(monthlySeries.map((item) => [item.month, item.total]));
-  const monthlyForecastMap = new Map(forecast.map((item) => [item.month, item.projectedTotal]));
-  const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const monthlyActualMap = new Map(
+    monthlySeries.map((item) => [item.month, item.total]),
+  );
+  const monthlyForecastMap = new Map(
+    forecast.map((item) => [item.month, item.projectedTotal]),
+  );
+  const monthNames = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
   const currentCalendarYear = new Date().getFullYear();
   const previousCalendarYear = currentCalendarYear - 1;
   const currentYearSuffix = String(currentCalendarYear).slice(-2);
@@ -150,14 +201,16 @@ export function buildDashboardMetrics(records) {
   const recordMonthlyMaps = records.map((record) => {
     const recordSeries = (record.months || []).map((month, index) => ({
       month,
-      total: Number(record.sales?.[index] || 0)
+      total: Number(record.sales?.[index] || 0),
     }));
     const recordForecast = buildForecastFromSeries(recordSeries, 12);
     return {
       category: record.category,
       size: record.size,
       actual: new Map(recordSeries.map((item) => [item.month, item.total])),
-      projected: new Map(recordForecast.map((item) => [item.month, item.projectedTotal]))
+      projected: new Map(
+        recordForecast.map((item) => [item.month, item.projectedTotal]),
+      ),
     };
   });
 
@@ -198,9 +251,12 @@ export function buildDashboardMetrics(records) {
         currentYearValue: roundValue(currentValue),
         previousYearValue: roundValue(previousValue),
         delta: roundValue(rowDelta),
-        deltaPercent: previousValue === 0 ? null : roundValue((rowDelta / previousValue) * 100),
+        deltaPercent:
+          previousValue === 0
+            ? null
+            : roundValue((rowDelta / previousValue) * 100),
         currentYearSource: currentHasActual ? "actual" : "projected",
-        previousYearSource: previousHasActual ? "actual" : "projected"
+        previousYearSource: previousHasActual ? "actual" : "projected",
       };
     });
 
@@ -217,7 +273,7 @@ export function buildDashboardMetrics(records) {
         previousYearTotal: 0,
         delta: 0,
         deltaPercent: null,
-        sizes: []
+        sizes: [],
       };
       existing.currentYearTotal += row.currentYearValue;
       existing.previousYearTotal += row.previousYearValue;
@@ -228,35 +284,66 @@ export function buildDashboardMetrics(records) {
     for (const value of groupMap.values()) {
       value.currentYearTotal = roundValue(value.currentYearTotal);
       value.previousYearTotal = roundValue(value.previousYearTotal);
-      value.delta = roundValue(value.currentYearTotal - value.previousYearTotal);
-      value.deltaPercent = value.previousYearTotal === 0
-        ? null
-        : roundValue((value.delta / value.previousYearTotal) * 100);
+      value.delta = roundValue(
+        value.currentYearTotal - value.previousYearTotal,
+      );
+      value.deltaPercent =
+        value.previousYearTotal === 0
+          ? null
+          : roundValue((value.delta / value.previousYearTotal) * 100);
       groupedCategories.push(value);
     }
 
-    groupedCategories.sort((left, right) => left.category.localeCompare(right.category));
+    groupedCategories.sort((left, right) =>
+      left.category.localeCompare(right.category),
+    );
 
     return {
       month: monthName,
       currentYearValue: roundValue(current.value),
       previousYearValue: roundValue(previous.value),
       delta: roundValue(delta),
-      deltaPercent: previous.value === 0 ? null : roundValue((delta / previous.value) * 100),
+      deltaPercent:
+        previous.value === 0
+          ? null
+          : roundValue((delta / previous.value) * 100),
       currentYearSource: current.source,
       previousYearSource: previous.source,
-      categoryBreakdown: groupedCategories
+      categoryBreakdown: groupedCategories,
     };
   });
 
-  const currentYearTotal = roundValue(yearlyMonthlyComparison.reduce((sum, item) => sum + item.currentYearValue, 0));
-  const previousYearTotal = roundValue(yearlyMonthlyComparison.reduce((sum, item) => sum + item.previousYearValue, 0));
+  const currentYearTotal = roundValue(
+    yearlyMonthlyComparison.reduce(
+      (sum, item) => sum + item.currentYearValue,
+      0,
+    ),
+  );
+  const previousYearTotal = roundValue(
+    yearlyMonthlyComparison.reduce(
+      (sum, item) => sum + item.previousYearValue,
+      0,
+    ),
+  );
   const yearlyDelta = roundValue(currentYearTotal - previousYearTotal);
-  const yearlyDeltaPercent = previousYearTotal === 0 ? null : roundValue((yearlyDelta / previousYearTotal) * 100);
+  const yearlyDeltaPercent =
+    previousYearTotal === 0
+      ? null
+      : roundValue((yearlyDelta / previousYearTotal) * 100);
 
   const yearProjectionSizeBreakdown = records.map((record) => {
-    const recordActualMap = new Map((record.months || []).map((month, index) => [month, Number(record.sales?.[index] || 0)]));
-    const recordForecastMap = new Map(buildRecordForecast(record, 24).map((item) => [item.month, item.projectedTotal]));
+    const recordActualMap = new Map(
+      (record.months || []).map((month, index) => [
+        month,
+        Number(record.sales?.[index] || 0),
+      ]),
+    );
+    const recordForecastMap = new Map(
+      buildRecordForecast(record, 24).map((item) => [
+        item.month,
+        item.projectedTotal,
+      ]),
+    );
 
     const getRecordMonthValue = (year, monthName) => {
       const label = `${monthName}-${String(year).slice(-2)}`;
@@ -272,8 +359,14 @@ export function buildDashboardMetrics(records) {
     let currentYearSizeTotal = 0;
     let previousYearSizeTotal = 0;
     for (const monthName of monthNames) {
-      currentYearSizeTotal += getRecordMonthValue(currentCalendarYear, monthName);
-      previousYearSizeTotal += getRecordMonthValue(previousCalendarYear, monthName);
+      currentYearSizeTotal += getRecordMonthValue(
+        currentCalendarYear,
+        monthName,
+      );
+      previousYearSizeTotal += getRecordMonthValue(
+        previousCalendarYear,
+        monthName,
+      );
     }
 
     const delta = currentYearSizeTotal - previousYearSizeTotal;
@@ -283,7 +376,10 @@ export function buildDashboardMetrics(records) {
       currentYearTotal: roundValue(currentYearSizeTotal),
       previousYearTotal: roundValue(previousYearSizeTotal),
       delta: roundValue(delta),
-      deltaPercent: previousYearSizeTotal === 0 ? null : roundValue((delta / previousYearSizeTotal) * 100)
+      deltaPercent:
+        previousYearSizeTotal === 0
+          ? null
+          : roundValue((delta / previousYearSizeTotal) * 100),
     };
   });
 
@@ -293,8 +389,18 @@ export function buildDashboardMetrics(records) {
 
   const progressByCategory = new Map();
   for (const record of records) {
-    const recordActualMap = new Map((record.months || []).map((month, index) => [month, Number(record.sales?.[index] || 0)]));
-    const recordForecastMap = new Map(buildRecordForecast(record, 24).map((item) => [item.month, item.projectedTotal]));
+    const recordActualMap = new Map(
+      (record.months || []).map((month, index) => [
+        month,
+        Number(record.sales?.[index] || 0),
+      ]),
+    );
+    const recordForecastMap = new Map(
+      buildRecordForecast(record, 24).map((item) => [
+        item.month,
+        item.projectedTotal,
+      ]),
+    );
 
     let projectedYearTotalForSize = 0;
     let actualToDateForSize = 0;
@@ -311,33 +417,40 @@ export function buildDashboardMetrics(records) {
       if (asOfMonthLabel) {
         const monthDate = parseMonthLabel(label);
         const asOfDate = parseMonthLabel(asOfMonthLabel);
-        
+
         if (monthDate <= asOfDate) {
           actualToDateForSize += Number(recordActualMap.get(label) || 0);
         } else {
           // Future-month likelihood compares the forecast with last year's actuals.
           expectedRemainingForSize += Number(recordForecastMap.get(label) || 0);
-          
+
           const prevYearLabel = `${monthName}-${String(previousCalendarYear).slice(-2)}`;
-          previousYearRemainingForSize += Number(recordActualMap.get(prevYearLabel) || 0);
+          previousYearRemainingForSize += Number(
+            recordActualMap.get(prevYearLabel) || 0,
+          );
         }
       }
     }
 
     let likelihoodForSize = null;
     if (asOfMonthLabel && previousYearRemainingForSize > 0) {
-      likelihoodForSize = roundValue((expectedRemainingForSize / previousYearRemainingForSize) * 100);
+      likelihoodForSize = roundValue(
+        (expectedRemainingForSize / previousYearRemainingForSize) * 100,
+      );
     }
 
     const sizeEntry = {
       size: record.size,
       projectedYearTotal: roundValue(projectedYearTotalForSize),
       actualToDateTotal: roundValue(actualToDateForSize),
-      remainingToProjection: roundValue(projectedYearTotalForSize - actualToDateForSize),
-      completionPercent: projectedYearTotalForSize === 0
-        ? null
-        : roundValue((actualToDateForSize / projectedYearTotalForSize) * 100),
-      likelihoodOfReachingProjection: likelihoodForSize
+      remainingToProjection: roundValue(
+        projectedYearTotalForSize - actualToDateForSize,
+      ),
+      completionPercent:
+        projectedYearTotalForSize === 0
+          ? null
+          : roundValue((actualToDateForSize / projectedYearTotalForSize) * 100),
+      likelihoodOfReachingProjection: likelihoodForSize,
     };
 
     const categoryEntry = progressByCategory.get(record.category) || {
@@ -346,12 +459,13 @@ export function buildDashboardMetrics(records) {
       actualToDateTotal: 0,
       remainingToProjection: 0,
       completionPercent: null,
-      sizes: []
+      sizes: [],
     };
 
     categoryEntry.projectedYearTotal += projectedYearTotalForSize;
     categoryEntry.actualToDateTotal += actualToDateForSize;
-    categoryEntry.remainingToProjection += projectedYearTotalForSize - actualToDateForSize;
+    categoryEntry.remainingToProjection +=
+      projectedYearTotalForSize - actualToDateForSize;
     categoryEntry.sizes.push(sizeEntry);
     progressByCategory.set(record.category, categoryEntry);
   }
@@ -361,44 +475,77 @@ export function buildDashboardMetrics(records) {
     entry.projectedYearTotal = roundValue(entry.projectedYearTotal);
     entry.actualToDateTotal = roundValue(entry.actualToDateTotal);
     entry.remainingToProjection = roundValue(entry.remainingToProjection);
-    entry.completionPercent = entry.projectedYearTotal === 0
-      ? null
-      : roundValue((entry.actualToDateTotal / entry.projectedYearTotal) * 100);
-    
+    entry.completionPercent =
+      entry.projectedYearTotal === 0
+        ? null
+        : roundValue(
+            (entry.actualToDateTotal / entry.projectedYearTotal) * 100,
+          );
+
     let categoryLikelihood = null;
     const categoryTotalPrevYearRemaining = entry.sizes.reduce((sum, size) => {
       if (size.likelihoodOfReachingProjection !== null) {
-        return sum + (size.projectedYearTotal > size.actualToDateTotal 
-          ? (size.projectedYearTotal - size.actualToDateTotal) / (size.likelihoodOfReachingProjection / 100)
-          : 0);
+        return (
+          sum +
+          (size.projectedYearTotal > size.actualToDateTotal
+            ? (size.projectedYearTotal - size.actualToDateTotal) /
+              (size.likelihoodOfReachingProjection / 100)
+            : 0)
+        );
       }
       return sum;
     }, 0);
-    
+
     if (categoryTotalPrevYearRemaining > 0) {
       const categoryTotalExpectedRemaining = entry.sizes.reduce((sum, size) => {
-        if (size.likelihoodOfReachingProjection !== null && size.projectedYearTotal > size.actualToDateTotal) {
-          const prevYearRemaining = (size.projectedYearTotal - size.actualToDateTotal) / (size.likelihoodOfReachingProjection / 100);
-          return sum + (prevYearRemaining * size.likelihoodOfReachingProjection / 100);
+        if (
+          size.likelihoodOfReachingProjection !== null &&
+          size.projectedYearTotal > size.actualToDateTotal
+        ) {
+          const prevYearRemaining =
+            (size.projectedYearTotal - size.actualToDateTotal) /
+            (size.likelihoodOfReachingProjection / 100);
+          return (
+            sum +
+            (prevYearRemaining * size.likelihoodOfReachingProjection) / 100
+          );
         }
         return sum;
       }, 0);
-      categoryLikelihood = roundValue((categoryTotalExpectedRemaining / categoryTotalPrevYearRemaining) * 100);
+      categoryLikelihood = roundValue(
+        (categoryTotalExpectedRemaining / categoryTotalPrevYearRemaining) * 100,
+      );
     }
     entry.likelihoodOfReachingProjection = categoryLikelihood;
-    
+
     entry.sizes.sort((left, right) => compareSizeValues(left.size, right.size));
     progressCategoryBreakdown.push(entry);
   }
-  progressCategoryBreakdown.sort((left, right) => left.category.localeCompare(right.category));
+  progressCategoryBreakdown.sort((left, right) =>
+    left.category.localeCompare(right.category),
+  );
 
-  const projectedYearTotalProgress = roundValue(progressCategoryBreakdown.reduce((sum, entry) => sum + entry.projectedYearTotal, 0));
-  const actualToDateTotalProgress = roundValue(progressCategoryBreakdown.reduce((sum, entry) => sum + entry.actualToDateTotal, 0));
-  const remainingToProjectionProgress = roundValue(projectedYearTotalProgress - actualToDateTotalProgress);
-  const completionPercentProgress = projectedYearTotalProgress === 0
-    ? null
-    : roundValue((actualToDateTotalProgress / projectedYearTotalProgress) * 100);
-
+  const projectedYearTotalProgress = roundValue(
+    progressCategoryBreakdown.reduce(
+      (sum, entry) => sum + entry.projectedYearTotal,
+      0,
+    ),
+  );
+  const actualToDateTotalProgress = roundValue(
+    progressCategoryBreakdown.reduce(
+      (sum, entry) => sum + entry.actualToDateTotal,
+      0,
+    ),
+  );
+  const remainingToProjectionProgress = roundValue(
+    projectedYearTotalProgress - actualToDateTotalProgress,
+  );
+  const completionPercentProgress =
+    projectedYearTotalProgress === 0
+      ? null
+      : roundValue(
+          (actualToDateTotalProgress / projectedYearTotalProgress) * 100,
+        );
 
   return {
     totals: {
@@ -408,10 +555,13 @@ export function buildDashboardMetrics(records) {
       previousTotal: roundValue(previousTotal),
       monthOverMonthDelta: roundValue(monthOverMonthDelta),
       monthOverMonthPercent,
-      yearOverYearDelta: yearOverYearDelta === null ? null : roundValue(yearOverYearDelta),
+      yearOverYearDelta:
+        yearOverYearDelta === null ? null : roundValue(yearOverYearDelta),
       yearOverYearPercent,
       yearOverYearMonth: yearOverYearPoint?.month || null,
-      yearOverYearTotal: yearOverYearPoint ? roundValue(yearOverYearPoint.total) : null
+      yearOverYearTotal: yearOverYearPoint
+        ? roundValue(yearOverYearPoint.total)
+        : null,
     },
     monthlySeries,
     categoryBreakdown,
@@ -419,7 +569,7 @@ export function buildDashboardMetrics(records) {
     forecastSummary: {
       forecastHorizon: forecast.length,
       projectedYearTotal,
-      projectedAverageMonthly
+      projectedAverageMonthly,
     },
     projectionVsCurrentProgress: {
       currentYear: currentCalendarYear,
@@ -428,7 +578,7 @@ export function buildDashboardMetrics(records) {
       actualToDateTotal: actualToDateTotalProgress,
       remainingToProjection: remainingToProjectionProgress,
       completionPercent: completionPercentProgress,
-      categoryBreakdown: progressCategoryBreakdown
+      categoryBreakdown: progressCategoryBreakdown,
     },
     yearProjectionComparison: {
       currentYear: currentCalendarYear,
@@ -438,8 +588,8 @@ export function buildDashboardMetrics(records) {
       delta: yearlyDelta,
       deltaPercent: yearlyDeltaPercent,
       sizeBreakdown: yearProjectionSizeBreakdown,
-      monthly: yearlyMonthlyComparison
+      monthly: yearlyMonthlyComparison,
     },
-    forecast
+    forecast,
   };
 }

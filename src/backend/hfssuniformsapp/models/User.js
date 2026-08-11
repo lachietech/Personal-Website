@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { uniformsDb } from "../../databases.js";
+import { uniformsDb } from "../../config/databases.js";
 
 const userSchema = new mongoose.Schema(
   {
@@ -10,43 +10,43 @@ const userSchema = new mongoose.Schema(
       trim: true,
       lowercase: true,
       minlength: 3,
-      maxlength: 32
+      maxlength: 32,
     },
     passwordHash: {
       type: String,
-      required: true
+      required: true,
     },
     role: {
       type: String,
       enum: ["admin", "staff"],
-      default: "staff"
+      default: "staff",
     },
     active: {
       type: Boolean,
-      default: true
+      default: true,
     },
     failedLoginCount: {
       type: Number,
-      default: 0
+      default: 0,
     },
     lockUntil: {
       type: Date,
-      default: null
+      default: null,
     },
     mustChangePassword: {
       type: Boolean,
-      default: false
+      default: false,
     },
     passwordChangedAt: {
       type: Date,
-      default: null
+      default: null,
     },
     lastLoginAt: {
       type: Date,
-      default: null
-    }
+      default: null,
+    },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 export default uniformsDb.model("User", userSchema);

@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { uniformsDb } from "../../databases.js";
+import { uniformsDb } from "../../config/databases.js";
 
 const auditLogSchema = new mongoose.Schema(
   {
@@ -7,48 +7,48 @@ const auditLogSchema = new mongoose.Schema(
       type: String,
       required: true,
       trim: true,
-      maxlength: 100
+      maxlength: 100,
     },
     actorUserId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      default: null
+      default: null,
     },
     actorUsername: {
       type: String,
       default: "system",
       trim: true,
-      maxlength: 64
+      maxlength: 64,
     },
     targetUserId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      default: null
+      default: null,
     },
     targetUsername: {
       type: String,
       default: null,
       trim: true,
-      maxlength: 64
+      maxlength: 64,
     },
     details: {
       type: mongoose.Schema.Types.Mixed,
-      default: {}
+      default: {},
     },
     ipAddress: {
       type: String,
       default: null,
       trim: true,
-      maxlength: 128
+      maxlength: 128,
     },
     userAgent: {
       type: String,
       default: null,
       trim: true,
-      maxlength: 400
-    }
+      maxlength: 400,
+    },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 export default uniformsDb.model("AuditLog", auditLogSchema);

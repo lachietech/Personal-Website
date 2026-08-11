@@ -7,7 +7,9 @@ const COOKIE_PATH = "/clientportal";
 function getJwtSecret() {
   const secret = process.env.JWT_SECRET || process.env.SECRET_KEY;
   if (!secret) {
-    throw new Error("JWT_SECRET or SECRET_KEY is required for Client Portal auth");
+    throw new Error(
+      "JWT_SECRET or SECRET_KEY is required for Client Portal auth",
+    );
   }
   return secret;
 }
@@ -18,10 +20,10 @@ export function createPortalToken(user) {
       sub: user._id.toString(),
       username: user.username,
       role: user.role,
-      clientId: user.clientId?.toString() || null
+      clientId: user.clientId?.toString() || null,
     },
     getJwtSecret(),
-    { expiresIn: process.env.CLIENT_PORTAL_AUTH_TTL || "8h" }
+    { expiresIn: process.env.CLIENT_PORTAL_AUTH_TTL || "8h" },
   );
 }
 
@@ -31,7 +33,7 @@ export function setPortalCookie(res, token) {
     sameSite: "strict",
     secure: process.env.NODE_ENV === "production",
     maxAge: 1000 * 60 * 60 * 8,
-    path: COOKIE_PATH
+    path: COOKIE_PATH,
   });
 }
 
@@ -40,7 +42,7 @@ export function clearPortalCookie(res) {
     httpOnly: true,
     sameSite: "strict",
     secure: process.env.NODE_ENV === "production",
-    path: COOKIE_PATH
+    path: COOKIE_PATH,
   });
 }
 
@@ -52,7 +54,9 @@ export async function resolvePortalUser(req, res = null) {
     }
 
     const payload = jwt.verify(token, getJwtSecret());
-    const user = await User.findById(payload.sub).select("username role clientId active mustChangePassword");
+    const user = await User.findById(payload.sub).select(
+      "username role clientId active mustChangePassword",
+    );
     if (!user || !user.active) {
       if (res) {
         clearPortalCookie(res);
@@ -65,7 +69,7 @@ export async function resolvePortalUser(req, res = null) {
       username: user.username,
       role: user.role,
       clientId: user.clientId?.toString() || null,
-      mustChangePassword: Boolean(user.mustChangePassword)
+      mustChangePassword: Boolean(user.mustChangePassword),
     };
   } catch (error) {
     if (res) {

@@ -20,6 +20,10 @@ export default defineConfig({
           import.meta.dirname,
           "src/hfssUniforms.jsx",
         ),
+        "meander-suite": path.resolve(
+          import.meta.dirname,
+          "src/meanderSuite.jsx",
+        ),
       },
       output: {
         entryFileNames: "[name].js",

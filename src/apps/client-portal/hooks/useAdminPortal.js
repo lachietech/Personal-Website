@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { portalRequest } from "../portalApi.js";
-import { emptyBilling } from "../portalUtils.js";
+import { portalRequest } from "../api/portalApi.js";
+import { emptyBilling } from "../utils/portalUtils.js";
 
 export function useAdminPortal() {
   const [clients, setClients] = useState([]);

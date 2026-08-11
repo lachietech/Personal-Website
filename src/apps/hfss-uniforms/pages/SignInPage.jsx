@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { CredentialField } from "../components/CredentialField.jsx";
-import { prepareUniformSession, uniformRequest } from "../uniformApi.js";
+import { prepareUniformSession, uniformRequest } from "../api/uniformApi.js";
 
 const BASE_PATH = "/hfssuniformsapp";
 const allowedDestinations = new Set([

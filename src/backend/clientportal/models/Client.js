@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { clientPortalDb } from "../../databases.js";
+import { clientPortalDb } from "../../config/databases.js";
 
 const invoiceLineSchema = new mongoose.Schema(
   {
@@ -7,41 +7,41 @@ const invoiceLineSchema = new mongoose.Schema(
       type: String,
       required: true,
       trim: true,
-      maxlength: 240
+      maxlength: 240,
     },
     quantity: {
       type: Number,
       required: true,
-      min: 0
+      min: 0,
     },
     rate: {
       type: Number,
       required: true,
-      min: 0
-    }
+      min: 0,
+    },
   },
-  { _id: true }
+  { _id: true },
 );
 
 const hourEntrySchema = new mongoose.Schema(
   {
     date: {
       type: Date,
-      required: true
+      required: true,
     },
     hours: {
       type: Number,
       required: true,
-      min: 0
+      min: 0,
     },
     work: {
       type: String,
       required: true,
       trim: true,
-      maxlength: 320
-    }
+      maxlength: 320,
+    },
   },
-  { _id: true }
+  { _id: true },
 );
 
 const invoiceSchema = new mongoose.Schema(
@@ -50,43 +50,43 @@ const invoiceSchema = new mongoose.Schema(
       type: String,
       required: true,
       trim: true,
-      maxlength: 40
+      maxlength: 40,
     },
     status: {
       type: String,
       enum: ["draft", "sent", "overdue", "paid"],
-      default: "draft"
+      default: "draft",
     },
     issued: {
       type: Date,
-      required: true
+      required: true,
     },
     due: {
       type: Date,
-      required: true
+      required: true,
     },
     taxRate: {
       type: Number,
       min: 0,
       max: 1,
-      default: 0.1
+      default: 0.1,
     },
     notes: {
       type: String,
       trim: true,
       maxlength: 1000,
-      default: ""
+      default: "",
     },
     items: {
       type: [invoiceLineSchema],
-      default: []
+      default: [],
     },
     hours: {
       type: [hourEntrySchema],
-      default: []
-    }
+      default: [],
+    },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 const clientSchema = new mongoose.Schema(
@@ -95,33 +95,33 @@ const clientSchema = new mongoose.Schema(
       type: String,
       required: true,
       trim: true,
-      maxlength: 160
+      maxlength: 160,
     },
     contact: {
       type: String,
       required: true,
       trim: true,
-      maxlength: 120
+      maxlength: 120,
     },
     email: {
       type: String,
       required: true,
       trim: true,
       lowercase: true,
-      maxlength: 254
+      maxlength: 254,
     },
     notes: {
       type: String,
       trim: true,
       maxlength: 1000,
-      default: ""
+      default: "",
     },
     invoices: {
       type: [invoiceSchema],
-      default: []
-    }
+      default: [],
+    },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 export default clientPortalDb.model("PortalClient", clientSchema);

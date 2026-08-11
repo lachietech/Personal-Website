@@ -8,7 +8,7 @@ export async function logAuditEvent({
   targetUsername = null,
   details = {},
   ipAddress = null,
-  userAgent = null
+  userAgent = null,
 }) {
   try {
     await AuditLog.create({
@@ -19,7 +19,7 @@ export async function logAuditEvent({
       targetUsername,
       details,
       ipAddress,
-      userAgent
+      userAgent,
     });
   } catch (error) {
     console.error("Unable to write audit log:", error.message);

@@ -21,6 +21,67 @@
     --space-5: 24px;
 }
 
+/* Shared React page layouts */
+.section-header-row,
+.two-column-layout,
+.form-actions,
+.inline-form {
+    display: flex;
+    gap: var(--space-3);
+}
+
+.section-header-row {
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--space-4);
+}
+
+.two-column-layout {
+    align-items: flex-start;
+}
+
+.two-column-layout > :first-child {
+    flex: 1 1 65%;
+}
+
+.two-column-layout > aside {
+    flex: 1 1 320px;
+    position: sticky;
+    top: var(--space-3);
+}
+
+.form-actions,
+.inline-form {
+    align-items: end;
+    flex-wrap: wrap;
+    margin-top: var(--space-3);
+}
+
+.receipt-preview {
+    overflow-x: auto;
+    padding: var(--space-3);
+    border-radius: 8px;
+    background: var(--surface-alt);
+    white-space: pre-wrap;
+}
+
+.status-message.warning {
+    color: var(--blue-grey);
+    background: var(--warning-bg);
+}
+
+@media (max-width: 800px) {
+    .section-header-row,
+    .two-column-layout {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .two-column-layout > aside {
+        position: static;
+    }
+}
+
 * {
     margin: 0;
     padding: 0;

@@ -10,7 +10,7 @@ const FIXED_SIZE_ORDER = new Map([
   ["XXXL", 7],
   ["3XL", 7],
   ["4XL", 8],
-  ["5XL", 9]
+  ["5XL", 9],
 ]);
 
 const SIZE_ALIASES = new Map([
@@ -28,11 +28,14 @@ const SIZE_ALIASES = new Map([
   ["2X", "2XL"],
   ["3X", "3XL"],
   ["4X", "4XL"],
-  ["5X", "5XL"]
+  ["5X", "5XL"],
 ]);
 
 function normalizeSize(value) {
-  const normalized = String(value || "").trim().toUpperCase().replace(/\s+/g, "");
+  const normalized = String(value || "")
+    .trim()
+    .toUpperCase()
+    .replace(/\s+/g, "");
   return SIZE_ALIASES.get(normalized) || normalized;
 }
 
@@ -89,7 +92,9 @@ export function compareSizeValues(left, right) {
 }
 
 export function compareCategoryThenSize(left, right) {
-  const categoryCompare = String(left.category || "").localeCompare(String(right.category || ""));
+  const categoryCompare = String(left.category || "").localeCompare(
+    String(right.category || ""),
+  );
   if (categoryCompare !== 0) {
     return categoryCompare;
   }

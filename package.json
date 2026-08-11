@@ -6,7 +6,6 @@
     "build": "vite build",
     "build:watch": "vite build --watch",
     "test": "node scripts/check-syntax.js && node --test",
-    "db:clone-client-portal": "node scripts/clone-client-portal-db.js",
     "dev": "npm run build && nodemon src/backend/server.js",
     "dev:client": "vite build --watch",
     "dev:server": "nodemon src/backend/server.js",

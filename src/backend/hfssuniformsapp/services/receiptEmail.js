@@ -1,7 +1,12 @@
 export function buildReceiptContent(order) {
-  const createdAt = new Date(order.createdAt || Date.now()).toLocaleString("en-AU");
+  const createdAt = new Date(order.createdAt || Date.now()).toLocaleString(
+    "en-AU",
+  );
   const lines = (order.items || [])
-    .map((item) => `${item.qty} x ${item.name} (${Number(item.price || 0).toFixed(2)}) = ${Number(item.subtotal || 0).toFixed(2)}`)
+    .map(
+      (item) =>
+        `${item.qty} x ${item.name} (${Number(item.price || 0).toFixed(2)}) = ${Number(item.subtotal || 0).toFixed(2)}`,
+    )
     .join("\n");
 
   const paymentMethodLabel = String(order.paymentMethod || "").toUpperCase();
@@ -16,11 +21,14 @@ export function buildReceiptContent(order) {
     "Items:",
     lines,
     "",
-    `Total: ${Number(order.total || 0).toFixed(2)}`
+    `Total: ${Number(order.total || 0).toFixed(2)}`,
   ].join("\n");
 
   const htmlItems = (order.items || [])
-    .map((item) => `<li>${item.qty} x ${item.name} (${Number(item.price || 0).toFixed(2)}) = ${Number(item.subtotal || 0).toFixed(2)}</li>`)
+    .map(
+      (item) =>
+        `<li>${item.qty} x ${item.name} (${Number(item.price || 0).toFixed(2)}) = ${Number(item.subtotal || 0).toFixed(2)}</li>`,
+    )
     .join("");
 
   const html = `

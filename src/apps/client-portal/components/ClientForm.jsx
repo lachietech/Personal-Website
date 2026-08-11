@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { portalRequest } from "../portalApi.js";
+import { portalRequest } from "../api/portalApi.js";
 import { FormMessage } from "./PortalLayout.jsx";
 
 const emptyClient = {

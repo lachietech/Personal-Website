@@ -1,12 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
-import { portalRequest } from "../portalApi.js";
+import { portalRequest } from "../api/portalApi.js";
 import {
   amountOwing,
   formatDate,
   invoiceTotal,
   money,
   printInvoice,
-} from "../portalUtils.js";
+} from "../utils/portalUtils.js";
 import { AccountForm } from "../components/AccountForm.jsx";
 import { InvoiceDetail } from "../components/InvoiceDetail.jsx";
 import {

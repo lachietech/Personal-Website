@@ -1,6 +1,6 @@
 import { Resend } from "resend";
 import { environment } from "../config/environment.js";
-import { escapeHtml } from "../security.js";
+import { escapeHtml } from "../utils/security.js";
 
 const resend = new Resend(environment.resendApiKey);
 

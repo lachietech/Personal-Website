@@ -2,7 +2,20 @@ import Sales from "../models/Sales.js";
 import POSProduct from "../models/POSProduct.js";
 
 export function getCurrentMonthLabel(date = new Date()) {
-  const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const monthNames = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
   return `${monthNames[date.getMonth()]}-${String(date.getFullYear()).slice(-2)}`;
 }
 
@@ -13,12 +26,18 @@ function toSku(category, size) {
 }
 
 function normalizeText(value) {
-  return String(value || "").trim().toUpperCase();
+  return String(value || "")
+    .trim()
+    .toUpperCase();
 }
 
 function pickCanonicalProduct(existing, candidate) {
-  const existingTime = Date.parse(existing.updatedAt || existing.createdAt || 0);
-  const candidateTime = Date.parse(candidate.updatedAt || candidate.createdAt || 0);
+  const existingTime = Date.parse(
+    existing.updatedAt || existing.createdAt || 0,
+  );
+  const candidateTime = Date.parse(
+    candidate.updatedAt || candidate.createdAt || 0,
+  );
   if (!Number.isNaN(existingTime) && !Number.isNaN(candidateTime)) {
     return candidateTime > existingTime ? candidate : existing;
   }
@@ -29,12 +48,20 @@ function pickCanonicalProduct(existing, candidate) {
 export async function syncPosProductsFromSalesRecords() {
   const salesRecords = await Sales.find({}).select("_id category size").lean();
   if (!salesRecords.length) {
-    return { synced: 0, created: 0, updated: 0, removedDuplicates: 0, deactivated: 0 };
+    return {
+      synced: 0,
+      created: 0,
+      updated: 0,
+      removedDuplicates: 0,
+      deactivated: 0,
+    };
   }
 
   const existingProducts = await POSProduct.find({})
     .sort({ updatedAt: -1, createdAt: -1 })
-    .select("_id name sku category size salesRecordId price stockOnHand stockInWarehouse updatedAt createdAt")
+    .select(
+      "_id name sku category size salesRecordId price stockOnHand stockInWarehouse updatedAt createdAt",
+    )
     .lean();
 
   const bySalesRecordId = new Map();
@@ -66,7 +93,10 @@ export async function syncPosProductsFromSalesRecords() {
     const skuKey = normalizeText(computedSku);
     const variantKey = `${normalizeText(record.category)}|${normalizeText(record.size)}`;
 
-    let target = bySalesRecordId.get(salesKey) || bySku.get(skuKey) || byVariant.get(variantKey);
+    let target =
+      bySalesRecordId.get(salesKey) ||
+      bySku.get(skuKey) ||
+      byVariant.get(variantKey);
 
     if (target) {
       await POSProduct.updateOne(
@@ -78,9 +108,9 @@ export async function syncPosProductsFromSalesRecords() {
             name: `${record.category} - ${record.size}`,
             sku: computedSku,
             salesRecordId: record._id,
-            active: true
-          }
-        }
+            active: true,
+          },
+        },
       );
       updated += 1;
 
@@ -91,7 +121,7 @@ export async function syncPosProductsFromSalesRecords() {
         name: `${record.category} - ${record.size}`,
         sku: computedSku,
         salesRecordId: record._id,
-        active: true
+        active: true,
       };
 
       bySalesRecordId.set(salesKey, refreshedTarget);
@@ -109,7 +139,7 @@ export async function syncPosProductsFromSalesRecords() {
       price: 0,
       stockOnHand: 0,
       stockInWarehouse: 0,
-      active: true
+      active: true,
     });
 
     created += 1;
@@ -140,14 +170,17 @@ export async function syncPosProductsFromSalesRecords() {
     }
 
     const canonical = pickCanonicalProduct(existing, product);
-    const duplicate = String(canonical._id) === String(existing._id) ? product : existing;
+    const duplicate =
+      String(canonical._id) === String(existing._id) ? product : existing;
     canonicalBySalesRecord.set(key, canonical);
     duplicateLinkedIds.push(duplicate._id);
   }
 
   let removedDuplicates = 0;
   if (duplicateLinkedIds.length) {
-    const deleteResult = await POSProduct.deleteMany({ _id: { $in: duplicateLinkedIds } });
+    const deleteResult = await POSProduct.deleteMany({
+      _id: { $in: duplicateLinkedIds },
+    });
     removedDuplicates = deleteResult.deletedCount || 0;
   }
 
@@ -156,7 +189,7 @@ export async function syncPosProductsFromSalesRecords() {
     created,
     updated,
     removedDuplicates,
-    deactivated: 0
+    deactivated: 0,
   };
 }
 
@@ -173,7 +206,10 @@ export async function applyPosOrderToSales(items) {
 
     if (item.salesRecordId) {
       const key = String(item.salesRecordId);
-      incrementsByRecordId.set(key, (incrementsByRecordId.get(key) || 0) + quantity);
+      incrementsByRecordId.set(
+        key,
+        (incrementsByRecordId.get(key) || 0) + quantity,
+      );
       continue;
     }
 
@@ -184,21 +220,28 @@ export async function applyPosOrderToSales(items) {
     }
 
     const variantKey = `${category}::${size}`;
-    incrementsByVariant.set(variantKey, (incrementsByVariant.get(variantKey) || 0) + quantity);
+    incrementsByVariant.set(
+      variantKey,
+      (incrementsByVariant.get(variantKey) || 0) + quantity,
+    );
   }
 
   const [salesById, salesByVariant] = await Promise.all([
     incrementsByRecordId.size
-      ? Sales.find({ _id: { $in: [...incrementsByRecordId.keys()] } }).select("_id category size months sales").lean()
+      ? Sales.find({ _id: { $in: [...incrementsByRecordId.keys()] } })
+          .select("_id category size months sales")
+          .lean()
       : Promise.resolve([]),
     incrementsByVariant.size
       ? Sales.find({
-        $or: [...incrementsByVariant.keys()].map((variantKey) => {
-          const [category, size] = variantKey.split("::");
-          return { category, size };
+          $or: [...incrementsByVariant.keys()].map((variantKey) => {
+            const [category, size] = variantKey.split("::");
+            return { category, size };
+          }),
         })
-      }).select("_id category size months sales").lean()
-      : Promise.resolve([])
+          .select("_id category size months sales")
+          .lean()
+      : Promise.resolve([]),
   ]);
 
   const salesByIdMap = new Map();
@@ -211,18 +254,27 @@ export async function applyPosOrderToSales(items) {
     if (!salesByIdMap.has(recordId)) {
       continue;
     }
-    quantitiesBySaleId.set(recordId, (quantitiesBySaleId.get(recordId) || 0) + quantity);
+    quantitiesBySaleId.set(
+      recordId,
+      (quantitiesBySaleId.get(recordId) || 0) + quantity,
+    );
   }
 
   const variantToSaleId = new Map(
-    salesByVariant.map((sale) => [`${String(sale.category || "").trim()}::${String(sale.size || "").trim()}`, String(sale._id)])
+    salesByVariant.map((sale) => [
+      `${String(sale.category || "").trim()}::${String(sale.size || "").trim()}`,
+      String(sale._id),
+    ]),
   );
   for (const [variantKey, quantity] of incrementsByVariant.entries()) {
     const saleId = variantToSaleId.get(variantKey);
     if (!saleId) {
       continue;
     }
-    quantitiesBySaleId.set(saleId, (quantitiesBySaleId.get(saleId) || 0) + quantity);
+    quantitiesBySaleId.set(
+      saleId,
+      (quantitiesBySaleId.get(saleId) || 0) + quantity,
+    );
   }
 
   if (!quantitiesBySaleId.size) {
@@ -254,10 +306,10 @@ export async function applyPosOrderToSales(items) {
           $set: {
             months,
             sales,
-            updatedAt: new Date()
-          }
-        }
-      }
+            updatedAt: new Date(),
+          },
+        },
+      },
     });
   }
 

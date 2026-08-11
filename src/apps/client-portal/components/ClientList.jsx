@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { amountOwing, money } from "../portalUtils.js";
+import { amountOwing, money } from "../utils/portalUtils.js";
 
 export function ClientList({ clients, selectedId, onSelect, onCreate }) {
   const [search, setSearch] = useState("");

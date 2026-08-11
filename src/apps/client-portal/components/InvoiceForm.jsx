@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { portalRequest } from "../portalApi.js";
-import { formatDate, invoiceTotal, money, today } from "../portalUtils.js";
+import { portalRequest } from "../api/portalApi.js";
+import { formatDate, invoiceTotal, money, today } from "../utils/portalUtils.js";
 import { FormMessage } from "./PortalLayout.jsx";
 
 function rowKey() {

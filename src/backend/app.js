@@ -3,19 +3,17 @@ import express from "express";
 import session from "express-session";
 import helmet from "helmet";
 import path from "node:path";
-import clientPortalRoutes from "./clientportal/routes/index.js";
+import clientPortalRoutes from "./clientportal/routing/index.js";
 import { environment } from "./config/environment.js";
-import hfssUniformsRoutes from "./hfssuniformsapp/hfssuniformsroutes.js";
+import hfssUniformsRoutes from "./hfssuniformsapp/routing/index.js";
 import {
   csrfTokenRoute,
   generateCsrfToken,
   protectFromCsrf,
 } from "./middleware/csrf.js";
-import meanderRoutes from "./meandersuite/meanderroutes.js";
-import pinpointRoutes from "./pinpoint/pinpointroutes.js";
-import { apiLimiter, generalLimiter } from "./ratelimits.js";
-import mainRoutes from "./routes/main.js";
-import superchatRoutes from "./superchat/superchatroutes.js";
+import meanderRoutes from "./meandersuite/routing/index.js";
+import { generalLimiter } from "./middleware/rateLimits.js";
+import mainRoutes from "./routing/main.js";
 
 const publicDirectory = path.resolve(import.meta.dirname, "../../public");
 const assetDirectory = path.resolve(import.meta.dirname, "../assets");
@@ -56,9 +54,6 @@ export function createApp() {
   app.use("/", mainRoutes);
   app.use("/clientportal", clientPortalRoutes);
   app.use("/meandersuite", meanderRoutes);
-  app.use("/superchat", superchatRoutes);
   app.use("/hfssuniformsapp", hfssUniformsRoutes);
-  app.use("/api/pinpoint", apiLimiter, pinpointRoutes);
-
   return app;
 }

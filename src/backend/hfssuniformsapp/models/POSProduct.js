@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { uniformsDb } from "../../databases.js";
+import { uniformsDb } from "../../config/databases.js";
 
 const posProductSchema = new mongoose.Schema(
   {
@@ -8,12 +8,16 @@ const posProductSchema = new mongoose.Schema(
     category: { type: String, required: true, trim: true },
     size: { type: String, trim: true, default: "" },
     sku: { type: String, trim: true, default: "" },
-    salesRecordId: { type: mongoose.Schema.Types.ObjectId, ref: "Sales", default: null },
+    salesRecordId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Sales",
+      default: null,
+    },
     stockOnHand: { type: Number, min: 0, default: 0 },
     stockInWarehouse: { type: Number, min: 0, default: 0 },
-    active: { type: Boolean, default: true }
+    active: { type: Boolean, default: true },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 export default uniformsDb.model("POSProduct", posProductSchema);
