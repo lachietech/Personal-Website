@@ -32,7 +32,7 @@ function createResponseRecorder() {
   };
 }
 
-test("credentialed CORS uses the canonical server allowlist value", () => {
+test("credentialed CORS accepts only exact server allowlist members", () => {
   const response = createResponseRecorder();
   let continued = false;
   const request = {
@@ -53,6 +53,35 @@ test("credentialed CORS uses the canonical server allowlist value", () => {
     getTrustedOrigin("https://nielseninnovations.com"),
   );
   assert.equal(response.headers.get("access-control-allow-credentials"), "true");
+
+  const rejectedResponse = createResponseRecorder();
+  let rejectedRequestContinued = false;
+  enforceTrustedOrigins(
+    {
+      method: "GET",
+      path: "/clientportal/api/client/dashboard",
+      get(name) {
+        return name === "origin"
+          ? "https://nielseninnovations.com.evil.test"
+          : undefined;
+      },
+    },
+    rejectedResponse,
+    () => {
+      rejectedRequestContinued = true;
+    },
+  );
+
+  assert.equal(rejectedRequestContinued, false);
+  assert.equal(rejectedResponse.statusCode, 403);
+  assert.equal(
+    rejectedResponse.headers.has("access-control-allow-origin"),
+    false,
+  );
+  assert.equal(
+    rejectedResponse.headers.has("access-control-allow-credentials"),
+    false,
+  );
 });
 
 test("CSRF middleware rejects sessions that never initialized a token", () => {
