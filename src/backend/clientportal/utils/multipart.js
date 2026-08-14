@@ -1,24 +1,28 @@
 import path from "path";
 
-const ALLOWED_RECEIPT_TYPES = new Map([
-  ["application/pdf", (data) => data.subarray(0, 5).toString() === "%PDF-"],
-  ["image/jpeg", (data) => data[0] === 0xff && data[1] === 0xd8],
-  [
-    "image/png",
-    (data) =>
-      data
-        .subarray(0, 8)
-        .equals(
-          Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]),
-        ),
-  ],
-  [
-    "image/webp",
-    (data) =>
-      data.subarray(0, 4).toString() === "RIFF" &&
-      data.subarray(8, 12).toString() === "WEBP",
-  ],
+const PNG_SIGNATURE = Buffer.from([
+  0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a,
 ]);
+
+export function hasAllowedReceiptSignature(contentType, data) {
+  if (!Buffer.isBuffer(data)) return false;
+
+  switch (contentType) {
+    case "application/pdf":
+      return data.subarray(0, 5).toString() === "%PDF-";
+    case "image/jpeg":
+      return data[0] === 0xff && data[1] === 0xd8;
+    case "image/png":
+      return data.subarray(0, 8).equals(PNG_SIGNATURE);
+    case "image/webp":
+      return (
+        data.subarray(0, 4).toString() === "RIFF" &&
+        data.subarray(8, 12).toString() === "WEBP"
+      );
+    default:
+      return false;
+  }
+}
 
 export function parseMultipartReceipt(req, maxBytes = 2 * 1024 * 1024) {
   return new Promise((resolve, reject) => {
@@ -66,8 +70,7 @@ export function parseMultipartReceipt(req, maxBytes = 2 * 1024 * 1024) {
 
           if (fieldName === "receipt" && filename && fileData.length) {
             const safeContentType = (type || "").trim().toLowerCase();
-            const signatureMatches = ALLOWED_RECEIPT_TYPES.get(safeContentType);
-            if (!signatureMatches || !signatureMatches(fileData)) {
+            if (!hasAllowedReceiptSignature(safeContentType, fileData)) {
               reject(new Error("Receipt must be a PDF, JPEG, PNG, or WebP file"));
               return;
             }

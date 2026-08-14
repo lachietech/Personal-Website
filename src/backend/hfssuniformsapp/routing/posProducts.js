@@ -1,5 +1,5 @@
 import express from "express";
-import mongoose from "mongoose";
+import { getObjectId } from "../../middleware/databaseInput.js";
 import POSProduct from "../models/POSProduct.js";
 import { requireAdmin } from "../middleware/auth.js";
 import { syncPosProductsFromSalesRecords } from "../services/posIntegration.js";
@@ -7,10 +7,6 @@ import { compareCategoryThenSize } from "../utils/sizeOrder.js";
 
 const router = express.Router();
 const SAFE_TEXT_PATTERN = /^[A-Za-z0-9 .\-_/()+&]{1,100}$/;
-
-function validateObjectId(idValue) {
-  return mongoose.Types.ObjectId.isValid(String(idValue || ""));
-}
 
 function sanitizeTextInput(value, fieldName, maxLength = 100) {
   if (typeof value !== "string") {
@@ -106,7 +102,10 @@ router.post("/", requireAdmin, async (req, res) => {
     const safeSize = sanitizeOptionalText(size, "size", 30);
     const safeSku = sanitizeOptionalText(sku, "sku", 50);
 
-    if (salesRecordId && !validateObjectId(salesRecordId)) {
+    const safeSalesRecordId = salesRecordId
+      ? getObjectId(salesRecordId)
+      : null;
+    if (salesRecordId && !safeSalesRecordId) {
       return res.status(400).json({ error: "Invalid salesRecordId" });
     }
 
@@ -124,7 +123,7 @@ router.post("/", requireAdmin, async (req, res) => {
         "stockInWarehouse",
         { integer: true },
       ),
-      salesRecordId: salesRecordId || null,
+      salesRecordId: safeSalesRecordId,
     });
     await product.save();
     res.status(201).json(product);
@@ -135,9 +134,13 @@ router.post("/", requireAdmin, async (req, res) => {
 
 router.put("/:id", requireAdmin, async (req, res) => {
   try {
-    if (!validateObjectId(req.params.id)) {
+    const productId = getObjectId(req.params.id);
+    if (!productId) {
       return res.status(400).json({ error: "Invalid product id" });
     }
+
+    const product = await POSProduct.findById(productId);
+    if (!product) return res.status(404).json({ error: "Product not found" });
 
     const {
       name,
@@ -151,55 +154,52 @@ router.put("/:id", requireAdmin, async (req, res) => {
       salesRecordId,
     } = req.body;
 
-    const updatePayload = {};
     if (name !== undefined) {
-      updatePayload.name = sanitizeTextInput(name, "name");
+      product.name = sanitizeTextInput(name, "name");
     }
     if (category !== undefined) {
-      updatePayload.category = sanitizeTextInput(category, "category");
+      product.category = sanitizeTextInput(category, "category");
     }
     if (size !== undefined) {
-      updatePayload.size = sanitizeOptionalText(size, "size", 30);
+      product.size = sanitizeOptionalText(size, "size", 30);
     }
     if (sku !== undefined) {
-      updatePayload.sku = sanitizeOptionalText(sku, "sku", 50);
+      product.sku = sanitizeOptionalText(sku, "sku", 50);
     }
     if (active !== undefined) {
       if (typeof active !== "boolean") {
         throw new Error("active must be a boolean");
       }
-      updatePayload.active = active;
+      product.active = active;
     }
 
     if (salesRecordId !== undefined) {
-      if (salesRecordId && !validateObjectId(salesRecordId)) {
+      const safeSalesRecordId = salesRecordId
+        ? getObjectId(salesRecordId)
+        : null;
+      if (salesRecordId && !safeSalesRecordId) {
         return res.status(400).json({ error: "Invalid salesRecordId" });
       }
-      updatePayload.salesRecordId = salesRecordId || null;
+      product.salesRecordId = safeSalesRecordId;
     }
 
     if (price !== undefined) {
-      updatePayload.price = sanitizeNumber(price, "price");
+      product.price = sanitizeNumber(price, "price");
     }
     if (stockOnHand !== undefined) {
-      updatePayload.stockOnHand = sanitizeNumber(stockOnHand, "stockOnHand", {
+      product.stockOnHand = sanitizeNumber(stockOnHand, "stockOnHand", {
         integer: true,
       });
     }
     if (stockInWarehouse !== undefined) {
-      updatePayload.stockInWarehouse = sanitizeNumber(
+      product.stockInWarehouse = sanitizeNumber(
         stockInWarehouse,
         "stockInWarehouse",
         { integer: true },
       );
     }
 
-    const product = await POSProduct.findByIdAndUpdate(
-      req.params.id,
-      updatePayload,
-      { new: true, runValidators: true },
-    );
-    if (!product) return res.status(404).json({ error: "Product not found" });
+    await product.save();
     res.json(product);
   } catch (err) {
     res.status(400).json({ error: err.message });
@@ -208,7 +208,8 @@ router.put("/:id", requireAdmin, async (req, res) => {
 
 router.post("/:id/transfer", requireAdmin, async (req, res) => {
   try {
-    if (!validateObjectId(req.params.id)) {
+    const productId = getObjectId(req.params.id);
+    if (!productId) {
       return res.status(400).json({ error: "Invalid product id" });
     }
 
@@ -221,7 +222,7 @@ router.post("/:id/transfer", requireAdmin, async (req, res) => {
         });
     }
 
-    const product = await POSProduct.findById(req.params.id);
+    const product = await POSProduct.findById(productId);
     if (!product) {
       return res.status(404).json({ error: "Product not found" });
     }
@@ -242,7 +243,8 @@ router.post("/:id/transfer", requireAdmin, async (req, res) => {
 
 router.post("/:id/add-stock", requireAdmin, async (req, res) => {
   try {
-    if (!validateObjectId(req.params.id)) {
+    const productId = getObjectId(req.params.id);
+    if (!productId) {
       return res.status(400).json({ error: "Invalid product id" });
     }
 
@@ -265,7 +267,7 @@ router.post("/:id/add-stock", requireAdmin, async (req, res) => {
         .json({ error: "Stock location must be warehouse or on-hand" });
     }
 
-    const product = await POSProduct.findById(req.params.id);
+    const product = await POSProduct.findById(productId);
     if (!product) {
       return res.status(404).json({ error: "Product not found" });
     }
@@ -285,16 +287,15 @@ router.post("/:id/add-stock", requireAdmin, async (req, res) => {
 
 router.delete("/:id", requireAdmin, async (req, res) => {
   try {
-    if (!validateObjectId(req.params.id)) {
+    const productId = getObjectId(req.params.id);
+    if (!productId) {
       return res.status(400).json({ error: "Invalid product id" });
     }
 
-    const product = await POSProduct.findByIdAndUpdate(
-      req.params.id,
-      { active: false },
-      { new: true },
-    );
+    const product = await POSProduct.findById(productId);
     if (!product) return res.status(404).json({ error: "Product not found" });
+    product.active = false;
+    await product.save();
     res.json({ ok: true });
   } catch (err) {
     res.status(500).json({ error: "Unable to archive product" });

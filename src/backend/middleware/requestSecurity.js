@@ -16,24 +16,51 @@ function configuredOrigins() {
     .split(",")
     .map((origin) => origin.trim())
     .filter(Boolean);
-  return new Set([
+  const configured = [
     ...PRODUCTION_ORIGINS,
     ...(process.env.NODE_ENV === "production" ? [] : DEVELOPMENT_ORIGINS),
     ...environmentOrigins,
-  ]);
+  ];
+  const allowedOrigins = new Map();
+
+  for (const candidate of configured) {
+    try {
+      const parsed = new URL(candidate);
+      if (
+        !["http:", "https:"].includes(parsed.protocol) ||
+        parsed.username ||
+        parsed.password ||
+        parsed.pathname !== "/" ||
+        parsed.search ||
+        parsed.hash
+      ) {
+        continue;
+      }
+      allowedOrigins.set(parsed.origin, parsed.origin);
+    } catch {
+      // Invalid configured values must not weaken the allowlist.
+    }
+  }
+
+  return allowedOrigins;
 }
 
 function isApiPath(path) {
   return path === "/csrf-token" || /(?:^|\/)api(?:\/|$)/.test(path);
 }
 
-export function isTrustedOrigin(origin) {
-  if (!origin || origin === "null") return false;
+export function getTrustedOrigin(origin) {
+  if (!origin || origin === "null") return null;
   try {
-    return configuredOrigins().has(new URL(origin).origin);
+    const parsedOrigin = new URL(origin).origin;
+    return configuredOrigins().get(parsedOrigin) || null;
   } catch {
-    return false;
+    return null;
   }
+}
+
+export function isTrustedOrigin(origin) {
+  return Boolean(getTrustedOrigin(origin));
 }
 
 export function enforceTrustedOrigins(req, res, next) {
@@ -46,10 +73,13 @@ export function enforceTrustedOrigins(req, res, next) {
   res.setHeader("Access-Control-Max-Age", "600");
 
   if (origin) {
-    if (!isTrustedOrigin(origin)) {
+    const trustedOrigin = getTrustedOrigin(origin);
+    if (!trustedOrigin) {
       return res.status(403).json({ error: "Origin is not permitted" });
     }
-    res.setHeader("Access-Control-Allow-Origin", origin);
+    // Use the canonical value sourced from the server-side allowlist. Never
+    // reflect the request header into a credentialed CORS response.
+    res.setHeader("Access-Control-Allow-Origin", trustedOrigin);
     res.setHeader("Access-Control-Allow-Credentials", "true");
   } else if (req.get("sec-fetch-site") === "cross-site") {
     return res.status(403).json({ error: "Cross-site request blocked" });

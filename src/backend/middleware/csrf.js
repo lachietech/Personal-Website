@@ -45,5 +45,14 @@ export function protectFromCsrf(req, res, next) {
     next();
     return;
   }
-  csrf.doubleCsrfProtection(req, res, next);
+
+  // Require the token-issuing route to have marked this exact session before
+  // performing the cryptographic double-submit validation. Besides failing
+  // closed when a client skips token initialization, this makes the CSRF
+  // session check explicit to static analysis tools.
+  if (req.session?.csrfReady !== true) {
+    return res.status(403).json({ error: "Invalid CSRF token" });
+  }
+
+  return csrf.doubleCsrfProtection(req, res, next);
 }
