@@ -56,30 +56,71 @@ export function slugify(value) {
     .slice(0, 120);
 }
 
+function cleanProjectText(value, maxLength, fallback = "") {
+  if (value === undefined || value === null || value === "") return fallback;
+  if (typeof value !== "string") throw new Error("Invalid project text");
+  return value.trim().slice(0, maxLength);
+}
+
+function cleanProjectUrl(value) {
+  const url = cleanProjectText(value, 500);
+  if (!url) return "";
+  if (url.startsWith("/") && !url.startsWith("//")) return url;
+  try {
+    const parsed = new URL(url);
+    if (parsed.protocol !== "https:" || parsed.username || parsed.password) {
+      throw new Error("Project URL must use HTTPS");
+    }
+    return parsed.toString();
+  } catch (error) {
+    if (error.message === "Project URL must use HTTPS") throw error;
+    throw new Error("Project URL must be HTTPS or a site path");
+  }
+}
+
+function cleanProjectImage(value) {
+  const image = cleanProjectText(value, 500);
+  if (!image) return "";
+  if (!image.startsWith("/static/") || image.startsWith("//")) {
+    throw new Error("Project image must use a local static asset");
+  }
+  return image;
+}
+
 export function projectPayload(body = {}) {
-  const title = String(body.title || "").trim();
+  const title = cleanProjectText(body.title, 120);
   if (!title) throw new Error("Project title is required");
   const slug = slugify(body.slug || title);
   if (!slug) throw new Error("A valid project slug is required");
-  const url = String(body.url || "").trim();
-  if (url && !/^(https?:\/\/|\/)[^\s]+$/i.test(url))
-    throw new Error("Project URL must be an HTTP(S) URL or a site path");
+  const url = cleanProjectUrl(body.url);
+  const github =
+    body.github && typeof body.github === "object"
+      ? {
+          owner: cleanProjectText(body.github.owner, 100),
+          repo: cleanProjectText(body.github.repo, 100),
+          stars: Math.max(0, Number.parseInt(body.github.stars, 10) || 0),
+          language: cleanProjectText(body.github.language, 80),
+          lastSyncedAt: body.github.lastSyncedAt
+            ? new Date(body.github.lastSyncedAt)
+            : null,
+        }
+      : undefined;
   return {
     title,
     slug,
     url,
-    summary: String(body.summary || "").trim(),
-    type: String(body.type || "Project").trim(),
-    status: String(body.status || "Live project").trim(),
-    image: String(body.image || "").trim(),
-    imageAlt: String(body.imageAlt || `${title} project`).trim(),
-    visualClass: String(body.visualClass || "project-default")
+    summary: cleanProjectText(body.summary, 500),
+    type: cleanProjectText(body.type, 100, "Project"),
+    status: cleanProjectText(body.status, 60, "Live project"),
+    image: cleanProjectImage(body.image),
+    imageAlt: cleanProjectText(body.imageAlt, 180, `${title} project`),
+    visualClass: cleanProjectText(body.visualClass, 80, "project-default")
       .trim()
       .replace(/[^a-z0-9_-]/gi, ""),
     featured: Boolean(body.featured),
     published: body.published !== false,
     sortOrder: Math.max(0, Number.parseInt(body.sortOrder, 10) || 0),
-    github: body.github || undefined,
+    github,
   };
 }
 

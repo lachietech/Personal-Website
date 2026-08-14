@@ -73,7 +73,8 @@ export function AdminPage() {
   return (
     <PortalLayout
       eyebrow="Administration"
-      title="Manage clients, projects, invoices, and business records."
+      title="Business, at a glance."
+      subtitle="Manage clients, projects, invoices, reporting, and account settings from one workspace."
       actions={
         <>
           <button

@@ -67,3 +67,65 @@ export function getAnalyticsStartDate(days, now = new Date()) {
     startDate: new Date(now.getTime() - safeDays * 24 * 60 * 60 * 1000),
   };
 }
+
+function rankEvents(events, field) {
+  const values = new Map();
+  for (const event of events) {
+    const label = event[field] || "Other";
+    const current = values.get(label) || { views: 0, sessions: new Set() };
+    current.views += 1;
+    current.sessions.add(event.sessionId);
+    values.set(label, current);
+  }
+
+  return [...values.entries()]
+    .map(([label, value]) => ({
+      [field]: label,
+      views: value.views,
+      visitors: value.sessions.size,
+    }))
+    .sort((left, right) => right.views - left.views)
+    .slice(0, 10);
+}
+
+export function buildAnalyticsSummary(events, days) {
+  const sessions = new Set();
+  const dailyValues = new Map();
+
+  for (const event of events) {
+    sessions.add(event.sessionId);
+    const date = new Date(event.occurredAt).toISOString().slice(0, 10);
+    const current = dailyValues.get(date) || {
+      views: 0,
+      sessions: new Set(),
+    };
+    current.views += 1;
+    current.sessions.add(event.sessionId);
+    dailyValues.set(date, current);
+  }
+
+  const pageViews = events.length;
+  const visitors = sessions.size;
+  return {
+    days,
+    totals: {
+      pageViews,
+      visitors,
+      viewsPerVisitor: visitors
+        ? Number((pageViews / visitors).toFixed(1))
+        : 0,
+    },
+    daily: [...dailyValues.entries()]
+      .map(([date, value]) => ({
+        date,
+        views: value.views,
+        visitors: value.sessions.size,
+      }))
+      .sort((left, right) => left.date.localeCompare(right.date)),
+    pages: rankEvents(events, "path"),
+    referrers: rankEvents(events, "referrer"),
+    devices: rankEvents(events, "device"),
+    browsers: rankEvents(events, "browser"),
+    recent: events.slice(0, 20).map(({ sessionId, ...event }) => event),
+  };
+}

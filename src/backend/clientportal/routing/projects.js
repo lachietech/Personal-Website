@@ -7,8 +7,10 @@ import {
   serializeProject,
   slugify,
 } from "../utils/projects.js";
+import { requireObjectIdParam } from "../../middleware/databaseInput.js";
 
 const router = express.Router();
+router.param("projectId", requireObjectIdParam("project"));
 
 router.get("/", async (_req, res) => {
   try {

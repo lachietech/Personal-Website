@@ -10,8 +10,10 @@ import {
   requireAuth,
   setAuthCookie,
 } from "../middleware/auth.js";
+import { requireObjectIdParam } from "../../middleware/databaseInput.js";
 
 const router = express.Router();
+router.param("id", requireObjectIdParam("user"));
 
 router.use((req, res, next) => {
   res.setHeader(

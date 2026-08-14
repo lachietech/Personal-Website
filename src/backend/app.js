@@ -13,6 +13,11 @@ import {
 } from "./middleware/csrf.js";
 import meanderRoutes from "./meandersuite/routing/index.js";
 import { generalLimiter } from "./middleware/rateLimits.js";
+import { errorHandler, notFoundHandler } from "./middleware/errors.js";
+import {
+  enforceTrustedOrigins,
+  rejectUnsafeRequestKeys,
+} from "./middleware/requestSecurity.js";
 import mainRoutes from "./routing/main.js";
 
 const publicDirectory = path.resolve(import.meta.dirname, "../../public");
@@ -31,6 +36,7 @@ export function createApp() {
         directives: {
           defaultSrc: ["'self'"],
           scriptSrc: ["'self'"],
+          scriptSrcAttr: ["'none'"],
           styleSrc: [
             "'self'",
             "'unsafe-inline'",
@@ -41,6 +47,9 @@ export function createApp() {
           imgSrc: ["'self'", "data:"],
           connectSrc: ["'self'"],
           objectSrc: ["'none'"],
+          frameSrc: ["'none'"],
+          workerSrc: ["'none'"],
+          manifestSrc: ["'self'"],
           frameAncestors: ["'none'"],
           baseUri: ["'self'"],
           formAction: ["'self'"],
@@ -50,10 +59,12 @@ export function createApp() {
     }),
   );
   app.use(cookieParser());
+  app.use(enforceTrustedOrigins);
   app.use(express.static(publicDirectory));
   app.use("/static", express.static(assetDirectory));
   app.use(express.urlencoded({ extended: false, limit: "50kb" }));
   app.use(express.json({ limit: "50kb" }));
+  app.use(rejectUnsafeRequestKeys);
   app.use(
     session({
       secret: environment.sessionSecret,
@@ -78,5 +89,7 @@ export function createApp() {
   app.use("/clientportal", clientPortalRoutes);
   app.use("/meandersuite", meanderRoutes);
   app.use("/hfssuniformsapp", hfssUniformsRoutes);
+  app.use(notFoundHandler);
+  app.use(errorHandler);
   return app;
 }

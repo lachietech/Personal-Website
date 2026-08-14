@@ -16,8 +16,11 @@ import {
   validatePassword,
 } from "../utils/portal-data.js";
 import { invoiceEmailHtml, sendPortalEmail } from "../services/emails.js";
+import { requireObjectIdParam } from "../../middleware/databaseInput.js";
 
 const router = express.Router();
+router.param("clientId", requireObjectIdParam("client"));
+router.param("invoiceId", requireObjectIdParam("invoice"));
 router.use(adminApiLimiter, requirePortalAuth, requirePortalAdmin);
 
 async function loadClientAndInvoice(clientId, invoiceId) {
@@ -261,7 +264,7 @@ router.post("/clients/:clientId/emails/account", async (req, res) => {
     return res.json({ ok: true, email });
   } catch (error) {
     return res.status(500).json({
-      error: error.message || "Unable to send account email",
+      error: "Unable to send account email",
     });
   }
 });
@@ -291,7 +294,7 @@ router.post(
       return res.json({ ok: true, email, client: serializeClient(client) });
     } catch (error) {
       return res.status(500).json({
-        error: error.message || "Unable to send invoice email",
+        error: "Unable to send invoice email",
       });
     }
   },
@@ -319,7 +322,7 @@ router.post(
       return res.json({ ok: true, email });
     } catch (error) {
       return res.status(500).json({
-        error: error.message || "Unable to send reminder email",
+        error: "Unable to send reminder email",
       });
     }
   },
@@ -352,7 +355,7 @@ router.post(
       return res.json({ ok: true, email });
     } catch (error) {
       return res.status(500).json({
-        error: error.message || "Unable to send receipt email",
+        error: "Unable to send receipt email",
       });
     }
   },

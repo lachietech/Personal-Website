@@ -55,7 +55,7 @@ router.get("/", async (req, res) => {
 
     res.json(orders);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: "Unable to load orders" });
   }
 });
 
@@ -71,7 +71,7 @@ router.get("/receipts", async (req, res) => {
 
     res.json(receipts);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: "Unable to load receipts" });
   }
 });
 
@@ -97,7 +97,7 @@ router.get("/:id/receipt", async (req, res) => {
       html: receipt.html,
     });
   } catch (err) {
-    return res.status(500).json({ error: err.message });
+    return res.status(500).json({ error: "Unable to load receipt" });
   }
 });
 
@@ -105,7 +105,7 @@ router.post("/", async (req, res) => {
   try {
     const { items, paymentMethod, amountTendered } = req.body;
 
-    if (!Array.isArray(items) || items.length === 0) {
+    if (!Array.isArray(items) || items.length === 0 || items.length > 100) {
       return res.status(400).json({ error: "No items in order" });
     }
     if (!ALLOWED_PAYMENT_METHODS.includes(paymentMethod)) {
@@ -133,7 +133,7 @@ router.post("/", async (req, res) => {
     const normalizedItems = [];
     for (const item of items) {
       const qty = Number(item.qty || 0);
-      if (!Number.isFinite(qty) || qty < 1) {
+      if (!Number.isInteger(qty) || qty < 1 || qty > 1000) {
         return res.status(400).json({ error: "Invalid item quantity" });
       }
 
@@ -170,8 +170,14 @@ router.post("/", async (req, res) => {
       0,
     );
     const total = subtotal;
+    const parsedTendered = Number(amountTendered);
     const tendered =
-      paymentMethod === "cash" ? parseFloat(amountTendered) || 0 : 0;
+      paymentMethod === "cash" && Number.isFinite(parsedTendered)
+        ? parsedTendered
+        : 0;
+    if (tendered < 0 || tendered > 1000000) {
+      return res.status(400).json({ error: "Invalid cash amount" });
+    }
     const change = paymentMethod === "cash" ? Math.max(0, tendered - total) : 0;
 
     if (paymentMethod === "cash" && tendered < total) {

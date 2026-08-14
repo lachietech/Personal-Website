@@ -52,12 +52,11 @@ function sanitizeNumber(value, fieldName, { integer = false } = {}) {
 
 router.get("/", async (req, res) => {
   try {
-    await syncPosProductsFromSalesRecords();
     const products = await POSProduct.find({ active: true }).lean();
     products.sort((left, right) => compareCategoryThenSize(left, right));
     res.json(products);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: "Unable to load products" });
   }
 });
 
@@ -67,7 +66,7 @@ router.get("/stock", async (req, res) => {
     products.sort((left, right) => compareCategoryThenSize(left, right));
     res.json(products);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: "Unable to load stock" });
   }
 });
 
@@ -77,7 +76,7 @@ router.get("/all", async (req, res) => {
     products.sort((left, right) => compareCategoryThenSize(left, right));
     res.json(products);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: "Unable to load products" });
   }
 });
 
@@ -86,11 +85,11 @@ router.post("/sync-from-sales", requireAdmin, async (req, res) => {
     const summary = await syncPosProductsFromSalesRecords();
     res.json({ ok: true, ...summary });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: "Unable to sync products" });
   }
 });
 
-router.post("/", async (req, res) => {
+router.post("/", requireAdmin, async (req, res) => {
   try {
     const {
       name,
@@ -134,7 +133,7 @@ router.post("/", async (req, res) => {
   }
 });
 
-router.put("/:id", async (req, res) => {
+router.put("/:id", requireAdmin, async (req, res) => {
   try {
     if (!validateObjectId(req.params.id)) {
       return res.status(400).json({ error: "Invalid product id" });
@@ -207,7 +206,7 @@ router.put("/:id", async (req, res) => {
   }
 });
 
-router.post("/:id/transfer", async (req, res) => {
+router.post("/:id/transfer", requireAdmin, async (req, res) => {
   try {
     if (!validateObjectId(req.params.id)) {
       return res.status(400).json({ error: "Invalid product id" });
@@ -237,11 +236,11 @@ router.post("/:id/transfer", async (req, res) => {
 
     return res.json(product);
   } catch (err) {
-    return res.status(500).json({ error: err.message });
+    return res.status(500).json({ error: "Unable to transfer stock" });
   }
 });
 
-router.post("/:id/add-stock", async (req, res) => {
+router.post("/:id/add-stock", requireAdmin, async (req, res) => {
   try {
     if (!validateObjectId(req.params.id)) {
       return res.status(400).json({ error: "Invalid product id" });
@@ -280,11 +279,11 @@ router.post("/:id/add-stock", async (req, res) => {
     await product.save();
     return res.json(product);
   } catch (err) {
-    return res.status(500).json({ error: err.message });
+    return res.status(500).json({ error: "Unable to add stock" });
   }
 });
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", requireAdmin, async (req, res) => {
   try {
     if (!validateObjectId(req.params.id)) {
       return res.status(400).json({ error: "Invalid product id" });
@@ -298,7 +297,7 @@ router.delete("/:id", async (req, res) => {
     if (!product) return res.status(404).json({ error: "Product not found" });
     res.json({ ok: true });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: "Unable to archive product" });
   }
 });
 

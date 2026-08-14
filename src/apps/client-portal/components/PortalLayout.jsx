@@ -1,17 +1,24 @@
 import { PortalBrand } from "./PortalBrand.jsx";
 
-export function PortalLayout({ title, eyebrow, actions, children }) {
+export function PortalLayout({ title, eyebrow, subtitle, actions, children }) {
   return (
     <>
       <header className="portal-shell">
         <nav className="topbar" aria-label="Client portal navigation">
           <PortalBrand />
-          <div className="topbar-actions">{actions}</div>
+          <div className="topbar-actions">
+            <span className="secure-badge">
+              <i className="bi bi-shield-check" aria-hidden="true" />
+              Secure workspace
+            </span>
+            {actions}
+          </div>
         </nav>
         <section className="portal-header compact-header">
-          <div>
+          <div className="portal-header-copy">
             <p className="eyebrow">{eyebrow}</p>
             <h1>{title}</h1>
+            {subtitle && <p className="portal-subtitle">{subtitle}</p>}
           </div>
         </section>
       </header>
@@ -41,7 +48,7 @@ export function Tabs({ tabs, activeTab, onChange }) {
           key={tab.id}
         >
           <i className={`bi ${tab.icon}`} aria-hidden="true" />
-          {tab.label}
+          <span>{tab.label}</span>
         </button>
       ))}
     </div>

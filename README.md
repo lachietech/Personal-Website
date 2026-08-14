@@ -46,3 +46,11 @@ stock, and access-management controllers.
 
 For live client and server changes, run `npm run dev:client` and
 `npm run dev:server` in separate terminals.
+
+## Security configuration
+
+Set `TRUSTED_ORIGINS` to a comma-separated list of additional HTTPS origins
+that may call browser APIs. Production always trusts
+`https://nielseninnovations.com` and `https://www.nielseninnovations.com`.
+Cross-origin browser requests from every other origin are rejected. Localhost
+origins are included only outside production.

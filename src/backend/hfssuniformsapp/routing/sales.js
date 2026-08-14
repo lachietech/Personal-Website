@@ -11,6 +11,7 @@ import {
   sanitizeSalesText,
   validateSalesSeries,
 } from "../utils/salesValidation.js";
+import { requireAdmin } from "../middleware/auth.js";
 
 const router = express.Router();
 
@@ -35,7 +36,7 @@ router.get("/sales", async (req, res) => {
     sales.sort(compareCategoryThenSize);
     res.json(sales);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: "Unable to load sales records" });
   }
 });
 
@@ -43,7 +44,7 @@ router.get("/dashboard", async (req, res) => {
   try {
     res.json(buildDashboardMetrics(await Sales.find({}).lean()));
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: "Unable to load dashboard data" });
   }
 });
 
@@ -54,11 +55,11 @@ router.get("/sales/:id", requireValidId, async (req, res) => {
       ? res.json(sale)
       : res.status(404).json({ error: "Sales record not found" });
   } catch (error) {
-    return res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: "Unable to load sales record" });
   }
 });
 
-router.post("/sales", async (req, res) => {
+router.post("/sales", requireAdmin, async (req, res) => {
   try {
     const category = sanitizeSalesText(req.body.category, "category");
     const size = sanitizeSalesText(req.body.size, "size");
@@ -83,7 +84,7 @@ router.post("/sales", async (req, res) => {
   }
 });
 
-router.put("/sales/:id", requireValidId, async (req, res) => {
+router.put("/sales/:id", requireAdmin, requireValidId, async (req, res) => {
   try {
     const update = {};
     if (req.body.category !== undefined) {
@@ -112,25 +113,28 @@ router.put("/sales/:id", requireValidId, async (req, res) => {
   }
 });
 
-router.post("/sales/:id/add-month", requireValidId, async (req, res) => {
+router.post("/sales/:id/add-month", requireAdmin, requireValidId, async (req, res) => {
   try {
     const { month, value } = req.body;
     if (!month || value === undefined) {
       return res.status(400).json({ error: "Month and value are required" });
     }
 
+    const series = validateSalesSeries([month], [value]);
+    const safeMonth = series.months[0];
+    const safeValue = series.sales[0];
     const sale = await Sales.findById(req.params.id);
     if (!sale) {
       return res.status(404).json({ error: "Sales record not found" });
     }
-    if (sale.months.includes(month)) {
+    if (sale.months.includes(safeMonth)) {
       return res.status(400).json({
-        error: `Month ${month} already exists for this record`,
+        error: `Month ${safeMonth} already exists for this record`,
       });
     }
 
-    sale.months.push(month);
-    sale.sales.push(value);
+    sale.months.push(safeMonth);
+    sale.sales.push(safeValue);
     await sale.save();
     return res.json(sale);
   } catch (error) {
@@ -140,6 +144,7 @@ router.post("/sales/:id/add-month", requireValidId, async (req, res) => {
 
 router.patch(
   "/sales/:id/month/:monthIndex",
+  requireAdmin,
   requireValidId,
   async (req, res) => {
     try {
@@ -148,7 +153,9 @@ router.patch(
         return res.status(404).json({ error: "Sales record not found" });
       }
 
-      const monthIndex = Number.parseInt(req.params.monthIndex, 10);
+      const monthIndex = /^\d+$/.test(req.params.monthIndex)
+        ? Number(req.params.monthIndex)
+        : Number.NaN;
       if (
         !Number.isInteger(monthIndex) ||
         monthIndex < 0 ||
@@ -159,7 +166,10 @@ router.patch(
         });
       }
 
-      sale.sales[monthIndex] = req.body.value;
+      sale.sales[monthIndex] = validateSalesSeries(
+        [sale.months[monthIndex]],
+        [req.body.value],
+      ).sales[0];
       await sale.save();
       return res.json(sale);
     } catch (error) {
@@ -168,7 +178,7 @@ router.patch(
   },
 );
 
-router.delete("/sales/:id", requireValidId, async (req, res) => {
+router.delete("/sales/:id", requireAdmin, requireValidId, async (req, res) => {
   try {
     const deleted = await Sales.findByIdAndDelete(req.params.id);
     if (!deleted) {
@@ -177,7 +187,7 @@ router.delete("/sales/:id", requireValidId, async (req, res) => {
     await syncPosProductsFromSalesRecords();
     return res.json({ message: "Sales record deleted successfully", deleted });
   } catch (error) {
-    return res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: "Unable to delete sales record" });
   }
 });
 
@@ -186,7 +196,7 @@ router.get("/metadata/months", async (req, res) => {
     const firstRecord = await Sales.findOne().select("months").lean();
     res.json({ months: firstRecord?.months || [] });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: "Unable to load month metadata" });
   }
 });
 
@@ -194,7 +204,7 @@ router.get("/metadata/categories", async (req, res) => {
   try {
     res.json({ categories: await Sales.distinct("category") });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: "Unable to load category metadata" });
   }
 });
 
@@ -209,7 +219,7 @@ router.get("/metadata/categories/:category/sizes", async (req, res) => {
     ].sort(compareSizeValues);
     res.json({ category, sizes });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: "Unable to load size metadata" });
   }
 });
 

@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Disallow: /clientportal/
+Disallow: /hfssuniformsapp/
+Disallow: /meandersuite/suite
+Disallow: /meandersuite/login
+Disallow: /meandersuite/register
+Disallow: /csrf-token
+
+Sitemap: https://nielseninnovations.com/sitemap.xml

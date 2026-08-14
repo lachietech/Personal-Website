@@ -30,12 +30,37 @@ export function LoginPage() {
 
   return (
     <main className="login-shell">
+      <section className="login-intro" aria-label="Portal features">
+        <span className="login-kicker">
+          <i className="bi bi-shield-check" aria-hidden="true" />
+          Private client workspace
+        </span>
+        <div>
+          <p className="eyebrow">Nielsen Innovations</p>
+          <h2>Everything important, in one clear place.</h2>
+          <p>
+            Keep track of invoices, balances, and account details without the
+            back-and-forth.
+          </p>
+        </div>
+        <ul className="login-feature-list">
+          <li>
+            <i className="bi bi-receipt" aria-hidden="true" /> Invoice history
+          </li>
+          <li>
+            <i className="bi bi-wallet2" aria-hidden="true" /> Live balances
+          </li>
+          <li>
+            <i className="bi bi-lock" aria-hidden="true" /> Secure access
+          </li>
+        </ul>
+      </section>
       <section className="login-panel">
         <PortalBrand />
         <p className="eyebrow">Client Portal</p>
-        <h1>Sign in</h1>
+        <h1>Welcome back</h1>
         <p className="login-copy">
-          Access invoices, balances, and client billing updates.
+          Sign in to continue to your workspace.
         </p>
 
         <form className="stack-form" onSubmit={handleSubmit}>

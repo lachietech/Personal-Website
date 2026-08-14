@@ -1,0 +1,16 @@
+{
+  "name": "Nielsen Innovations",
+  "short_name": "Nielsen",
+  "description": "Websites, applications, and digital products built in Brisbane, Australia.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#07111f",
+  "theme_color": "#07111f",
+  "icons": [
+    {
+      "src": "/favicon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

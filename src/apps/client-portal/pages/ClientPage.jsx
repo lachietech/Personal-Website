@@ -71,6 +71,7 @@ export function ClientPage() {
     <PortalLayout
       eyebrow="Client Portal"
       title={`Welcome, ${client.contact}.`}
+      subtitle="Review your account, invoices, and payment status whenever you need them."
       actions={
         <>
           <button

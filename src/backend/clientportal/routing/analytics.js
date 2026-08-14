@@ -1,8 +1,13 @@
 import express from "express";
 import rateLimit from "express-rate-limit";
+import mongoose from "mongoose";
 import { requirePortalAdmin, requirePortalAuth } from "../middleware/auth.js";
-import AnalyticsEvent from "../models/AnalyticsEvent.js";
+import AnalyticsEvent, {
+  ANALYTICS_COLLECTION,
+  initialiseAnalyticsStorage,
+} from "../models/AnalyticsEvent.js";
 import {
+  buildAnalyticsSummary,
   getAnalyticsPayload,
   getAnalyticsStartDate,
 } from "../utils/analytics.js";
@@ -16,8 +21,15 @@ const collectionLimiter = rateLimit({
   message: { error: "Too many analytics events" },
 });
 
+initialiseAnalyticsStorage()
+  .then(() => console.log(`Analytics storage ready: ${ANALYTICS_COLLECTION}`))
+  .catch((error) =>
+    console.error("Unable to initialise analytics storage:", error.message),
+  );
+
 router.post("/event", collectionLimiter, async (req, res) => {
   try {
+    await initialiseAnalyticsStorage();
     await AnalyticsEvent.create(
       getAnalyticsPayload(req.body, req.headers["user-agent"]),
     );
@@ -32,64 +44,34 @@ router.post("/event", collectionLimiter, async (req, res) => {
 });
 
 router.get("/summary", requirePortalAuth, requirePortalAdmin, async (req, res) => {
-  const { days, startDate } = getAnalyticsStartDate(req.query.days);
-  const match = { occurredAt: { $gte: startDate } };
-  const [totals, daily, pages, referrers, devices, browsers, recent] =
-    await Promise.all([
-      AnalyticsEvent.aggregate([
-        { $match: match },
-        {
-          $group: {
-            _id: null,
-            pageViews: { $sum: 1 },
-            sessions: { $addToSet: "$sessionId" },
-          },
-        },
-        { $project: { _id: 0, pageViews: 1, visitors: { $size: "$sessions" } } },
-      ]),
-      AnalyticsEvent.aggregate([
-        { $match: match },
-        { $group: { _id: { $dateToString: { format: "%Y-%m-%d", date: "$occurredAt" } }, views: { $sum: 1 }, sessions: { $addToSet: "$sessionId" } } },
-        { $project: { _id: 0, date: "$_id", views: 1, visitors: { $size: "$sessions" } } },
-        { $sort: { date: 1 } },
-      ]),
-      rankedCounts(match, "$path", "path"),
-      rankedCounts(match, "$referrer", "referrer"),
-      rankedCounts(match, "$device", "device"),
-      rankedCounts(match, "$browser", "browser"),
-      AnalyticsEvent.find(match)
-        .sort({ occurredAt: -1 })
-        .limit(20)
-        .select("path title referrer device browser occurredAt -_id")
-        .lean(),
-    ]);
+  try {
+    await initialiseAnalyticsStorage();
+    const { days, startDate } = getAnalyticsStartDate(req.query.days);
+    const events = await AnalyticsEvent.find({
+      // The operator is created by this route, not supplied by the request.
+      // Mark it trusted so the global sanitizeFilter setting does not wrap the
+      // range in $eq and attempt to cast the entire object as a Date.
+      occurredAt: mongoose.trusted({ $gte: startDate }),
+    })
+      .sort({ occurredAt: -1 })
+      .limit(50000)
+      .select("sessionId path title referrer device browser occurredAt -_id")
+      .lean();
 
-  const summary = totals[0] || { pageViews: 0, visitors: 0 };
-  return res.json({
-    days,
-    totals: {
-      ...summary,
-      viewsPerVisitor: summary.visitors
-        ? Number((summary.pageViews / summary.visitors).toFixed(1))
-        : 0,
-    },
-    daily,
-    pages,
-    referrers,
-    devices,
-    browsers,
-    recent,
-  });
+    return res.json({
+      ...buildAnalyticsSummary(events, days),
+      storage: {
+        connected: true,
+        collection: ANALYTICS_COLLECTION,
+        eventsInPeriod: events.length,
+      },
+    });
+  } catch (error) {
+    console.error("Unable to load analytics summary:", error.message);
+    return res.status(503).json({
+      error: "Analytics data is temporarily unavailable. Please try again.",
+    });
+  }
 });
-
-function rankedCounts(match, field, label) {
-  return AnalyticsEvent.aggregate([
-    { $match: match },
-    { $group: { _id: field, views: { $sum: 1 }, sessions: { $addToSet: "$sessionId" } } },
-    { $project: { _id: 0, [label]: "$_id", views: 1, visitors: { $size: "$sessions" } } },
-    { $sort: { views: -1 } },
-    { $limit: 10 },
-  ]);
-}
 
 export default router;

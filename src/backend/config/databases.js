@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import "./environment.js";
 
 mongoose.set("sanitizeFilter", true);
+mongoose.set("strictQuery", true);
 
 function createDatabaseConnection(label, uri) {
   const connection = mongoose.createConnection(uri);

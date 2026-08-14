@@ -17,8 +17,14 @@ import {
   serializeBookkeepingRule,
   serializeBookkeepingTransaction,
 } from "../utils/portal-data.js";
+import {
+  getObjectIdArray,
+  requireObjectIdParam,
+} from "../../middleware/databaseInput.js";
 
 const router = express.Router();
+router.param("ruleId", requireObjectIdParam("rule"));
+router.param("transactionId", requireObjectIdParam("transaction"));
 router.use(adminApiLimiter, requirePortalAuth, requirePortalAdmin);
 
 function findOwnedTransaction(user, transactionId) {
@@ -67,7 +73,7 @@ router.post("/transactions", async (req, res) => {
 
 router.post("/transactions/bulk-categorize", async (req, res) => {
   try {
-    const ids = Array.isArray(req.body?.ids) ? req.body.ids.slice(0, 500) : [];
+    const ids = getObjectIdArray(req.body?.ids);
     const category = getRequiredText(req.body?.category, "Category", 120);
     const account = getOptionalText(req.body?.account, 120);
     const transactions = await BookkeepingTransaction.find({
@@ -265,7 +271,9 @@ router.get("/transactions/:transactionId/receipt", async (req, res) => {
     "Content-Type",
     transaction.receipt.contentType || "application/octet-stream",
   );
-  res.setHeader("Content-Disposition", `inline; filename="${filename}"`);
+  res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("Content-Security-Policy", "sandbox; default-src 'none'");
   return res.send(transaction.receipt.data);
 });
 
