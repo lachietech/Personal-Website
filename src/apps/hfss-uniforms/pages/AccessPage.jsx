@@ -4,12 +4,14 @@ import { useUniformData } from "../hooks/useUniformData.js";
 import { uniformRequest } from "../api/uniformApi.js";
 
 export function AccessPage() {
-  const { data: users = [], error, reload } = useUniformData("/api/auth/users");
+  const { data: users, error, reload } = useUniformData("/api/auth/users", {
+    initialData: [],
+  });
   const {
-    data: auditLogs = [],
+    data: auditLogs,
     error: auditError,
     reload: reloadAudit,
-  } = useUniformData("/api/auth/audit-logs");
+  } = useUniformData("/api/auth/audit-logs", { initialData: [] });
   const [message, setMessage] = useState(null);
   const [draft, setDraft] = useState({
     username: "",

@@ -7,11 +7,11 @@ const emptyRecord = { category: "", size: "", months: [], sales: [] };
 
 export function SalesPage() {
   const {
-    data: records = [],
+    data: records,
     loading,
     error,
     reload,
-  } = useUniformData("/api/sales");
+  } = useUniformData("/api/sales", { initialData: [] });
   const [selectedId, setSelectedId] = useState(null);
   const selected = useMemo(
     () => records.find((record) => record._id === selectedId),

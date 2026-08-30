@@ -5,11 +5,11 @@ import { uniformMoney, uniformRequest } from "../api/uniformApi.js";
 
 export function PosPage() {
   const {
-    data: products = [],
+    data: products,
     loading,
     error,
     reload,
-  } = useUniformData("/api/pos/products");
+  } = useUniformData("/api/pos/products", { initialData: [] });
   const [query, setQuery] = useState("");
   const [cart, setCart] = useState({});
   const [paymentMethod, setPaymentMethod] = useState("card");

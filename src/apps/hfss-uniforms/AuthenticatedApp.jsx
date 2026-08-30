@@ -31,16 +31,14 @@ export function AuthenticatedApp() {
   const [user, setUser] = useState(null);
   const [page, setPage] = useState(readPage);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    uniformRequest("/api/auth/me")
-      .then(({ user: currentUser }) => {
-        setUser(currentUser);
-        if (currentUser.mustChangePassword) navigate("account", true);
-      })
-      .catch(() => {
-        window.location.assign(`${basePath}/signin`);
-      });
+    let isCurrent = true;
+    loadCurrentUser(() => isCurrent);
+    return () => {
+      isCurrent = false;
+    };
   }, []);
 
   useEffect(() => {
@@ -70,13 +68,54 @@ export function AuthenticatedApp() {
     }
   }
 
-  if (!user)
+  async function loadCurrentUser(isCurrent = () => true) {
+    setLoading(true);
+    setError("");
+
+    try {
+      const { user: currentUser } = await uniformRequest("/api/auth/me");
+      if (!isCurrent()) return;
+      setUser(currentUser);
+      if (currentUser.mustChangePassword) navigate("account", true);
+    } catch (requestError) {
+      if (!isCurrent()) return;
+      if (requestError.status === 401) {
+        window.location.assign(
+          `${basePath}/signin?next=${encodeURIComponent(window.location.pathname)}`,
+        );
+        return;
+      }
+      setError(
+        requestError.message ||
+          "The uniform shop service is unavailable. Please try again.",
+      );
+    } finally {
+      if (isCurrent()) setLoading(false);
+    }
+  }
+
+  if (!user) {
     return (
-      <main className="container">
-        <p className="loading">Loading Uniform Shop Manager...</p>
+      <main className="container app-load-state">
+        {loading && <p className="loading">Loading Uniform Shop Manager...</p>}
         {error && <p className="status-message error">{error}</p>}
+        {error && (
+          <div className="form-actions">
+            <button
+              className="btn btn-primary"
+              type="button"
+              onClick={() => loadCurrentUser()}
+            >
+              Try again
+            </button>
+            <a className="btn btn-secondary" href={`${basePath}/signin`}>
+              Return to sign in
+            </a>
+          </div>
+        )}
       </main>
     );
+  }
   const pages = {
     dashboard: <DashboardPage />,
     "sales-records": <SalesPage />,

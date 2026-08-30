@@ -65,6 +65,18 @@
     white-space: pre-wrap;
 }
 
+.app-load-state {
+    margin-top: max(32px, 12vh);
+}
+
+.app-load-state .form-actions {
+    justify-content: center;
+}
+
+.app-load-state a.btn {
+    text-decoration: none;
+}
+
 .status-message.warning {
     color: var(--blue-grey);
     background: var(--warning-bg);

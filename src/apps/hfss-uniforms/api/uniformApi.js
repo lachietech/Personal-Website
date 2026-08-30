@@ -30,7 +30,10 @@ export async function uniformRequest(path, options = {}) {
   const data = await response.json().catch(() => ({}));
 
   if (!response.ok) {
-    throw new Error(data.error || "Request failed.");
+    const error = new Error(data.error || "Request failed.");
+    error.status = response.status;
+    error.code = data.code || "";
+    throw error;
   }
 
   return data;
@@ -44,8 +47,17 @@ export function uniformMoney(value) {
 }
 
 export async function prepareUniformSession() {
-  await fetch(`${BASE_PATH}/api/csrf-token`, {
+  const response = await fetch(`${BASE_PATH}/api/csrf-token`, {
     credentials: "same-origin",
     cache: "no-store",
   });
+
+  if (!response.ok) {
+    const data = await response.json().catch(() => ({}));
+    const error = new Error(
+      data.error || "Unable to initialise the secure session.",
+    );
+    error.status = response.status;
+    throw error;
+  }
 }

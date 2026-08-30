@@ -1,6 +1,5 @@
 import express from "express";
 import path from "path";
-import { resolveAuthenticatedUser } from "../middleware/auth.js";
 
 const router = express.Router();
 const basePath = "/hfssuniformsapp";
@@ -19,70 +18,32 @@ const appRoutes = [
   "/access-management",
   "/account",
 ];
-const allowedNextTargets = new Set(["/dashboard", ...appRoutes]);
-const allowedAppNextTargets = new Set([...allowedNextTargets].map(toAppPath));
 
 function toAppPath(route) {
   return `${basePath}${route}`;
 }
 
-async function requirePageAuth(req, res, next) {
-  const user = await resolveAuthenticatedUser(req, res);
-  if (!user) {
-    const target = encodeURIComponent(
-      req.originalUrl || toAppPath("/dashboard"),
-    );
-    return res.redirect(`${basePath}/signin?next=${target}`);
-  }
-
-  req.user = user;
-  next();
+function sendAppDocument(_req, res) {
+  // The React shell contains no private data. Send it immediately and let the
+  // authenticated API decide whether the browser has a valid session. This
+  // prevents a slow database connection from turning every page request into
+  // a blank document while keeping all application data protected.
+  res.setHeader("Cache-Control", "no-store");
+  return res.sendFile(appDocument, { cacheControl: false });
 }
 
-function getSafeNextTarget(nextValue) {
-  if (typeof nextValue !== "string") {
-    return toAppPath("/dashboard");
-  }
-
-  const trimmedValue = nextValue.trim();
-  if (
-    !allowedNextTargets.has(trimmedValue) &&
-    !allowedAppNextTargets.has(trimmedValue)
-  ) {
-    return toAppPath("/dashboard");
-  }
-
-  return trimmedValue.startsWith(basePath)
-    ? trimmedValue
-    : toAppPath(trimmedValue);
-}
-
-router.get("/", async (req, res) => {
-  const user = await resolveAuthenticatedUser(req, res);
-  if (!user) {
-    return res.redirect(`${basePath}/signin`);
-  }
+router.get("/", (_req, res) => {
   return res.redirect(toAppPath("/dashboard"));
 });
 
-router.get("/signin", async (req, res) => {
-  const user = await resolveAuthenticatedUser(req, res);
-  if (user) {
-    const nextTarget = getSafeNextTarget(req.query.next);
-    return res.redirect(nextTarget);
-  }
+router.get("/signin", sendAppDocument);
 
-  return res.sendFile(appDocument);
-});
-
-router.get("/monthly-update", requirePageAuth, (req, res) => {
+router.get("/monthly-update", (_req, res) => {
   res.redirect(toAppPath("/sales-records"));
 });
 
 for (const route of appRoutes) {
-  router.get(route, requirePageAuth, (req, res) => {
-    res.sendFile(appDocument);
-  });
+  router.get(route, sendAppDocument);
 }
 
 export default router;

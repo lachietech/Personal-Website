@@ -41,14 +41,24 @@ export function SignInPage() {
           return;
         }
 
+        if (sessionResponse.status !== 401) {
+          const sessionError = await sessionResponse.json().catch(() => ({}));
+          throw new Error(
+            sessionError.error || "The uniform shop service is unavailable.",
+          );
+        }
+
         const setup = await uniformRequest("/api/auth/setup-status");
         if (isCurrent) {
           setMode(setup.needsSetup ? "setup" : "login");
         }
-      } catch {
+      } catch (error) {
         if (isCurrent) {
           setMode("login");
-          setMessage("Could not connect to the server.");
+          setMessage(
+            error.message ||
+              "Could not connect to the uniform shop service. Please try again.",
+          );
         }
       }
     }

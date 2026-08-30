@@ -1,8 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
 import { uniformRequest } from "../api/uniformApi.js";
 
-export function useUniformData(path, dependencies = []) {
-  const [data, setData] = useState(null);
+export function useUniformData(
+  path,
+  { dependencies = [], initialData = null } = {},
+) {
+  const [data, setData] = useState(initialData);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
 

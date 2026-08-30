@@ -16,11 +16,11 @@ const emptyProduct = {
 
 export function StockPage({ user }) {
   const {
-    data: products = [],
+    data: products,
     loading,
     error,
     reload,
-  } = useUniformData("/api/pos/products/all");
+  } = useUniformData("/api/pos/products/all", { initialData: [] });
   const [selectedId, setSelectedId] = useState(null);
   const [draft, setDraft] = useState(emptyProduct);
   const [message, setMessage] = useState(null);

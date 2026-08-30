@@ -4,10 +4,12 @@ import { uniformMoney, uniformRequest } from "../api/uniformApi.js";
 
 export function ReceiptsPage() {
   const {
-    data: receipts = [],
+    data: receipts,
     loading,
     error,
-  } = useUniformData("/api/pos/orders/receipts?limit=250");
+  } = useUniformData("/api/pos/orders/receipts?limit=250", {
+    initialData: [],
+  });
   const [receipt, setReceipt] = useState(null);
   const [receiptError, setReceiptError] = useState("");
 
