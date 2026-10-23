@@ -47,6 +47,15 @@ stock, and access-management controllers.
 For live client and server changes, run `npm run dev:client` and
 `npm run dev:server` in separate terminals.
 
+Use Node.js 22.12+ or 24 LTS for development. Server restarts use Node's built-in
+`--watch` mode and follow imported server modules. Restart manually after changing
+`.env`; client files are handled by the separate Vite watcher.
+
+Nodemon was removed because its dependency chain includes `braces` versions
+affected by [GHSA-vfj7-8cjw-p6xm](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm).
+The audit's suggested Nodemon downgrade reintroduces older vulnerable dependencies.
+Run `npm audit` to check the current dependency tree.
+
 ## Security configuration
 
 Set `TRUSTED_ORIGINS` to a comma-separated list of additional HTTPS origins
