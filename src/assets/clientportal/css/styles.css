@@ -25,6 +25,18 @@
   display: none !important;
 }
 
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
 body {
   margin: 0;
   min-width: 320px;
@@ -404,6 +416,123 @@ h2 {
 .admin-panels {
   display: grid;
   gap: 16px;
+  min-width: 0;
+}
+
+.client-hub {
+  display: grid;
+  gap: 18px;
+  min-width: 0;
+}
+
+.client-hub > section {
+  min-width: 0;
+  scroll-margin-top: 20px;
+}
+
+.hub-identity,
+.hub-intro {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.hub-identity > div {
+  min-width: 0;
+  flex: 1 1 220px;
+  overflow-wrap: anywhere;
+}
+
+.hub-contact,
+.hub-intro p,
+.hub-email-context {
+  margin: 10px 0 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.hub-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  margin: 20px 0;
+}
+
+.hub-metrics > div {
+  padding: 0;
+}
+
+.hub-metrics > div + div {
+  padding-left: 20px;
+  border-left: 1px solid var(--line);
+}
+
+.hub-metrics dt {
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.hub-metrics dd {
+  margin: 6px 0 0;
+  font-size: 1.3rem;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+.hub-disclosure {
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+  box-shadow: var(--shadow-small);
+}
+
+.hub-disclosure > summary {
+  padding: 18px 22px;
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.hub-disclosure > summary span {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.hub-disclosure > summary small {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 400;
+}
+
+.hub-disclosure > .invoice-panel,
+.hub-disclosure > .invoice-detail {
+  border: 0;
+  box-shadow: none;
+}
+
+.hub-disclosure[open] > summary {
+  border-bottom: 1px solid var(--line);
+}
+
+.hub-preview-actions {
+  padding: 18px 22px 0;
+}
+
+@media (max-width: 680px) {
+  .hub-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-workspace .client-list {
+    max-height: 260px;
+    overflow-y: auto;
+  }
 }
 
 .client-panel,
@@ -646,6 +775,7 @@ h2 {
 }
 
 .action-button,
+.secondary-button,
 .icon-button,
 .danger-button {
   display: inline-flex;
@@ -669,6 +799,7 @@ h2 {
 }
 
 .action-button:disabled,
+.secondary-button:disabled,
 .icon-button:disabled,
 .danger-button:disabled {
   cursor: not-allowed;
@@ -679,6 +810,18 @@ h2 {
   width: 42px;
   color: var(--ink);
   background: var(--soft);
+}
+
+.secondary-button {
+  padding: 0 14px;
+  color: var(--ink);
+  background: var(--panel);
+  border: 1px solid var(--line);
+}
+
+.secondary-button:hover:not(:disabled) {
+  background: var(--soft);
+  border-color: var(--blue);
 }
 
 .danger-button {
@@ -1916,6 +2059,251 @@ body.admin-mode .admin-only {
     width: 100%;
     margin: 4px 0 0 28px;
     text-align: left;
+  }
+}
+
+/* A compact dashboard shell keeps the working area in focus. */
+.admin-dashboard .topbar {
+  min-height: 72px;
+}
+
+.admin-dashboard .portal-header {
+  padding: 18px 0 24px;
+}
+
+.admin-dashboard .compact-header h1 {
+  font-size: clamp(1.75rem, 3vw, 2.25rem);
+  letter-spacing: -0.035em;
+  line-height: 1.2;
+}
+
+.admin-dashboard .portal-header .eyebrow {
+  color: var(--muted);
+  font-size: 0.68rem;
+}
+
+.admin-dashboard .portal-subtitle {
+  margin-top: 8px;
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.admin-dashboard .tabbar {
+  gap: 4px;
+  border-radius: 12px;
+  box-shadow: none;
+}
+
+.admin-dashboard .tab-button {
+  font-size: 0.88rem;
+  font-weight: 600;
+  border-radius: 8px;
+}
+
+.admin-dashboard .tab-button.active {
+  background: var(--nav);
+  box-shadow: none;
+}
+
+.admin-dashboard .admin-workspace:not(.portal-wide) {
+  grid-template-columns: 270px minmax(0, 1fr);
+}
+
+.admin-dashboard .client-panel,
+.admin-dashboard .client-hub .invoice-panel,
+.admin-dashboard .hub-disclosure {
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(23, 32, 51, 0.025);
+}
+
+.admin-dashboard .client-panel,
+.admin-dashboard .client-hub .invoice-panel {
+  padding: 20px;
+}
+
+.admin-dashboard .client-hub {
+  gap: 14px;
+}
+
+.admin-dashboard h2 {
+  font-size: 1.05rem;
+}
+
+.admin-dashboard .hub-identity h2 {
+  font-size: 1.2rem;
+}
+
+.client-count {
+  display: inline-block;
+  margin-left: 6px;
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.admin-dashboard .client-list {
+  gap: 4px;
+  max-height: 65vh;
+  overflow-y: auto;
+}
+
+.admin-dashboard .client-card {
+  padding: 12px;
+  border-color: transparent;
+  border-radius: 8px;
+}
+
+.admin-dashboard .client-card strong {
+  font-size: 0.9rem;
+}
+
+.admin-dashboard .client-card span,
+.admin-dashboard .client-card small {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.admin-dashboard .client-card.active,
+.admin-dashboard .invoice-card.active {
+  background: #f0f5ff;
+  border-color: #c9d9f4;
+  box-shadow: none;
+}
+
+.admin-dashboard .client-card:hover,
+.admin-dashboard .invoice-card:hover {
+  transform: none;
+  background: var(--soft);
+}
+
+.admin-dashboard .hub-account-details {
+  border: 0;
+  border-top: 1px solid var(--line);
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.hub-account-details > summary {
+  padding: 14px 0 0;
+  font-size: 0.85rem;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.hub-account-details[open] > summary {
+  border-bottom: 0;
+  padding-bottom: 14px;
+}
+
+.admin-dashboard .hub-account-details > .invoice-panel {
+  padding: 10px 0 0;
+  box-shadow: none;
+}
+
+.admin-dashboard .admin-invoice-list {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 6px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.admin-dashboard .invoice-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(180px, 1fr);
+  gap: 14px;
+  align-items: center;
+  padding: 12px 14px;
+  font-size: 0.88rem;
+}
+
+.admin-dashboard .invoice-card strong {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.admin-dashboard .invoice-card span {
+  font-size: 0.8rem;
+}
+
+.admin-dashboard .invoice-card-footer {
+  margin: 0;
+}
+
+.hub-invoice-editor {
+  border-top: 1px solid var(--line);
+}
+
+.hub-invoice-editor > summary {
+  padding: 14px 0 0;
+  color: var(--blue-dark);
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.hub-invoice-editor[open] > summary {
+  padding-bottom: 18px;
+}
+
+.admin-dashboard .email-actions {
+  margin-top: 16px;
+}
+
+.admin-dashboard .email-actions button {
+  font-size: 0.84rem;
+}
+
+.admin-dashboard .hub-email-context {
+  font-size: 0.8rem;
+  margin-top: 6px;
+}
+
+.admin-dashboard .hub-disclosure > summary small {
+  display: inline;
+  margin-left: 10px;
+}
+
+@media (max-width: 980px) {
+  .admin-dashboard .admin-workspace:not(.portal-wide) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .admin-dashboard .client-list {
+    max-height: 210px;
+  }
+}
+
+@media (max-width: 680px) {
+  .admin-dashboard .client-panel,
+  .admin-dashboard .client-hub .invoice-panel {
+    padding: 16px;
+  }
+
+  .admin-dashboard .hub-account-details > .invoice-panel {
+    padding: 10px 0 0;
+  }
+
+  .admin-dashboard .invoice-card {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px 12px;
+  }
+
+  .admin-dashboard .invoice-card-footer {
+    grid-column: 1 / -1;
+  }
+
+  .admin-dashboard .hub-disclosure > summary small {
+    display: block;
+    margin-left: 0;
+  }
+
+  .admin-dashboard .email-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-dashboard .email-actions button {
+    padding: 8px;
   }
 }
 

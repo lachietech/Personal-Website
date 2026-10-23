@@ -52,7 +52,7 @@ export function InvoiceDetail({ client, invoice, billing, onEdit }) {
   }
 
   return (
-    <article className="invoice-detail">
+    <article className="invoice-detail" id="invoiceDetail">
       <div className="invoice-top">
         <div>
           <p className="eyebrow">Invoice</p>

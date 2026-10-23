@@ -38,20 +38,23 @@ export function EmailPanel({ client, invoice, onClientUpdated }) {
   }
 
   return (
-    <section className="invoice-panel">
+    <section className="invoice-panel hub-email-panel">
       <div className="panel-heading">
         <div>
-          <p className="eyebrow">Notifications</p>
-          <h2>Client emails</h2>
+          <h2>Email</h2>
         </div>
       </div>
-      <p>
-        Send messages to <strong>{client.email}</strong>
-        {invoice ? ` about invoice ${invoice.number}.` : "."}
+      <p className="hub-contact">
+        Send to <strong>{client.email}</strong>
+      </p>
+      <p className="hub-email-context">
+        {invoice
+          ? `${invoice.number} · Sends the saved invoice. Save edits before sending.`
+          : "Save or select an invoice to enable invoice emails."}
       </p>
       <div className="email-actions">
         <button
-          className="action-button"
+          className="secondary-button"
           type="button"
           disabled={Boolean(sending)}
           onClick={() => send("account")}
@@ -59,7 +62,7 @@ export function EmailPanel({ client, invoice, onClientUpdated }) {
           Send account email
         </button>
         <button
-          className="secondary-button"
+          className="action-button"
           type="button"
           disabled={!invoice || Boolean(sending)}
           onClick={() => send("invoice")}

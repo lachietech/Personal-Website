@@ -22,11 +22,6 @@ export function About() {
                 technical problem-solving with a strong focus on the people who
                 use them.
               </p>
-              <p>
-                I’m studying Information Technology at QUT, majoring in
-                Artificial Intelligence and Software Development, while building
-                products and client systems.
-              </p>
             </div>
 
             <div className="about-details">

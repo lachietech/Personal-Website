@@ -18,10 +18,16 @@ export function ClientList({ clients, selectedId, onSelect, onCreate }) {
     <aside className="client-panel">
       <div className="panel-heading">
         <div>
-          <p className="eyebrow">Directory</p>
-          <h2>Clients</h2>
+          <h2>
+            Clients <span className="client-count">{clients.length}</span>
+          </h2>
         </div>
-        <button className="icon-button" type="button" onClick={onCreate}>
+        <button
+          className="icon-button"
+          type="button"
+          title="New client"
+          onClick={onCreate}
+        >
           <i className="bi bi-plus-lg" aria-hidden="true" />
           <span className="visually-hidden">New client</span>
         </button>
@@ -32,6 +38,7 @@ export function ClientList({ clients, selectedId, onSelect, onCreate }) {
           type="search"
           value={search}
           placeholder="Search clients"
+          aria-label="Search clients"
           onChange={(event) => setSearch(event.target.value)}
         />
       </label>
@@ -40,6 +47,7 @@ export function ClientList({ clients, selectedId, onSelect, onCreate }) {
           <button
             className={`client-card${client.id === selectedId ? " active" : ""}`}
             type="button"
+            aria-pressed={client.id === selectedId}
             onClick={() => onSelect(client.id)}
             key={client.id}
           >
@@ -50,7 +58,11 @@ export function ClientList({ clients, selectedId, onSelect, onCreate }) {
         ))}
         {!filteredClients.length && (
           <div className="empty-state">
-            <p>No matching clients.</p>
+            <p>
+              {clients.length
+                ? "No matching clients."
+                : "No clients yet. Add your first client to get started."}
+            </p>
           </div>
         )}
       </div>

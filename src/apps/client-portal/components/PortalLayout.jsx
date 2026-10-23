@@ -1,9 +1,16 @@
 import { PortalBrand } from "./PortalBrand.jsx";
 
-export function PortalLayout({ title, eyebrow, subtitle, actions, children }) {
+export function PortalLayout({
+  title,
+  eyebrow,
+  subtitle,
+  actions,
+  children,
+  className = "",
+}) {
   return (
     <>
-      <header className="portal-shell">
+      <header className={`portal-shell ${className}`}>
         <nav className="topbar" aria-label="Client portal navigation">
           <PortalBrand />
           <div className="topbar-actions">
@@ -22,7 +29,7 @@ export function PortalLayout({ title, eyebrow, subtitle, actions, children }) {
           </div>
         </section>
       </header>
-      <main className="portal-main">{children}</main>
+      <main className={`portal-main ${className}`}>{children}</main>
     </>
   );
 }

@@ -1,6 +1,11 @@
 import { useEffect, useState } from "react";
 import { portalRequest } from "../api/portalApi.js";
-import { formatDate, invoiceTotal, money, today } from "../utils/portalUtils.js";
+import {
+  formatDate,
+  invoiceTotal,
+  money,
+  today,
+} from "../utils/portalUtils.js";
 import { FormMessage } from "./PortalLayout.jsx";
 
 function rowKey() {
@@ -35,17 +40,29 @@ function withKeys(invoice) {
   };
 }
 
-export function InvoiceForm({ client, invoice, onSelect, onSaved }) {
+export function InvoiceForm({
+  client,
+  invoice,
+  onSelect,
+  onSaved,
+  onCreateModeChange,
+}) {
   const [values, setValues] = useState(emptyInvoice);
   const [createMode, setCreateMode] = useState(!invoice);
   const [message, setMessage] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [editing, setEditing] = useState(!invoice);
 
   useEffect(() => {
     setValues(withKeys(invoice));
     setCreateMode(!invoice);
+    setEditing(!invoice);
     setMessage(null);
   }, [invoice, client?.id]);
+
+  useEffect(() => {
+    onCreateModeChange?.(createMode);
+  }, [createMode, onCreateModeChange]);
 
   if (!client) {
     return <div className="empty-state">Select or create a client first.</div>;
@@ -97,6 +114,7 @@ export function InvoiceForm({ client, invoice, onSelect, onSaved }) {
         if (createdInvoice) onSelect(createdInvoice.id);
       }
       onSaved(data.client);
+      setEditing(false);
       setMessage({ type: "success", text: "Invoice saved." });
     } catch (error) {
       setMessage({ type: "error", text: error.message });
@@ -123,15 +141,20 @@ export function InvoiceForm({ client, invoice, onSelect, onSaved }) {
     <section className="invoice-panel">
       <div className="panel-heading">
         <div>
-          <p className="eyebrow">Invoices for {client.business}</p>
-          <h2>{createMode ? "Create invoice" : `Edit ${invoice.number}`}</h2>
+          <h2>
+            Invoices{" "}
+            <span className="client-count">{client.invoices.length}</span>
+          </h2>
         </div>
         <button
           className="secondary-button"
           type="button"
+          disabled={createMode}
           onClick={() => {
             setCreateMode(true);
+            setEditing(true);
             setValues(emptyInvoice());
+            setMessage(null);
           }}
         >
           New invoice
@@ -143,7 +166,14 @@ export function InvoiceForm({ client, invoice, onSelect, onSaved }) {
           <button
             className={`invoice-card${invoice?.id === item.id && !createMode ? " active" : ""}`}
             type="button"
-            onClick={() => onSelect(item.id)}
+            onClick={() => {
+              onSelect(item.id);
+              setCreateMode(false);
+              setEditing(false);
+              setValues(withKeys(item));
+              setMessage(null);
+            }}
+            aria-pressed={invoice?.id === item.id && !createMode}
             key={item.id}
           >
             <strong>{item.number}</strong>
@@ -158,199 +188,213 @@ export function InvoiceForm({ client, invoice, onSelect, onSaved }) {
         ))}
       </div>
 
-      <form className="stack-form" onSubmit={save}>
-        <div className="form-grid">
-          <label>
-            Invoice number
-            <input
-              value={values.number}
-              onChange={(event) => update("number", event.target.value)}
-              required
-            />
-          </label>
-          <label>
-            Status
-            <select
-              value={values.status}
-              onChange={(event) => update("status", event.target.value)}
-            >
-              <option value="draft">Draft</option>
-              <option value="sent">Sent</option>
-              <option value="overdue">Overdue</option>
-              <option value="paid">Paid</option>
-            </select>
-          </label>
-          <label>
-            Issued
-            <input
-              type="date"
-              value={values.issued}
-              onChange={(event) => update("issued", event.target.value)}
-              required
-            />
-          </label>
-          <label>
-            Due
-            <input
-              type="date"
-              value={values.due}
-              onChange={(event) => update("due", event.target.value)}
-              required
-            />
-          </label>
-          <label>
-            GST rate
-            <input
-              type="number"
-              min="0"
-              max="1"
-              step="0.01"
-              value={values.taxRate}
-              onChange={(event) => update("taxRate", event.target.value)}
-            />
-          </label>
-        </div>
-
-        <div className="editor-heading">
-          <h3>Line items</h3>
-          <button
-            className="secondary-button"
-            type="button"
-            onClick={() =>
-              update("items", [
-                ...values.items,
-                { _key: rowKey(), description: "", quantity: 1, rate: 0 },
-              ])
-            }
-          >
-            Add line
-          </button>
-        </div>
-        <div className="line-items-editor">
-          {values.items.map((item) => (
-            <div className="line-item-row" key={item._key}>
+      <details
+        className="hub-invoice-editor"
+        open={editing}
+        onToggle={(event) => setEditing(event.currentTarget.open)}
+      >
+        <summary>
+          {createMode ? "Create invoice" : `Edit ${invoice.number}`}
+        </summary>
+        <form className="stack-form" onSubmit={save}>
+          <div className="form-grid">
+            <label>
+              Invoice number
               <input
-                placeholder="Description"
-                value={item.description}
-                onChange={(event) =>
-                  updateRow(
-                    "items",
-                    item._key,
-                    "description",
-                    event.target.value,
-                  )
-                }
+                value={values.number}
+                onChange={(event) => update("number", event.target.value)}
                 required
               />
-              <input
-                type="number"
-                min="0"
-                step="0.25"
-                placeholder="Qty"
-                value={item.quantity}
-                onChange={(event) =>
-                  updateRow("items", item._key, "quantity", event.target.value)
-                }
-                required
-              />
-              <input
-                type="number"
-                min="0"
-                step="0.01"
-                placeholder="Rate"
-                value={item.rate}
-                onChange={(event) =>
-                  updateRow("items", item._key, "rate", event.target.value)
-                }
-                required
-              />
-              <button
-                className="icon-button danger-icon"
-                type="button"
-                onClick={() => removeRow("items", item._key)}
-                aria-label="Remove line item"
+            </label>
+            <label>
+              Status
+              <select
+                value={values.status}
+                onChange={(event) => update("status", event.target.value)}
               >
-                <i className="bi bi-trash3" aria-hidden="true" />
-              </button>
-            </div>
-          ))}
-        </div>
-
-        <div className="editor-heading">
-          <h3>Hours breakdown</h3>
-          <button
-            className="secondary-button"
-            type="button"
-            onClick={() =>
-              update("hours", [
-                ...values.hours,
-                { _key: rowKey(), date: today(), hours: 1, work: "" },
-              ])
-            }
-          >
-            Add hours
-          </button>
-        </div>
-        <div className="hours-editor">
-          {values.hours.map((entry) => (
-            <div className="hour-entry-row" key={entry._key}>
+                <option value="draft">Draft</option>
+                <option value="sent">Sent</option>
+                <option value="overdue">Overdue</option>
+                <option value="paid">Paid</option>
+              </select>
+            </label>
+            <label>
+              Issued
               <input
                 type="date"
-                value={entry.date}
-                onChange={(event) =>
-                  updateRow("hours", entry._key, "date", event.target.value)
-                }
+                value={values.issued}
+                onChange={(event) => update("issued", event.target.value)}
                 required
               />
+            </label>
+            <label>
+              Due
+              <input
+                type="date"
+                value={values.due}
+                onChange={(event) => update("due", event.target.value)}
+                required
+              />
+            </label>
+            <label>
+              GST rate
               <input
                 type="number"
                 min="0"
-                step="0.25"
-                value={entry.hours}
-                onChange={(event) =>
-                  updateRow("hours", entry._key, "hours", event.target.value)
-                }
-                required
+                max="1"
+                step="0.01"
+                value={values.taxRate}
+                onChange={(event) => update("taxRate", event.target.value)}
               />
-              <input
-                value={entry.work}
-                placeholder="Work completed"
-                onChange={(event) =>
-                  updateRow("hours", entry._key, "work", event.target.value)
-                }
-                required
-              />
-              <button
-                className="icon-button danger-icon"
-                type="button"
-                onClick={() => removeRow("hours", entry._key)}
-                aria-label="Remove hours"
-              >
-                <i className="bi bi-trash3" aria-hidden="true" />
-              </button>
-            </div>
-          ))}
-        </div>
+            </label>
+          </div>
 
-        <label>
-          Notes
-          <textarea
-            value={values.notes}
-            onChange={(event) => update("notes", event.target.value)}
-          />
-        </label>
-        <div className="form-actions">
-          <button className="action-button" type="submit" disabled={saving}>
-            {saving ? "Saving…" : "Save invoice"}
-          </button>
-          {!createMode && (
-            <button className="danger-button" type="button" onClick={remove}>
-              Delete invoice
+          <div className="editor-heading">
+            <h3>Line items</h3>
+            <button
+              className="secondary-button"
+              type="button"
+              onClick={() =>
+                update("items", [
+                  ...values.items,
+                  { _key: rowKey(), description: "", quantity: 1, rate: 0 },
+                ])
+              }
+            >
+              Add line
             </button>
-          )}
-        </div>
-        <FormMessage message={message} />
-      </form>
+          </div>
+          <div className="line-items-editor">
+            {values.items.map((item) => (
+              <div className="line-item-row" key={item._key}>
+                <input
+                  placeholder="Description"
+                  value={item.description}
+                  onChange={(event) =>
+                    updateRow(
+                      "items",
+                      item._key,
+                      "description",
+                      event.target.value,
+                    )
+                  }
+                  required
+                />
+                <input
+                  type="number"
+                  min="0"
+                  step="0.25"
+                  placeholder="Qty"
+                  value={item.quantity}
+                  onChange={(event) =>
+                    updateRow(
+                      "items",
+                      item._key,
+                      "quantity",
+                      event.target.value,
+                    )
+                  }
+                  required
+                />
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  placeholder="Rate"
+                  value={item.rate}
+                  onChange={(event) =>
+                    updateRow("items", item._key, "rate", event.target.value)
+                  }
+                  required
+                />
+                <button
+                  className="icon-button danger-icon"
+                  type="button"
+                  onClick={() => removeRow("items", item._key)}
+                  aria-label="Remove line item"
+                >
+                  <i className="bi bi-trash3" aria-hidden="true" />
+                </button>
+              </div>
+            ))}
+          </div>
+
+          <div className="editor-heading">
+            <h3>Hours breakdown</h3>
+            <button
+              className="secondary-button"
+              type="button"
+              onClick={() =>
+                update("hours", [
+                  ...values.hours,
+                  { _key: rowKey(), date: today(), hours: 1, work: "" },
+                ])
+              }
+            >
+              Add hours
+            </button>
+          </div>
+          <div className="hours-editor">
+            {values.hours.map((entry) => (
+              <div className="hour-entry-row" key={entry._key}>
+                <input
+                  type="date"
+                  value={entry.date}
+                  onChange={(event) =>
+                    updateRow("hours", entry._key, "date", event.target.value)
+                  }
+                  required
+                />
+                <input
+                  type="number"
+                  min="0"
+                  step="0.25"
+                  value={entry.hours}
+                  onChange={(event) =>
+                    updateRow("hours", entry._key, "hours", event.target.value)
+                  }
+                  required
+                />
+                <input
+                  value={entry.work}
+                  placeholder="Work completed"
+                  onChange={(event) =>
+                    updateRow("hours", entry._key, "work", event.target.value)
+                  }
+                  required
+                />
+                <button
+                  className="icon-button danger-icon"
+                  type="button"
+                  onClick={() => removeRow("hours", entry._key)}
+                  aria-label="Remove hours"
+                >
+                  <i className="bi bi-trash3" aria-hidden="true" />
+                </button>
+              </div>
+            ))}
+          </div>
+
+          <label>
+            Notes
+            <textarea
+              value={values.notes}
+              onChange={(event) => update("notes", event.target.value)}
+            />
+          </label>
+          <div className="form-actions">
+            <button className="action-button" type="submit" disabled={saving}>
+              {saving ? "Saving…" : "Save invoice"}
+            </button>
+            {!createMode && (
+              <button className="danger-button" type="button" onClick={remove}>
+                Delete invoice
+              </button>
+            )}
+          </div>
+        </form>
+      </details>
+      <FormMessage message={message} />
     </section>
   );
 }
