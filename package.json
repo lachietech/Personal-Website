@@ -34,7 +34,11 @@
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^6.0.5",
-    "nodemon": "^3.1.10",
+    "nodemon": "^1.14.10",
     "vite": "^8.2.1"
+  },
+  "allowScripts": {
+    "bcrypt@6.0.0": true,
+    "nodemon@1.19.4": true
   }
 }
