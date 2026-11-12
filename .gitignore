@@ -2,3 +2,8 @@
 
 /node_modules
 /dist
+**/dist/
+**/node_modules/
+.env.*
+!.env.example
+frontend/public/static/react/

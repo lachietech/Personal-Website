@@ -1,40 +1,29 @@
 {
   "name": "nielsen-innovations",
   "version": "1.0.0",
-  "main": "src/backend/server.js",
-  "scripts": {
-    "build": "vite build",
-    "build:watch": "vite build --watch",
-    "test": "node scripts/check-syntax.js && node --test",
-    "dev": "npm run build && npm run dev:server",
-    "dev:client": "vite build --watch",
-    "dev:server": "node --watch src/backend/server.js",
-    "start": "node src/backend/server.js"
-  },
+  "private": true,
   "type": "module",
-  "author": "",
-  "license": "ISC",
-  "description": "Nielsen Innovations website and application suite",
-  "dependencies": {
-    "axios": "^1.20.0",
-    "bcrypt": "^6.0.0",
-    "bcryptjs": "^3.0.3",
-    "cookie-parser": "^1.4.7",
-    "csrf-csrf": "^4.0.3",
-    "dotenv": "^16.5.0",
-    "express": "^5.1.0",
-    "express-rate-limit": "^8.5.2",
-    "express-session": "^1.18.2",
-    "helmet": "^8.1.0",
-    "jsonwebtoken": "^9.0.3",
-    "mongoose": "^8.24.1",
-    "react": "^19.2.8",
-    "react-dom": "^19.2.8",
-    "resend": "^6.17.2"
+  "engines": {
+    "node": ">=22.12.0"
   },
-  "devDependencies": {
-    "@vitejs/plugin-react": "^6.0.5",
-    "vite": "^8.2.1"
+  "description": "Independent Nielsen Innovations frontend and backend services",
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "scripts": {
+    "build": "npm run build --workspace frontend",
+    "build:watch": "npm run build:watch --workspace frontend",
+    "test": "node scripts/check-syntax.js && npm test --workspaces && npm run test:integration",
+    "dev": "npm run build && node scripts/run-services.js --watch",
+    "dev:client": "npm run build:watch --workspace frontend",
+    "dev:frontend": "npm run dev --workspace frontend",
+    "dev:server": "npm run dev --workspace backend",
+    "dev:backend": "npm run dev --workspace backend",
+    "start": "node scripts/run-services.js",
+    "start:frontend": "npm start --workspace frontend",
+    "start:backend": "npm start --workspace backend",
+    "test:integration": "npm run build && node --test tests/*.test.js"
   },
   "allowScripts": {
     "bcrypt@6.0.0": true

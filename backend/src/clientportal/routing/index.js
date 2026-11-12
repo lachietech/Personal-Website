@@ -1,0 +1,24 @@
+import express from "express";
+import { preventCaching } from "../config.js";
+import { initialiseAdminBootstrap } from "../services/adminBootstrap.js";
+import adminRoutes from "./admin.js";
+import analyticsRoutes from "./analytics.js";
+import authRoutes from "./auth.js";
+import bookkeepingRoutes from "./bookkeeping.js";
+import clientRoutes from "./client.js";
+import projectRoutes from "./projects.js";
+import konnectRoutes from "./konnect.js";
+
+initialiseAdminBootstrap();
+
+const router = express.Router();
+router.use(preventCaching);
+router.use("/api/konnect", konnectRoutes);
+router.use("/api/projects", projectRoutes);
+router.use("/api/auth", authRoutes);
+router.use("/api/analytics", analyticsRoutes);
+router.use("/api/admin", adminRoutes);
+router.use("/api/bookkeeping", bookkeepingRoutes);
+router.use("/api/client", clientRoutes);
+
+export default router;
