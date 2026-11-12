@@ -1,5 +1,6 @@
 import express from "express";
 import path from "node:path";
+import { pageRoutes, pageRedirects } from "../scripts/page-routes.js";
 
 export function createPageRoutes(documentDirectory) {
   const router = express.Router();
@@ -8,46 +9,11 @@ export function createPageRoutes(documentDirectory) {
     res.sendFile(path.join(documentDirectory, name), { cacheControl: false });
   };
   router.get("/", document("index.html"));
-  router.get(
-    [
-      "/clientportal",
-      "/clientportal/login",
-      "/clientportal/account",
-      "/clientportal/admin",
-      "/clientportal/client",
-    ],
-    document("clientportal.html"),
-  );
-  router.get("/clientportal/billing", document("billing.html"));
-  router.get("/clientportal/konnect", document("konnect.html"));
-  router.get("/clientportal/visitpulse", document("visitpulse.html"));
-  router.get(
-    [
-      "/meandersuite",
-      "/meandersuite/login",
-      "/meandersuite/register",
-      "/meandersuite/suite",
-    ],
-    document("meander-suite.html"),
-  );
-  router.get("/hfssuniformsapp", (_req, res) =>
-    res.redirect("/hfssuniformsapp/dashboard"),
-  );
-  router.get("/hfssuniformsapp/monthly-update", (_req, res) =>
-    res.redirect("/hfssuniformsapp/sales-records"),
-  );
-  router.get(
-    [
-      "signin",
-      "dashboard",
-      "sales-records",
-      "pos",
-      "receipts",
-      "stock-manager",
-      "access-management",
-      "account",
-    ].map((route) => `/hfssuniformsapp/${route}`),
-    document("hfss-uniforms.html"),
-  );
+  for (const [route, name] of Object.entries(pageRoutes)) {
+    router.get(route, document(name));
+  }
+  for (const [route, destination] of Object.entries(pageRedirects)) {
+    router.get(route, (_req, res) => res.redirect(destination));
+  }
   return router;
 }

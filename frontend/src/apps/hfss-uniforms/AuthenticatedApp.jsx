@@ -8,6 +8,7 @@ import { ReceiptsPage } from "./pages/ReceiptsPage.jsx";
 import { SalesPage } from "./pages/SalesPage.jsx";
 import { StockPage } from "./pages/StockPage.jsx";
 import { uniformRequest } from "./api/uniformApi.js";
+import { pagePath } from "../../pagePath.js";
 
 const basePath = "/hfssuniformsapp";
 const pageIds = new Set([
@@ -21,7 +22,7 @@ const pageIds = new Set([
 ]);
 
 function readPage() {
-  const page = window.location.pathname
+  const page = pagePath(window.location.pathname)
     .slice(basePath.length + 1)
     .split("/")[0];
   return pageIds.has(page) ? page : "dashboard";

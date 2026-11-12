@@ -1,3 +1,5 @@
+import { pagePath } from "../../../pagePath.js";
+
 export const portalApps = [
   {
     id: "billing",
@@ -30,5 +32,6 @@ const allowedPaths = new Set([
   ...portalApps.map((app) => app.href),
 ]);
 export function portalDestination(value) {
-  return allowedPaths.has(value) ? value : "/clientportal";
+  const pathname = typeof value === "string" ? pagePath(value) : "";
+  return allowedPaths.has(pathname) ? pathname : "/clientportal";
 }

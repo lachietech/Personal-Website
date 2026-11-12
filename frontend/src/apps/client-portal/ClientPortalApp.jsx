@@ -2,8 +2,9 @@ import { PortalSession } from "./components/PortalSession.jsx";
 import { LoginPage } from "./pages/LoginPage.jsx";
 import { ApplicationsPage } from "./pages/ApplicationsPage.jsx";
 import { AccountPage } from "./pages/AccountPage.jsx";
+import { pagePath } from "../../pagePath.js";
 export function ClientPortalApp() {
-  const pathname = window.location.pathname.replace(/\/$/, "");
+  const pathname = pagePath(window.location.pathname);
   if (["/clientportal/admin", "/clientportal/client"].includes(pathname)) {
     window.location.replace("/clientportal/billing");
     return null;

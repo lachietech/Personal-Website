@@ -23,9 +23,9 @@ Deploy the frontend as a **Static Site**, with these settings:
 | Start command     | None                                                         |
 | `VITE_API_URL`    | `https://personal-website-53mf.onrender.com`                 |
 
-[render.yaml](render.yaml) defines the static frontend, page rewrites and security
-headers. It does not create another backend service. Apply it through a Render
-Blueprint, or copy its routes and headers into an existing Static Site's settings.
+[render.yaml](render.yaml) defines the static frontend, optional page rewrites and
+security headers. It does not create another backend service. Apply it through a
+Render Blueprint, or copy its headers into an existing Static Site's settings.
 A Git push does not apply Blueprint settings to an independently configured service.
 See Render's [Static Sites guide](https://render.com/docs/static-sites) and
 [rewrite documentation](https://render.com/docs/redirects-rewrites).
@@ -74,13 +74,21 @@ routing. Databases remain separate from both deployments.
 
 ## Page routing
 
-The static site's rewrites serve each application document at its existing URL:
+The build generates a physical HTML file and directory index for each application
+route. These pages work without Render dashboard rewrites, including on existing
+Static Sites where `render.yaml` has not been applied:
 
 - `/` serves the public homepage.
 - `/clientportal`, `/clientportal/login` and `/clientportal/account` serve the portal.
 - `/clientportal/billing`, `/clientportal/konnect` and `/clientportal/visitpulse` each
   serve their separate application bundle.
-- `/hfssuniformsapp/*` and `/meandersuite/*` use the explicit routes in `render.yaml`.
+- The Uniform Shop and Meander Suite pages are generated in the same way.
+
+For example, `/clientportal/login` is backed by both
+`frontend/dist/clientportal/login.html` and
+`frontend/dist/clientportal/login/index.html`. The browser handles clean paths,
+trailing slashes and explicit HTML paths consistently. All page routes are listed
+in `frontend/scripts/page-routes.js`; the local preview uses that same list.
 
 Do not add a catch-all rewrite to `/index.html`: these applications have different
 HTML entry points. API calls go to the backend host, not the static site. The
@@ -125,6 +133,12 @@ HTML documents. `frontend/server` is for local development and HTTP tests only.
 `backend/src` contains the API, authentication, models and business logic.
 `render.yaml` configures the production static site. Generated `frontend/dist`
 output is ignored by Git and rebuilt during deployment.
+
+If the portal root loads but sign-in or an application returns 404, rebuild and
+redeploy the frontend with publish directory `frontend/dist`. Verify that
+`/clientportal/login`, `/clientportal/billing`, `/clientportal/konnect` and
+`/clientportal/visitpulse` each return an application page. No frontend server or
+catch-all rewrite is required.
 
 Tests exercise frontend/backend separation, direct API requests, CORS and cookie
 settings, CSRF, authentication, public Konnect delivery, uploads and local proxy
