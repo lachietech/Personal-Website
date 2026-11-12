@@ -1,3 +1,4 @@
+import { cookieSettings } from "./config/cookies.js";
 import cookieParser from "cookie-parser";
 import express from "express";
 import session from "express-session";
@@ -72,9 +73,8 @@ export function createApp() {
       saveUninitialized: false,
       name: "psifi.sid",
       cookie: {
-        secure: environment.isProduction,
         httpOnly: true,
-        sameSite: "strict",
+        ...cookieSettings(),
         maxAge: 1000 * 60 * 60 * 8,
       },
     }),

@@ -1,3 +1,4 @@
+import { apiUrl } from "../../../api/http.js";
 import { useMemo, useState } from "react";
 import {
   cleanAmount,
@@ -568,7 +569,9 @@ export function BookkeepingPanel({ data, setData }) {
                   <td>
                     {transaction.receipt ? (
                       <a
-                        href={`/clientportal/api/bookkeeping/transactions/${transaction.id}/receipt`}
+                        href={apiUrl(
+                          `/clientportal/api/bookkeeping/transactions/${transaction.id}/receipt`,
+                        )}
                         target="_blank"
                         rel="noreferrer"
                       >

@@ -36,6 +36,8 @@ if (watch)
     path.join(root, "node_modules/vite/bin/vite.js"),
     "build",
     "--watch",
+    "--mode",
+    "development",
   ]);
 process.once("SIGINT", () => stop());
 process.once("SIGTERM", () => stop());

@@ -1,3 +1,4 @@
+import { cookieSettings } from "../config/cookies.js";
 import { doubleCsrf } from "csrf-csrf";
 import { environment } from "../config/environment.js";
 
@@ -8,9 +9,8 @@ const csrf = doubleCsrf({
     ? "__Host-psifi.x-csrf-token"
     : "psifi.x-csrf-token",
   cookieOptions: {
-    sameSite: "strict",
+    ...cookieSettings(),
     path: "/",
-    secure: environment.isProduction,
     httpOnly: true,
   },
   size: 64,

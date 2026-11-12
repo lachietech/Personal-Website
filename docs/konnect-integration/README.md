@@ -9,7 +9,7 @@ portal account. Messages appear in their Konnect inbox; they are not sent by ema
 
 ```http
 POST /clientportal/api/konnect/contact HTTP/1.1
-Host: nielseninnovations.com
+Host: personal-website-53mf.onrender.com
 Content-Type: application/json
 
 {
@@ -21,15 +21,14 @@ Content-Type: application/json
 }
 ```
 
-Replace `nielseninnovations` with your client's portal username. Use the public
-frontend hostname for your deployment; the frontend forwards requests to the
-backend, including when the backend is a private Render service.
+Replace `nielseninnovations` with your client's portal username. Use the public backend hostname shown above. The frontend is a static site and
+does not proxy API requests.
 
 ### JavaScript (browser or Node.js)
 
 ```js
 const response = await fetch(
-  "https://nielseninnovations.com/clientportal/api/konnect/contact",
+  "https://personal-website-53mf.onrender.com/clientportal/api/konnect/contact",
   {
     method: "POST",
     credentials: "omit",
@@ -53,7 +52,7 @@ console.log(result.message);
 Save the JSON from the quick start as `contact.json`, then run:
 
 ```sh
-curl --request POST "https://nielseninnovations.com/clientportal/api/konnect/contact" --header "Content-Type: application/json" --data-binary "@contact.json"
+curl --request POST "https://personal-website-53mf.onrender.com/clientportal/api/konnect/contact" --header "Content-Type: application/json" --data-binary "@contact.json"
 ```
 
 On Windows PowerShell, use `curl.exe` instead of `curl`. No `Origin` header is
@@ -110,7 +109,7 @@ form.addEventListener("submit", async (event) => {
 
   try {
     const response = await fetch(
-      "https://nielseninnovations.com/clientportal/api/konnect/contact",
+      "https://personal-website-53mf.onrender.com/clientportal/api/konnect/contact",
       {
         method: "POST",
         credentials: "omit",

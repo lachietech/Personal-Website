@@ -1,0 +1,154 @@
+# Frontend only. The existing API is deployed separately at:
+# https://personal-website-53mf.onrender.com
+services:
+  - type: web
+    name: nielsen-innovations-frontend
+    runtime: static
+    buildCommand: npm ci --workspace frontend --include=dev && npm run build
+    staticPublishPath: frontend/dist
+    envVars:
+      - key: VITE_API_URL
+        value: https://personal-website-53mf.onrender.com
+    headers:
+      - path: /*
+        name: X-Content-Type-Options
+        value: nosniff
+      - path: /*
+        name: Referrer-Policy
+        value: same-origin
+      - path: /*
+        name: X-Frame-Options
+        value: DENY
+      - path: /*
+        name: Cache-Control
+        value: no-cache
+      - path: /*
+        name: Content-Security-Policy
+        value: "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data:; connect-src 'self' https://personal-website-53mf.onrender.com; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
+    routes:
+      - type: redirect
+        source: /hfssuniformsapp
+        destination: /hfssuniformsapp/dashboard
+      - type: redirect
+        source: /hfssuniformsapp/monthly-update
+        destination: /hfssuniformsapp/sales-records
+      - type: rewrite
+        source: /clientportal
+        destination: /clientportal.html
+      - type: redirect
+        source: /clientportal/
+        destination: /clientportal
+      - type: rewrite
+        source: /clientportal/login
+        destination: /clientportal.html
+      - type: redirect
+        source: /clientportal/login/
+        destination: /clientportal/login
+      - type: rewrite
+        source: /clientportal/account
+        destination: /clientportal.html
+      - type: redirect
+        source: /clientportal/account/
+        destination: /clientportal/account
+      - type: rewrite
+        source: /clientportal/admin
+        destination: /clientportal.html
+      - type: redirect
+        source: /clientportal/admin/
+        destination: /clientportal/admin
+      - type: rewrite
+        source: /clientportal/client
+        destination: /clientportal.html
+      - type: redirect
+        source: /clientportal/client/
+        destination: /clientportal/client
+      - type: rewrite
+        source: /clientportal/billing
+        destination: /billing.html
+      - type: redirect
+        source: /clientportal/billing/
+        destination: /clientportal/billing
+      - type: rewrite
+        source: /clientportal/konnect
+        destination: /konnect.html
+      - type: redirect
+        source: /clientportal/konnect/
+        destination: /clientportal/konnect
+      - type: rewrite
+        source: /clientportal/visitpulse
+        destination: /visitpulse.html
+      - type: redirect
+        source: /clientportal/visitpulse/
+        destination: /clientportal/visitpulse
+      - type: rewrite
+        source: /meandersuite
+        destination: /meander-suite.html
+      - type: redirect
+        source: /meandersuite/
+        destination: /meandersuite
+      - type: rewrite
+        source: /meandersuite/login
+        destination: /meander-suite.html
+      - type: redirect
+        source: /meandersuite/login/
+        destination: /meandersuite/login
+      - type: rewrite
+        source: /meandersuite/register
+        destination: /meander-suite.html
+      - type: redirect
+        source: /meandersuite/register/
+        destination: /meandersuite/register
+      - type: rewrite
+        source: /meandersuite/suite
+        destination: /meander-suite.html
+      - type: redirect
+        source: /meandersuite/suite/
+        destination: /meandersuite/suite
+      - type: rewrite
+        source: /hfssuniformsapp/signin
+        destination: /hfss-uniforms.html
+      - type: redirect
+        source: /hfssuniformsapp/signin/
+        destination: /hfssuniformsapp/signin
+      - type: rewrite
+        source: /hfssuniformsapp/dashboard
+        destination: /hfss-uniforms.html
+      - type: redirect
+        source: /hfssuniformsapp/dashboard/
+        destination: /hfssuniformsapp/dashboard
+      - type: rewrite
+        source: /hfssuniformsapp/sales-records
+        destination: /hfss-uniforms.html
+      - type: redirect
+        source: /hfssuniformsapp/sales-records/
+        destination: /hfssuniformsapp/sales-records
+      - type: rewrite
+        source: /hfssuniformsapp/pos
+        destination: /hfss-uniforms.html
+      - type: redirect
+        source: /hfssuniformsapp/pos/
+        destination: /hfssuniformsapp/pos
+      - type: rewrite
+        source: /hfssuniformsapp/receipts
+        destination: /hfss-uniforms.html
+      - type: redirect
+        source: /hfssuniformsapp/receipts/
+        destination: /hfssuniformsapp/receipts
+      - type: rewrite
+        source: /hfssuniformsapp/stock-manager
+        destination: /hfss-uniforms.html
+      - type: redirect
+        source: /hfssuniformsapp/stock-manager/
+        destination: /hfssuniformsapp/stock-manager
+      - type: rewrite
+        source: /hfssuniformsapp/access-management
+        destination: /hfss-uniforms.html
+      - type: redirect
+        source: /hfssuniformsapp/access-management/
+        destination: /hfssuniformsapp/access-management
+      - type: rewrite
+        source: /hfssuniformsapp/account
+        destination: /hfss-uniforms.html
+      - type: redirect
+        source: /hfssuniformsapp/account/
+        destination: /hfssuniformsapp/account

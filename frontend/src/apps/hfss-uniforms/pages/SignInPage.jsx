@@ -1,3 +1,4 @@
+import { apiFetch } from "../../../api/http.js";
 import { useEffect, useState } from "react";
 import { CredentialField } from "../components/CredentialField.jsx";
 import { prepareUniformSession, uniformRequest } from "../api/uniformApi.js";
@@ -32,8 +33,8 @@ export function SignInPage() {
       try {
         await prepareUniformSession();
 
-        const sessionResponse = await fetch(`${BASE_PATH}/api/auth/me`, {
-          credentials: "same-origin",
+        const sessionResponse = await apiFetch(`${BASE_PATH}/api/auth/me`, {
+          credentials: "include",
           cache: "no-store",
         });
         if (sessionResponse.ok) {

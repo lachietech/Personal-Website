@@ -1,3 +1,4 @@
+import { cookieSettings } from "../../config/cookies.js";
 import express from "express";
 import fs from "fs";
 import { doubleCsrf } from "csrf-csrf";
@@ -96,8 +97,7 @@ const { generateCsrfToken, doubleCsrfProtection } = doubleCsrf({
   cookieName: "uniform_shop_csrf_secret",
   cookieOptions: {
     httpOnly: true,
-    sameSite: "strict",
-    secure: process.env.NODE_ENV === "production",
+    ...cookieSettings(),
     path: basePath,
   },
   ignoredMethods: ["GET", "HEAD", "OPTIONS"],
@@ -109,8 +109,7 @@ function exposeCsrfToken(req, res) {
   const csrfToken = generateCsrfToken(req, res);
   res.cookie("uniform_shop_csrf_token", csrfToken, {
     httpOnly: false,
-    sameSite: "strict",
-    secure: process.env.NODE_ENV === "production",
+    ...cookieSettings(),
     path: basePath,
   });
   res.setHeader("X-CSRF-Token", csrfToken);

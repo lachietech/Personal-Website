@@ -1,9 +1,10 @@
-import { defineConfig } from "vite";
+import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react";
 import path from "node:path";
 import { copyStaticFiles } from "./scripts/build-static.js";
+import { resolveApiOrigin } from "./src/api/http.js";
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   plugins: [
     react(),
     {
@@ -16,7 +17,15 @@ export default defineConfig({
     },
   ],
   publicDir: false,
-  define: { "process.env.NODE_ENV": JSON.stringify("production") },
+  define: {
+    "process.env.NODE_ENV": JSON.stringify("production"),
+    "import.meta.env.VITE_API_URL": JSON.stringify(
+      resolveApiOrigin(
+        loadEnv(mode, import.meta.dirname, "VITE_").VITE_API_URL,
+        mode === "production",
+      ),
+    ),
+  },
   build: {
     outDir: path.resolve(import.meta.dirname, "dist/static/react"),
     emptyOutDir: true,
@@ -46,4 +55,4 @@ export default defineConfig({
       },
     },
   },
-});
+}));

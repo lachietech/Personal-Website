@@ -1,3 +1,4 @@
+import { apiFetch } from "./api/http.js";
 const SESSION_KEY = "ni.analytics.session";
 
 function getSessionId() {
@@ -14,14 +15,14 @@ export function trackPageView() {
 
   const send = async () => {
     try {
-      const tokenResponse = await fetch("/csrf-token", {
-        credentials: "same-origin",
+      const tokenResponse = await apiFetch("/csrf-token", {
+        credentials: "include",
       });
       if (!tokenResponse.ok) return;
       const { csrfToken } = await tokenResponse.json();
-      await fetch("/clientportal/api/analytics/event", {
+      await apiFetch("/clientportal/api/analytics/event", {
         method: "POST",
-        credentials: "same-origin",
+        credentials: "include",
         keepalive: true,
         headers: {
           "Content-Type": "application/json",

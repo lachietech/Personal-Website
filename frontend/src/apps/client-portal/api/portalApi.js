@@ -1,9 +1,10 @@
+import { apiFetch } from "../../../api/http.js";
 let csrfTokenPromise;
 
 export async function getCsrfToken() {
   if (!csrfTokenPromise) {
-    csrfTokenPromise = fetch("/csrf-token", {
-      credentials: "same-origin",
+    csrfTokenPromise = apiFetch("/csrf-token", {
+      credentials: "include",
     })
       .then(async (response) => {
         if (!response.ok) {
@@ -25,7 +26,7 @@ export async function portalRequest(path, options = {}) {
   const headers = { ...(options.headers || {}) };
   const requestOptions = {
     method,
-    credentials: "same-origin",
+    credentials: "include",
     headers,
   };
 
@@ -38,7 +39,7 @@ export async function portalRequest(path, options = {}) {
     requestOptions.body = JSON.stringify(options.body);
   }
 
-  const response = await fetch(path, requestOptions);
+  const response = await apiFetch(path, requestOptions);
   const data = await response.json().catch(() => ({}));
 
   if (!response.ok) {
@@ -51,9 +52,9 @@ export async function portalRequest(path, options = {}) {
 }
 
 export async function portalUpload(path, formData) {
-  const response = await fetch(path, {
+  const response = await apiFetch(path, {
     method: "POST",
-    credentials: "same-origin",
+    credentials: "include",
     headers: { "x-csrf-token": await getCsrfToken() },
     body: formData,
   });

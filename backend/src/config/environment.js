@@ -10,10 +10,14 @@ dotenv.config({
   ],
 });
 
+const configuredProxy =
+  process.env.TRUST_PROXY || (process.env.RENDER === "true" ? "1" : "loopback");
 export const environment = Object.freeze({
   isProduction: process.env.NODE_ENV === "production",
   port: Number(process.env.PORT) || 5000,
-  trustProxy: process.env.TRUST_PROXY || "loopback",
+  trustProxy: /^\d+$/.test(configuredProxy)
+    ? Number(configuredProxy)
+    : configuredProxy,
   sessionSecret: process.env.SECRET_KEY,
   csrfSecret: process.env.CSRF_SECRET,
   resendApiKey: process.env.RESEND_API_KEY,

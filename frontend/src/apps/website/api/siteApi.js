@@ -1,3 +1,4 @@
+import { apiFetch } from "../../../api/http.js";
 async function readJson(response) {
   const data = await response.json().catch(() => ({}));
 
@@ -11,8 +12,8 @@ async function readJson(response) {
 }
 
 export async function getProjects() {
-  const response = await fetch("/clientportal/api/projects", {
-    credentials: "same-origin",
+  const response = await apiFetch("/clientportal/api/projects", {
+    credentials: "include",
     cache: "no-store",
   });
 
@@ -21,7 +22,7 @@ export async function getProjects() {
 }
 
 export async function sendContactMessage(message) {
-  const response = await fetch("/clientportal/api/konnect/contact", {
+  const response = await apiFetch("/clientportal/api/konnect/contact", {
     method: "POST",
     credentials: "omit",
     headers: {

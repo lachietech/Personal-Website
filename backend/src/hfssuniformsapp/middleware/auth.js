@@ -1,3 +1,4 @@
+import { cookieSettings } from "../../config/cookies.js";
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 
@@ -26,8 +27,7 @@ export function createAuthToken(user) {
 export function setAuthCookie(res, token) {
   res.cookie(AUTH_COOKIE_NAME, token, {
     httpOnly: true,
-    sameSite: "strict",
-    secure: process.env.NODE_ENV === "production",
+    ...cookieSettings(),
     maxAge: 1000 * 60 * 60 * 12,
     path: AUTH_COOKIE_PATH,
   });
@@ -36,8 +36,7 @@ export function setAuthCookie(res, token) {
 export function clearAuthCookie(res) {
   res.clearCookie(AUTH_COOKIE_NAME, {
     httpOnly: true,
-    sameSite: "strict",
-    secure: process.env.NODE_ENV === "production",
+    ...cookieSettings(),
     path: AUTH_COOKIE_PATH,
   });
 }

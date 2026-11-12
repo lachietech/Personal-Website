@@ -1,3 +1,4 @@
+import { cookieSettings } from "../../config/cookies.js";
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 
@@ -30,8 +31,7 @@ export function createPortalToken(user) {
 export function setPortalCookie(res, token) {
   res.cookie(PORTAL_AUTH_COOKIE, token, {
     httpOnly: true,
-    sameSite: "strict",
-    secure: process.env.NODE_ENV === "production",
+    ...cookieSettings(),
     maxAge: 1000 * 60 * 60 * 8,
     path: COOKIE_PATH,
   });
@@ -40,8 +40,7 @@ export function setPortalCookie(res, token) {
 export function clearPortalCookie(res) {
   res.clearCookie(PORTAL_AUTH_COOKIE, {
     httpOnly: true,
-    sameSite: "strict",
-    secure: process.env.NODE_ENV === "production",
+    ...cookieSettings(),
     path: COOKIE_PATH,
   });
 }

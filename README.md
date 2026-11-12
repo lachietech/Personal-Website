@@ -1,185 +1,146 @@
 # Nielsen Innovations
 
-The application is split into two independently runnable and deployable services.
-The repository uses npm workspaces to share a lockfile and development commands;
-neither service imports source code from the other.
+The frontend is a **static site**. It builds HTML, JavaScript, CSS and assets into
+`frontend/dist` and has no production start command or running Node server.
+The backend is a separate Express API hosted at
+`https://personal-website-53mf.onrender.com`.
 
 ```text
-Browser -> frontend (port 5173) -> backend API (port 5000) -> databases/integrations
+Browser -> Render Static Site (frontend/dist)
+Browser -> Render Web Service (backend API) -> databases/integrations
 ```
 
-`frontend/` owns React, HTML, styles, images, page routing, and the public web
-server. Its build produces `frontend/dist/`. The web server also forwards the
-existing API URLs to `BACKEND_URL`, keeping browser requests and authentication
-cookies on the same origin.
+## Production deployment on Render
 
-`backend/` owns authentication, authorization, CSRF protection, validation,
-MongoDB models, business logic, email, and external integrations. It returns
-JSON and API attachments; it never serves frontend documents or assets.
+Deploy the frontend as a **Static Site**, with these settings:
 
-## Layout
+| Setting           | Value                                                        |
+| ----------------- | ------------------------------------------------------------ |
+| Repository        | This GitHub repository                                       |
+| Root Directory    | Leave blank (npm workspaces use the root lockfile)           |
+| Build command     | `npm ci --workspace frontend --include=dev && npm run build` |
+| Publish directory | `frontend/dist`                                              |
+| Start command     | None                                                         |
+| `VITE_API_URL`    | `https://personal-website-53mf.onrender.com`                 |
 
-```text
-frontend/
-  src/                  React applications and browser assets
-  public/               HTML documents, robots, sitemap, favicon
-  server/               Page routing, static hosting, streaming API proxy
-  scripts/              Static asset build support
-  tests/                UI, page, utility and proxy tests
-  dist/                 Generated deployable frontend assets (ignored)
-  package.json          Frontend dependencies and commands
-backend/
-  src/                  API server, routes, middleware, models and services
-  tests/                Backend utility and security tests
-  package.json          Backend dependencies and commands
-scripts/                Local process launcher and syntax checks
-tests/                  Cross-service HTTP integration tests
-```
+[render.yaml](render.yaml) defines the static frontend, page rewrites and security
+headers. It does not create another backend service. Apply it through a Render
+Blueprint, or copy its routes and headers into an existing Static Site's settings.
+A Git push does not apply Blueprint settings to an independently configured service.
+See Render's [Static Sites guide](https://render.com/docs/static-sites) and
+[rewrite documentation](https://render.com/docs/redirects-rewrites).
+
+If the frontend is currently a Web Service with a start command, create a Static
+Site and move the frontend domain to it after verifying the deployment. Do not run
+`npm start`, `npm run dev`, `vite preview` or a Node server for the frontend in
+production. Root `npm start` now launches **only the backend**.
+
+Keep the existing backend as a Node **Web Service**:
+
+| Setting            | Value                                                                                                               |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------- |
+| Root Directory     | Leave blank                                                                                                         |
+| Build command      | `npm ci --workspace backend --omit=dev`                                                                             |
+| Start command      | `npm run start:backend` (or root `npm start`)                                                                       |
+| Health check       | `/health`                                                                                                           |
+| `NODE_ENV`         | `production`                                                                                                        |
+| `PUBLIC_SITE_URL`  | `https://nielseninnovations.com`                                                                                    |
+| `TRUSTED_ORIGINS`  | `https://nielseninnovations.com,https://www.nielseninnovations.com` plus any exact frontend preview origins you use |
+| `COOKIE_SAME_SITE` | `none` for the current separate website/API domains (production default)                                            |
+| `TRUST_PROXY`      | `1`, or omit on Render to use its ingress default                                                                   |
+
+Keep existing MongoDB URLs, session/JWT/CSRF secrets and integration keys on the
+backend only; see [backend/.env.example](backend/.env.example). Never place secrets
+in `VITE_*` variables: they are included in public browser bundles. Both services
+require Node 22.12+ or 24 LTS. Do not commit `.env` files.
+
+The browser calls the public backend directly. `VITE_API_URL` is a build-time value;
+rebuild after changing it and update the static site's CSP `connect-src` header
+in `render.yaml` or the Render dashboard. With no override, production builds use
+the backend URL above. The frontend no longer uses `BACKEND_URL`, `PORT` or
+`TRUST_PROXY` in production.
+
+Authentication requests include backend cookies, and protected APIs still enforce
+exact trusted origins and CSRF tokens. Production cookies use `Secure` and
+`SameSite=None` for the current different domains. Browsers that block third-party
+cookies can still block sign-in with this arrangement; for reliable cookie access,
+attach `api.nielseninnovations.com` to the same backend service, use that as
+`VITE_API_URL`, update the static CSP, and set `COOKIE_SAME_SITE=strict`. This uses
+the same site for both hosts without introducing a frontend server.
+
+Sessions use the existing in-memory Express store. Backend restarts require new
+CSRF sessions; multiple backend replicas need shared session storage or sticky
+routing. Databases remain separate from both deployments.
+
+## Page routing
+
+The static site's rewrites serve each application document at its existing URL:
+
+- `/` serves the public homepage.
+- `/clientportal`, `/clientportal/login` and `/clientportal/account` serve the portal.
+- `/clientportal/billing`, `/clientportal/konnect` and `/clientportal/visitpulse` each
+  serve their separate application bundle.
+- `/hfssuniformsapp/*` and `/meandersuite/*` use the explicit routes in `render.yaml`.
+
+Do not add a catch-all rewrite to `/index.html`: these applications have different
+HTML entry points. API calls go to the backend host, not the static site. The
+frontend cannot access a private Render service directly.
 
 ## Local development
-
-Use Node.js 22.12+ or 24 LTS. From the repository root:
 
 ```sh
 npm ci
 npm run dev
 ```
 
-Open `http://localhost:5173`. The development command builds the frontend,
-starts both services, and watches React/assets and server source. Refresh the
-browser after frontend rebuilds. Restart after editing environment files.
+Open `http://localhost:5173`. This command builds in development mode and runs a
+**local-only** frontend preview/proxy, the API and the asset watcher. The development
+proxy keeps local requests on one origin; it is not deployed or started by the
+production commands. Its startup explicitly refuses `NODE_ENV=production`.
 
-For a new checkout, copy `backend/.env.example` to `backend/.env` and fill in
-its secrets, MongoDB URLs and integration keys. Frontend defaults work locally;
-copy `frontend/.env.example` to `frontend/.env` when changing ports or hosts.
+Copy `backend/.env.example` to `backend/.env` and enter your local database URLs and
+secrets. Keep `NODE_ENV=development` locally. The backend also supports a root `.env`
+as a migration fallback; process environment variables take priority. Use
+`BACKEND_ENV_FILE` to select one explicit backend environment file.
 
-Existing root `.env` files continue to work as a backend-only migration fallback.
-Values in `backend/.env` take precedence over that fallback; process environment
-variables take precedence over both. `BACKEND_ENV_FILE` selects a single explicit
-backend environment file. The frontend loads only its own `.env` and must never
-receive database credentials or server secrets.
+The optional [frontend/.env.example](frontend/.env.example) documents the public
+API override and local preview settings. Development builds use relative API URLs
+unless `VITE_API_URL` is set. For direct local API calls, set it to
+`http://localhost:5000` and use `http://localhost:5173` for the frontend.
 
-Each service can also run separately:
+| Command                               | Purpose                                                                |
+| ------------------------------------- | ---------------------------------------------------------------------- |
+| `npm run build`                       | Build the static production frontend and exit                          |
+| `npm start` / `npm run start:backend` | Start only the backend API                                             |
+| `npm run dev`                         | Build/watch browser code and run both local development processes      |
+| `npm run dev:frontend`                | Run the local frontend preview/proxy                                   |
+| `npm run dev:backend`                 | Watch the backend API                                                  |
+| `npm run dev:client`                  | Watch/rebuild development browser assets                               |
+| `npm test`                            | Syntax checks, unit tests, production build and HTTP integration tests |
 
-```sh
-npm run build
-npm run start:backend
-# In another terminal:
-npm run start:frontend
-```
+## Layout and verification
 
-Or run `npm start` inside `backend/` and `frontend/` respectively. Building the
-frontend does not require a running API or database; starting the backend does
-not require a frontend build. `npm start` at the root launches both services
-using the existing frontend build.
+`frontend/src` contains browser applications and assets; `frontend/public` contains
+HTML documents. `frontend/server` is for local development and HTTP tests only.
+`backend/src` contains the API, authentication, models and business logic.
+`render.yaml` configures the production static site. Generated `frontend/dist`
+output is ignored by Git and rebuilt during deployment.
 
-| Root command                    | Purpose                                                                   |
-| ------------------------------- | ------------------------------------------------------------------------- |
-| `npm run build`                 | Build the website and application entry points, then copy static assets   |
-| `npm run dev`                   | Build, then run and watch both services                                   |
-| `npm run dev:frontend`          | Watch the frontend web server                                             |
-| `npm run dev:client`            | Watch and rebuild browser source and assets                               |
-| `npm run dev:backend`           | Watch the API server (`dev:server` is an alias)                           |
-| `npm run start:frontend`        | Start only the frontend                                                   |
-| `npm run start:backend`         | Start only the backend                                                    |
-| `npm test`                      | Syntax checks, both service test suites, build and HTTP integration tests |
-| `npm test --workspace frontend` | Frontend tests only                                                       |
-| `npm test --workspace backend`  | Backend tests only                                                        |
-
-## HTTP boundary
-
-The frontend forwards these paths unchanged, including query strings, request
-bodies, CSRF headers, cookies, downloads and status codes:
-
-- `/csrf-token`
-- `/contact`
-- `/clientportal/api/*`
-- `/hfssuniformsapp/api/*`
-- `/meandersuite/api/*`
-
-All other paths belong to frontend page/static routing. Each service exposes its
-own `/health` liveness response. Unavailable upstream APIs return JSON with status
-502; frontend pages remain available. A liveness response does not verify database
-or external-service availability.
-
-The frontend serves empty React page shells without consulting the database.
-React checks the current user through the API and redirects to sign-in when
-needed. Billing renders the appropriate role-specific workspace. The backend continues to enforce authorization on
-every protected API, including when callers bypass the frontend.
-
-## Deployment on Render from GitHub
-
-Connect the GitHub repository to two Render services using the native **Node**
-runtime. Leave **Root Directory** blank for both so npm can access the root
-workspace manifest and shared lockfile. Select the deployment branch and enable
-automatic deploys for each service. See Render's
-[monorepo documentation](https://render.com/docs/monorepo-support).
-
-| Setting           | Frontend                                                     | Backend                                 |
-| ----------------- | ------------------------------------------------------------ | --------------------------------------- |
-| Service type      | Web Service                                                  | Private Service                         |
-| Build command     | `npm ci --workspace frontend --include=dev && npm run build` | `npm ci --workspace backend --omit=dev` |
-| Start command     | `npm run start:frontend`                                     | `npm run start:backend`                 |
-| Health check path | `/health`                                                    | `/health`                               |
-
-Use the same region and workspace for both services. Render's
-[private services](https://render.com/docs/private-services) keep the API off the
-public internet. Set the frontend's `BACKEND_URL` to the backend's internal HTTP
-address, including its listening port, without a path. Both servers read `PORT`;
-if you set a backend port explicitly, use the same port in `BACKEND_URL`.
-
-Attach the public domain to the frontend Web Service, which serves the built pages
-and proxies API requests. It needs its Node server, so deploy it as a Web Service.
-The browser continues to call relative URLs; moving the API does not require a
-frontend rebuild.
-
-Configure environment variables in Render using `frontend/.env.example` and
-`backend/.env.example` as references. Set a supported Node version consistently on
-both services using Render's [Node version settings](https://render.com/docs/node-version).
-Keep database credentials and integration secrets on the backend service only,
-and use database URLs reachable from Render. Do not commit environment files.
-
-For production, set `NODE_ENV=production` on both services and use HTTPS. Configure
-frontend `TRUST_PROXY` with the trusted TLS ingress address/subnet so it can forward
-the original HTTPS scheme and client address. Configure backend `TRUST_PROXY` with
-the frontend proxy address/subnet (default: `loopback` for same-host processes).
-Restrict network access to those proxies; do not trust arbitrary public clients.
-Add your frontend origin to backend `TRUSTED_ORIGINS` and set `PUBLIC_SITE_URL` to
-that same public origin for email links. The Nielsen Innovations production origins
-remain allowed by default; localhost origins are included only outside production.
-
-Sessions still use the existing in-memory Express store. A backend restart requires
-new CSRF sessions, and multiple backend replicas require a shared session store or
-sticky routing. This change separates the services but does not migrate session
-storage or the databases.
-
-## Migration and verification
-
-The previous `src/backend/` is now `backend/src/`; browser source, assets and
-`public/` are under `frontend/`. Existing page/API URLs and cookie paths are retained.
-Deployment commands that previously started `src/backend/server.js` must now start
-the two services. Generated bundles are built into `frontend/dist/` rather than
-committed under `public/static/react/`.
-
-Integration tests run the real frontend and backend HTTP stacks with database
-operations stubbed. They cover page/API separation, built assets, session and CSRF
-cookies, login/logout, authorization, origin checks and backend outages. Proxy tests
-cover multipart uploads, binary downloads and spoofed forwarding headers. These
-tests do not send email or connect to live databases.
+Tests exercise frontend/backend separation, direct API requests, CORS and cookie
+settings, CSRF, authentication, public Konnect delivery, uploads and local proxy
+behavior. Database operations are stubbed; tests do not send real email or connect
+to production databases. Verify live login and message delivery after deployment.
 
 ## Portal applications and Konnect
 
-The portal now launches three separate browser applications, each with its own
-HTML document, JavaScript entry point and URL:
+- Billing: `/clientportal/billing`, including invoice/account email tools.
+- Konnect Mailbox: `/clientportal/konnect`, incoming messages without replies.
+- VisitPulse: `/clientportal/visitpulse`, analytics with existing account permissions.
 
-- Billing: `/clientportal/billing` (including all existing invoice/account email tools).
-- Konnect Mailbox: `/clientportal/konnect` (incoming enquiries, search, stars and archive; no replies).
-- VisitPulse Analytics: `/clientportal/visitpulse` (existing analytics permissions retained).
-
-Contact forms submit to Konnect and are stored in `konnect_messages` in the
-client portal database. Websites submit directly to
-`POST /clientportal/api/konnect/contact` with a recipient `username` (or `usernames`
-for multiple recipients). No admin setup, registered form or origin verification
-is needed. The homepage sends to `nielseninnovations`. Start with the
-[website integration README](docs/konnect-integration/README.md), [API guide](docs/konnect-api.md) and
-[OpenAPI contract](docs/konnect.openapi.yaml) for setup, requests and responses.
+Websites submit directly to
+`https://personal-website-53mf.onrender.com/clientportal/api/konnect/contact` with a
+recipient `username` or `usernames`. No admin setup or origin verification is
+needed for this public intake endpoint. Messages are stored in `konnect_messages`
+in the client portal database. Homepage enquiries go to `nielseninnovations`.
+See the [integration README](docs/konnect-integration/README.md),
+[API guide](docs/konnect-api.md) and [OpenAPI contract](docs/konnect.openapi.yaml).

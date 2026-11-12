@@ -73,6 +73,10 @@ export function enforceTrustedOrigins(req, res, next) {
   res.setHeader("Access-Control-Allow-Methods", ALLOWED_METHODS);
   res.setHeader("Access-Control-Allow-Headers", ALLOWED_HEADERS);
   res.setHeader("Access-Control-Max-Age", "600");
+  res.setHeader(
+    "Access-Control-Expose-Headers",
+    "X-CSRF-Token, Content-Disposition",
+  );
 
   if (origin) {
     const allowedOrigins = configuredOrigins();
