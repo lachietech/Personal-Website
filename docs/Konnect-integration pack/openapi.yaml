@@ -1,0 +1,289 @@
+openapi: 3.1.0
+info:
+  title: Konnect Mailbox
+  version: 1.1.0
+  description: Incoming contact messages and per-recipient mailbox state. No reply or outbound messaging operations.
+servers:
+  - url: https://personal-website-53mf.onrender.com/clientportal/api/konnect
+security:
+  - portalCookie: []
+paths:
+  /contact:
+    options:
+      operationId: preflightContact
+      security: []
+      responses:
+        "204":
+          description: Any origin accepted; POST and Content-Type allowed without credentials
+          headers:
+            Access-Control-Allow-Origin:
+              schema: { const: "*" }
+        "429": { $ref: "#/components/responses/Error" }
+    post:
+      operationId: submitContact
+      security: []
+      description: Public username delivery. No registered form, origin verification, authentication or CSRF token. Send username or usernames, never both. All recipients must be active. Maximum JSON size 16 KB. Origin is optional unverified metadata only. Responses allow any origin without credentials.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/Contact" }
+            example:
+              username: nielseninnovations
+              name: Alex Morgan
+              email: alex@example.com
+              subject: Project enquiry
+              message: I would like to discuss a new website.
+      responses:
+        "201": { $ref: "#/components/responses/Delivered" }
+        "400": { $ref: "#/components/responses/Error" }
+        "405": { $ref: "#/components/responses/Error" }
+        "413": { $ref: "#/components/responses/Error" }
+        "415": { $ref: "#/components/responses/Error" }
+        "429": { $ref: "#/components/responses/Error" }
+        "500": { $ref: "#/components/responses/Error" }
+  /forms/website/messages:
+    options:
+      operationId: preflightLegacyWebsite
+      deprecated: true
+      security: []
+      responses:
+        "204": { description: Any origin accepted without credentials }
+        "429": { $ref: "#/components/responses/Error" }
+    post:
+      operationId: submitLegacyWebsiteContact
+      deprecated: true
+      security: []
+      description: Homepage compatibility alias. No origin verification or source lookup. Recipient fields may be omitted; delivers only to nielseninnovations. Other recipients are rejected. Use /contact for new integrations.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ContactFields" }
+      responses:
+        "201": { $ref: "#/components/responses/Delivered" }
+        "400": { $ref: "#/components/responses/Error" }
+        "413": { $ref: "#/components/responses/Error" }
+        "415": { $ref: "#/components/responses/Error" }
+        "429": { $ref: "#/components/responses/Error" }
+        "500": { $ref: "#/components/responses/Error" }
+        "503": { $ref: "#/components/responses/Error" }
+  /forms/{key}/messages:
+    parameters:
+      - name: key
+        in: path
+        required: true
+        schema: { type: string }
+        description: Legacy form key; no registration required. The reserved website key uses the fixed-recipient operation above.
+    options:
+      operationId: preflightLegacyContact
+      deprecated: true
+      security: []
+      responses:
+        "204": { description: Any origin accepted without credentials }
+        "429": { $ref: "#/components/responses/Error" }
+    post:
+      operationId: submitLegacyContact
+      deprecated: true
+      security: []
+      description: Compatibility alias for username delivery. The key does not select recipients or permissions. No origin verification or source lookup. Use /contact for new integrations.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/Contact" }
+      responses:
+        "201": { $ref: "#/components/responses/Delivered" }
+        "400": { $ref: "#/components/responses/Error" }
+        "413": { $ref: "#/components/responses/Error" }
+        "415": { $ref: "#/components/responses/Error" }
+        "429": { $ref: "#/components/responses/Error" }
+        "500": { $ref: "#/components/responses/Error" }
+  /messages:
+    get:
+      operationId: listMessages
+      parameters:
+        - name: folder
+          in: query
+          schema:
+            {
+              type: string,
+              enum: [inbox, unread, starred, archive, all],
+              default: inbox,
+            }
+        - name: q
+          in: query
+          schema: { type: string, maxLength: 120 }
+        - name: page
+          in: query
+          schema: { type: integer, minimum: 1, maximum: 10000, default: 1 }
+      responses:
+        "200":
+          description: Only the caller's deliveries; counts are independent of search
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [messages, total, page, pageSize, counts]
+                properties:
+                  messages:
+                    {
+                      type: array,
+                      items: { $ref: "#/components/schemas/Message" },
+                    }
+                  total: { type: integer, minimum: 0 }
+                  page: { type: integer, minimum: 1 }
+                  pageSize: { const: 25 }
+                  counts:
+                    type: object
+                    required: [inbox, unread, starred, archive, all]
+                    additionalProperties: { type: integer, minimum: 0 }
+        "400": { $ref: "#/components/responses/Error" }
+        "401": { $ref: "#/components/responses/Error" }
+  /messages/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { $ref: "#/components/schemas/ObjectId" }
+    get:
+      operationId: readMessage
+      description: Does not mark read. Returns 404 unless the caller is a recipient, including for administrators.
+      responses:
+        "200": { $ref: "#/components/responses/FullMessage" }
+        "401": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+    patch:
+      operationId: updatePersonalMessageState
+      security:
+        - portalCookie: []
+          csrfHeader: []
+          sessionCookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              minProperties: 1
+              additionalProperties: false
+              properties:
+                read: { type: boolean }
+                starred: { type: boolean }
+                archived: { type: boolean }
+      responses:
+        "200": { $ref: "#/components/responses/FullMessage" }
+        "400": { $ref: "#/components/responses/Error" }
+        "401": { $ref: "#/components/responses/Error" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+components:
+  securitySchemes:
+    portalCookie: { type: apiKey, in: cookie, name: client_portal_session }
+    sessionCookie: { type: apiKey, in: cookie, name: psifi.sid }
+    csrfHeader:
+      type: apiKey
+      in: header
+      name: X-CSRF-Token
+      description: Obtain from GET /csrf-token and retain its session and CSRF cookies.
+  responses:
+    Delivered:
+      description: Stored for all recipients, or honeypot acknowledged without storage
+      headers:
+        Access-Control-Allow-Origin:
+          schema: { const: "*" }
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [success, message]
+            properties:
+              success: { const: true }
+              message: { type: string }
+    Error:
+      description: Request could not be completed
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [error]
+            properties:
+              error: { type: string }
+    FullMessage:
+      description: Message body and caller-specific delivery state
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [message]
+            properties:
+              message:
+                allOf:
+                  - $ref: "#/components/schemas/Message"
+                  - type: object
+                    required: [body]
+                    properties:
+                      body: { type: string }
+  schemas:
+    ObjectId: { type: string, pattern: "^[a-fA-F0-9]{24}$" }
+    Contact:
+      allOf:
+        - $ref: "#/components/schemas/ContactFields"
+        - oneOf:
+            - required: [username]
+            - required: [usernames]
+    ContactFields:
+      type: object
+      not: { required: [username, usernames] }
+      required: [name, email, subject, message]
+      additionalProperties: false
+      properties:
+        name: { type: string, minLength: 1, maxLength: 120 }
+        email: { type: string, format: email, maxLength: 254 }
+        subject: { type: string, minLength: 1, maxLength: 160 }
+        message: { type: string, minLength: 1, maxLength: 4000 }
+        username:
+          type: string
+          pattern: "^[a-zA-Z0-9._-]{3,32}$"
+          description: Active portal recipient username, case-insensitive. Use this or usernames, never both.
+        usernames:
+          type: array
+          minItems: 1
+          maxItems: 20
+          description: Alternative to username for multiple active recipients. Case-insensitive; duplicates are deduplicated.
+          items: { type: string, pattern: "^[a-zA-Z0-9._-]{3,32}$" }
+        website: { type: string, description: Optional honeypot; leave blank }
+    Message:
+      type: object
+      required:
+        [
+          id,
+          sender,
+          subject,
+          preview,
+          source,
+          createdAt,
+          read,
+          starred,
+          archived,
+        ]
+      properties:
+        id: { $ref: "#/components/schemas/ObjectId" }
+        sender:
+          type: object
+          required: [name, email]
+          properties:
+            name: { type: string }
+            email: { type: string, format: email }
+        subject: { type: string }
+        preview: { type: string, maxLength: 160 }
+        source:
+          type: object
+          properties:
+            key: { type: string }
+            name: { type: string }
+            origin: { type: string }
+        createdAt: { type: string, format: date-time }
+        read: { type: boolean }
+        starred: { type: boolean }
+        archived: { type: boolean }

@@ -74,7 +74,7 @@ function rankEvents(events, field) {
     const label = event[field] || "Other";
     const current = values.get(label) || { views: 0, sessions: new Set() };
     current.views += 1;
-    current.sessions.add(event.sessionId);
+    current.sessions.add(`${event.site || ""}:${event.sessionId}`);
     values.set(label, current);
   }
 
@@ -93,14 +93,14 @@ export function buildAnalyticsSummary(events, days) {
   const dailyValues = new Map();
 
   for (const event of events) {
-    sessions.add(event.sessionId);
+    sessions.add(`${event.site || ""}:${event.sessionId}`);
     const date = new Date(event.occurredAt).toISOString().slice(0, 10);
     const current = dailyValues.get(date) || {
       views: 0,
       sessions: new Set(),
     };
     current.views += 1;
-    current.sessions.add(event.sessionId);
+    current.sessions.add(`${event.site || ""}:${event.sessionId}`);
     dailyValues.set(date, current);
   }
 
@@ -123,6 +123,7 @@ export function buildAnalyticsSummary(events, days) {
       }))
       .sort((left, right) => left.date.localeCompare(right.date)),
     pages: rankEvents(events, "path"),
+    sites: rankEvents(events, "site"),
     referrers: rankEvents(events, "referrer"),
     devices: rankEvents(events, "device"),
     browsers: rankEvents(events, "browser"),

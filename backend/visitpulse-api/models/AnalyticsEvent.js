@@ -5,6 +5,9 @@ export const ANALYTICS_COLLECTION = "analytics_events";
 
 const analyticsEventSchema = new mongoose.Schema(
   {
+    ownerId: { type: mongoose.Schema.Types.ObjectId, ref: "PortalUser", required: true },
+    username: { type: String, required: true, maxlength: 32 },
+    site: { type: String, required: true, maxlength: 300 },
     sessionId: { type: String, required: true, maxlength: 64, index: true },
     path: { type: String, required: true, maxlength: 300, index: true },
     title: { type: String, default: "", maxlength: 160 },
@@ -22,6 +25,7 @@ const analyticsEventSchema = new mongoose.Schema(
 );
 
 analyticsEventSchema.index({ occurredAt: -1, path: 1 });
+analyticsEventSchema.index({ ownerId: 1, occurredAt: -1 });
 
 const AnalyticsEvent = clientPortalDb.model(
   "AnalyticsEvent",

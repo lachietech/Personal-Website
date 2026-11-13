@@ -3,6 +3,7 @@ import konnectRouter, {
   publicRouter as konnectPublicRouter,
 } from "./konnect-api/index.js";
 import visitpulseRouter, {
+  publicRouter as visitpulsePublicRouter,
   initialise as initialiseVisitpulse,
 } from "./visitpulse-api/index.js";
 import meandersuiteRouter from "./meandersuite-api/index.js";
@@ -35,6 +36,7 @@ export const apis = [
     name: "VisitPulse API",
     path: "/clientportal/api/analytics",
     router: visitpulseRouter,
+    publicRouter: visitpulsePublicRouter,
     initialise: initialiseVisitpulse,
   },
   {

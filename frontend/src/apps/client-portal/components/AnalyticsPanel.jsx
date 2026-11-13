@@ -206,6 +206,7 @@ export function AnalyticsPanel() {
             </article>
 
             <div className="analytics-grid">
+              <Ranking title="Websites" items={data.sites || []} field="site" />
               <Ranking title="Top pages" items={data.pages} field="path" />
               <Ranking
                 title="Top referrers"
@@ -241,7 +242,7 @@ export function AnalyticsPanel() {
                         <tr key={`${event.occurredAt}-${event.path}-${index}`}>
                           <td data-label="Page">
                             <strong>{event.title || event.path}</strong>
-                            <small className="analytics-path">{event.path}</small>
+                            <small className="analytics-path">{event.site}{event.path}</small>
                           </td>
                           <td data-label="Source">{event.referrer}</td>
                           <td data-label="Device">

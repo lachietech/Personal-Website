@@ -209,3 +209,7 @@ The Nielsen Innovations homepage uses the same endpoint with
 
 See the [API reference](../konnect-api.md) and
 [OpenAPI contract](../konnect.openapi.yaml) for authenticated mailbox operations.
+
+## Portable Konnect integration pack
+
+For copyable client code, environment examples, a complete contact form, offline tests and AI integration instructions, see the [Konnect integration pack](../Konnect-integration%20pack/README.md).

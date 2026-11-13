@@ -173,3 +173,11 @@ needed for this public intake endpoint. Messages are stored in `konnect_messages
 in the client portal database. Homepage enquiries go to `nielseninnovations`.
 See the [integration README](docs/konnect-integration/README.md),
 [API guide](docs/konnect-api.md) and [OpenAPI contract](docs/konnect.openapi.yaml).
+
+## VisitPulse integrations
+
+See [VisitPulse integration pack](docs/VisitPulse-integration%20pack/README.md) for the public tracking API, portable browser tracker, account setup and AI integration instructions.
+
+## Portable Konnect integration pack
+
+For copyable client code, environment examples, a complete contact form, offline tests and AI integration instructions, see the [Konnect integration pack](docs/Konnect-integration%20pack/README.md).

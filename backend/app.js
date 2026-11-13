@@ -24,7 +24,7 @@ export function createApp() {
   app.set("trust proxy", environment.trustProxy);
 
   app.use(helmet(securityHeaders));
-  // Public intake accepts any origin without credentials.
+  // Public intake routers enforce their own origin policies without credentials.
   // All authenticated mailbox APIs still pass through session and CSRF checks.
   for (const api of apis) {
     if (api.publicRouter) app.use(api.path, api.publicRouter);

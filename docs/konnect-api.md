@@ -161,3 +161,7 @@ rate limits, request validation, failed storage,
 safe text rendering and separate application routes. Database operations are
 stubbed in the HTTP tests; live MongoDB delivery and indexes require deployment
 verification against the configured database.
+
+## Portable Konnect integration pack
+
+For copyable client code, environment examples, a complete contact form, offline tests and AI integration instructions, see the [Konnect integration pack](Konnect-integration%20pack/README.md).
