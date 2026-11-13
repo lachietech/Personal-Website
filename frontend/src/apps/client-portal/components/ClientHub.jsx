@@ -32,9 +32,7 @@ export function ClientHub({
       <div className="client-hub">
         <div className="hub-intro">
           <p>
-            Create the client account first, then manage their invoices here.
-            Account emails, invoices and payment reminders are managed in
-            Billing.
+            Add a client to manage their invoices, payments and account emails.
           </p>
           {onCancel && (
             <button

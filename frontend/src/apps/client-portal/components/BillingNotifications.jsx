@@ -23,12 +23,11 @@ export function BillingNotifications({
   );
 
   return (
-    <div className="mailbox-panel">
-      <section className="invoice-panel">
+    <section className="invoice-panel mailbox-panel">
+      <div>
         <div className="panel-heading">
           <div>
-            <p className="eyebrow">Billing notifications</p>
-            <h2>{isAdmin ? client.business : "Your billing updates"}</h2>
+            <h2>Billing notifications</h2>
           </div>
         </div>
         <p className="hub-contact">
@@ -36,8 +35,7 @@ export function BillingNotifications({
         </p>
         <p className="hub-email-context">
           Account emails, invoices and payment reminders are delivered to this
-          email address. Contact enquiries are available in the separate Konnect
-          application.
+          email address.
         </p>
         {isAdmin && (
           <label className="mailbox-invoice-picker">
@@ -47,8 +45,12 @@ export function BillingNotifications({
               onChange={(event) => onSelectInvoice(event.target.value)}
               disabled={!client.invoices.length}
             >
-              {!client.invoices.length && (
-                <option value="">No saved invoices</option>
+              {(!invoice || !client.invoices.length) && (
+                <option value="">
+                  {client.invoices.length
+                    ? "Select a saved invoice"
+                    : "No saved invoices"}
+                </option>
               )}
               {client.invoices.map((item) => (
                 <option key={item.id} value={item.id}>
@@ -58,20 +60,20 @@ export function BillingNotifications({
             </select>
           </label>
         )}
-      </section>
+      </div>
       {isAdmin && (
         <EmailPanel
+          embedded
           key={`${client.id}-${invoice?.id || "none"}`}
           client={client}
           invoice={invoice}
           onClientUpdated={onClientUpdated}
         />
       )}
-      <section className="invoice-panel">
+      <div className="notification-history">
         <div className="panel-heading">
           <div>
-            <p className="eyebrow">Notifications</p>
-            <h2>Invoice updates</h2>
+            <h3>Invoice updates</h3>
           </div>
         </div>
         <p className="hub-email-context">
@@ -111,7 +113,7 @@ export function BillingNotifications({
         ) : (
           <p className="hub-contact">No invoice notifications yet.</p>
         )}
-      </section>
-    </div>
+      </div>
+    </section>
   );
 }

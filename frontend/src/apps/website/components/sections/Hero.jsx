@@ -3,9 +3,6 @@ import { Icon } from "../Icon.jsx";
 export function Hero() {
   return (
     <section id="home" className="hero">
-      <div className="hero-orb hero-orb-one" />
-      <div className="hero-orb hero-orb-two" />
-
       <div className="container hero-container">
         <div className="row align-items-center g-5">
           <div className="col-lg-7">
@@ -39,7 +36,7 @@ export function Hero() {
                   <Icon name="bi-bezier2" /> Product design
                 </span>
                 <span>
-                  <Icon name="bi-stars" /> AI exploration
+                  <Icon name="bi-cloud-check" /> Ongoing support
                 </span>
               </div>
             </div>

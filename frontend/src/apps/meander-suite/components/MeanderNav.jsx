@@ -4,7 +4,7 @@ export function MeanderNav() {
       <a href="/meandersuite">
         <img
           className="meander-logo"
-          src="/static/meandersuiteprerelease/mainfiles/logoblack.png"
+          src="/static/meandersuiteprerelease/mainfiles/logowhite.png"
           alt="Meander Suite"
         />
       </a>

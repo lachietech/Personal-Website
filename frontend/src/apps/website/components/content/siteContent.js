@@ -1,24 +1,8 @@
 export const navigationItems = [
   { label: "Home", href: "#home" },
-  { label: "About", href: "#about" },
-  { label: "Services", href: "#services" },
+  { label: "About me", href: "#about" },
   { label: "Pricing", href: "#pricing" },
   { label: "Work", href: "#portfolio" },
-];
-
-export const aboutValues = [
-  {
-    title: "Think broadly",
-    description: "Explore the real problem before reaching for a solution.",
-  },
-  {
-    title: "Build thoughtfully",
-    description: "Create clear, maintainable experiences with purpose.",
-  },
-  {
-    title: "Keep improving",
-    description: "Learn from feedback and evolve the product over time.",
-  },
 ];
 
 export const services = [
@@ -37,13 +21,6 @@ export const services = [
     tags: ["UI/UX", "Prototyping", "Accessibility"],
   },
   {
-    icon: "bi-cpu",
-    title: "AI exploration",
-    description:
-      "Thoughtful AI integration and research grounded in genuine product value.",
-    tags: ["Integration", "Research", "Responsible AI"],
-  },
-  {
     icon: "bi-cloud-check",
     title: "Hosting & ongoing support",
     description:
@@ -56,38 +33,25 @@ export const hostingPlans = [
   {
     icon: "bi-box",
     label: "Hosting 01",
-    title: "Basic assisted",
+    title: "Static website",
     price: "$40",
     features: [
-      "Technical support",
-      "Maintenance",
-      "Email forms",
-      "Database & web hosting",
+      "Hosting for static websites",
+      "Technical support & maintenance",
+      "VisitPulse Analytics access",
+      "Konnect Mailbox access",
     ],
   },
   {
     icon: "bi-layers",
     label: "Hosting 02",
-    title: "Standard assisted",
-    price: "$90",
-    popular: true,
+    title: "Server-backed website",
+    price: "$60+",
     features: [
-      "Technical support",
-      "Audits & maintenance",
-      "Database hosting",
-      "Email server & web hosting",
-    ],
-  },
-  {
-    icon: "bi-stack",
-    label: "Hosting 03",
-    title: "Advanced assisted",
-    price: "$120",
-    features: [
-      "Technical support",
-      "Audits & maintenance",
-      "Database & email server",
-      "Increased usage limits",
+      "Hosting for sites with a backend",
+      "Technical support & maintenance",
+      "VisitPulse Analytics access",
+      "Konnect Mailbox access",
     ],
   },
 ];

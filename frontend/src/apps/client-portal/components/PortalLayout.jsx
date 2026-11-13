@@ -1,4 +1,5 @@
 import { PortalBrand } from "./PortalBrand.jsx";
+import { AppTopbar } from "../../../components/AppTopbar.jsx";
 
 export function PortalLayout({
   title,
@@ -9,21 +10,21 @@ export function PortalLayout({
   className = "",
 }) {
   return (
-    <>
-      <header className={`portal-shell ${className}`}>
-        <nav className="topbar" aria-label="Client portal navigation">
-          <PortalBrand />
-          <div className="topbar-actions">
-            <a className="home-link" href="/clientportal">
-              <i className="bi bi-grid" aria-hidden="true" /> Applications
-            </a>
-            <span className="secure-badge">
-              <i className="bi bi-shield-check" aria-hidden="true" />
-              Secure workspace
-            </span>
-            {actions}
-          </div>
-        </nav>
+    <div className="portal-app">
+      <a className="skip-link" href="#portal-content">
+        Skip to content
+      </a>
+      <AppTopbar brand={<PortalBrand />} label="Client portal navigation">
+        <a className="home-link" href="/clientportal">
+          <i className="bi bi-grid" aria-hidden="true" /> Applications
+        </a>
+        {actions}
+      </AppTopbar>
+      <main
+        id="portal-content"
+        tabIndex={-1}
+        className={`portal-main ${className}`}
+      >
         <section className="portal-header compact-header">
           <div className="portal-header-copy">
             <p className="eyebrow">{eyebrow}</p>
@@ -31,9 +32,9 @@ export function PortalLayout({
             {subtitle && <p className="portal-subtitle">{subtitle}</p>}
           </div>
         </section>
-      </header>
-      <main className={`portal-main ${className}`}>{children}</main>
-    </>
+        {children}
+      </main>
+    </div>
   );
 }
 
@@ -42,26 +43,6 @@ export function LogoutButton({ onLogout }) {
     <button className="home-link" type="button" onClick={onLogout}>
       Sign out
     </button>
-  );
-}
-
-export function Tabs({ tabs, activeTab, onChange }) {
-  return (
-    <div className="tabbar" role="tablist" aria-label="Portal sections">
-      {tabs.map((tab) => (
-        <button
-          className={`tab-button${activeTab === tab.id ? " active" : ""}`}
-          type="button"
-          role="tab"
-          aria-selected={activeTab === tab.id}
-          onClick={() => onChange(tab.id)}
-          key={tab.id}
-        >
-          <i className={`bi ${tab.icon}`} aria-hidden="true" />
-          <span>{tab.label}</span>
-        </button>
-      ))}
-    </div>
   );
 }
 

@@ -50,19 +50,3 @@ export async function portalRequest(path, options = {}) {
 
   return data;
 }
-
-export async function portalUpload(path, formData) {
-  const response = await apiFetch(path, {
-    method: "POST",
-    credentials: "include",
-    headers: { "x-csrf-token": await getCsrfToken() },
-    body: formData,
-  });
-  const data = await response.json().catch(() => ({}));
-
-  if (!response.ok) {
-    throw new Error(data.error || "Upload failed.");
-  }
-
-  return data;
-}

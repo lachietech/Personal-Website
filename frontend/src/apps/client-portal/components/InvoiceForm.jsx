@@ -57,7 +57,6 @@ export function InvoiceForm({
     setValues(withKeys(invoice));
     setCreateMode(!invoice);
     setEditing(!invoice);
-    setMessage(null);
   }, [invoice, client?.id]);
 
   useEffect(() => {
@@ -196,7 +195,7 @@ export function InvoiceForm({
         <summary>
           {createMode ? "Create invoice" : `Edit ${invoice.number}`}
         </summary>
-        <form className="stack-form" onSubmit={save}>
+        <form className="stack-form invoice-editor-form" onSubmit={save}>
           <div className="form-grid">
             <label>
               Invoice number
@@ -267,46 +266,55 @@ export function InvoiceForm({
           <div className="line-items-editor">
             {values.items.map((item) => (
               <div className="line-item-row" key={item._key}>
-                <input
-                  placeholder="Description"
-                  value={item.description}
-                  onChange={(event) =>
-                    updateRow(
-                      "items",
-                      item._key,
-                      "description",
-                      event.target.value,
-                    )
-                  }
-                  required
-                />
-                <input
-                  type="number"
-                  min="0"
-                  step="0.25"
-                  placeholder="Qty"
-                  value={item.quantity}
-                  onChange={(event) =>
-                    updateRow(
-                      "items",
-                      item._key,
-                      "quantity",
-                      event.target.value,
-                    )
-                  }
-                  required
-                />
-                <input
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  placeholder="Rate"
-                  value={item.rate}
-                  onChange={(event) =>
-                    updateRow("items", item._key, "rate", event.target.value)
-                  }
-                  required
-                />
+                <label className="line-description">
+                  Description
+                  <input
+                    placeholder="Description"
+                    value={item.description}
+                    onChange={(event) =>
+                      updateRow(
+                        "items",
+                        item._key,
+                        "description",
+                        event.target.value,
+                      )
+                    }
+                    required
+                  />
+                </label>
+                <label>
+                  Quantity
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.25"
+                    placeholder="Qty"
+                    value={item.quantity}
+                    onChange={(event) =>
+                      updateRow(
+                        "items",
+                        item._key,
+                        "quantity",
+                        event.target.value,
+                      )
+                    }
+                    required
+                  />
+                </label>
+                <label>
+                  Rate (AUD)
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    placeholder="Rate"
+                    value={item.rate}
+                    onChange={(event) =>
+                      updateRow("items", item._key, "rate", event.target.value)
+                    }
+                    required
+                  />
+                </label>
                 <button
                   className="icon-button danger-icon"
                   type="button"
@@ -337,32 +345,46 @@ export function InvoiceForm({
           <div className="hours-editor">
             {values.hours.map((entry) => (
               <div className="hour-entry-row" key={entry._key}>
-                <input
-                  type="date"
-                  value={entry.date}
-                  onChange={(event) =>
-                    updateRow("hours", entry._key, "date", event.target.value)
-                  }
-                  required
-                />
-                <input
-                  type="number"
-                  min="0"
-                  step="0.25"
-                  value={entry.hours}
-                  onChange={(event) =>
-                    updateRow("hours", entry._key, "hours", event.target.value)
-                  }
-                  required
-                />
-                <input
-                  value={entry.work}
-                  placeholder="Work completed"
-                  onChange={(event) =>
-                    updateRow("hours", entry._key, "work", event.target.value)
-                  }
-                  required
-                />
+                <label>
+                  Date
+                  <input
+                    type="date"
+                    value={entry.date}
+                    onChange={(event) =>
+                      updateRow("hours", entry._key, "date", event.target.value)
+                    }
+                    required
+                  />
+                </label>
+                <label>
+                  Hours
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.25"
+                    value={entry.hours}
+                    onChange={(event) =>
+                      updateRow(
+                        "hours",
+                        entry._key,
+                        "hours",
+                        event.target.value,
+                      )
+                    }
+                    required
+                  />
+                </label>
+                <label className="hour-description">
+                  Work completed
+                  <input
+                    value={entry.work}
+                    placeholder="Work completed"
+                    onChange={(event) =>
+                      updateRow("hours", entry._key, "work", event.target.value)
+                    }
+                    required
+                  />
+                </label>
                 <button
                   className="icon-button danger-icon"
                   type="button"

@@ -37,7 +37,7 @@ paths resolve from the process working directory. Restart after configuration ch
 | `SECRET_KEY`                                                                       | Required Express session secret.                                                                                     |
 | `CSRF_SECRET`                                                                      | Required CSRF secret.                                                                                                |
 | `JWT_SECRET`                                                                       | Required signing secret for Uniform Shop and portal JWTs.                                                            |
-| `MONGO_URI_CLIENT`                                                                 | Required portal database URL: clients, billing, projects, bookkeeping, Konnect, analytics.                           |
+| `MONGO_URI_CLIENT`                                                                 | Required portal database URL: clients, billing, projects, Konnect, analytics.                                        |
 | `MONGO_URI_UNIFORMS`                                                               | Required Uniform Shop database URL: accounts, sales, stock, orders, audits.                                          |
 | `MONGO_URI_MEANDERSUITE`                                                           | Required Meander Suite database URL: users and weather records.                                                      |
 | `PORT`                                                                             | `5000`; if specified, an integer from 1 to 65535.                                                                    |
@@ -65,7 +65,8 @@ backend/
   app.js                     Express middleware order and API mounting
   apis.js                    Registry of API routers, URL prefixes and startup hooks
   startup.js                 Runs registered API initialization hooks
-  main-api/                  Website contact, portal accounts, billing, projects, bookkeeping
+  main-api/                  Website contact, portal accounts, clients, invoices, payment settings
+  projects-api/              Published portfolio, project management and GitHub imports
   konnect-api/               Public contact intake, message delivery and private mailboxes
   visitpulse-api/            Analytics event collection, storage and reports
   meandersuite-api/          Accounts, weather data, analysis and zone presets
@@ -97,23 +98,24 @@ several features need the same behavior. `app.js` shows middleware order while
 delegates CSRF and rate limits to its middleware folder and applies authentication
 once to protected API routes.
 
-Konnect and VisitPulse use the account model and authentication middleware owned by
-Main API. Their messages and analytics models, routes, services and utilities live
+Konnect, VisitPulse and Projects use the account model and authentication middleware owned by
+Main API. Their feature models, routes, services and utilities live
 inside their own API folders. Main API's website contact route calls the Konnect
 delivery service. These explicit imports reuse the existing account system without
 duplicating identities or changing access rules.
 
 The folder split does not change public URLs or move database collections. Konnect,
-VisitPulse and Main API continue to share `MONGO_URI_CLIENT`; the other two APIs
+VisitPulse, Projects and Main API continue to share `MONGO_URI_CLIENT`; the other two APIs
 retain their existing databases.
 
-| API folder | Existing URL prefixes |
-| --- | --- |
-| `main-api` | `/contact`, `/clientportal/api/auth`, `/clientportal/api/projects`, `/clientportal/api/admin`, `/clientportal/api/bookkeeping`, `/clientportal/api/client` |
-| `konnect-api` | `/clientportal/api/konnect` |
-| `visitpulse-api` | `/clientportal/api/analytics` |
-| `meandersuite-api` | `/meandersuite/api` |
-| `hfssuniforms-api` | `/hfssuniformsapp/api` |
+| API folder         | Existing URL prefixes                                                                       |
+| ------------------ | ------------------------------------------------------------------------------------------- |
+| `main-api`         | `/contact`, `/clientportal/api/auth`, `/clientportal/api/admin`, `/clientportal/api/client` |
+| `projects-api`     | `/clientportal/api/projects`                                                                |
+| `konnect-api`      | `/clientportal/api/konnect`                                                                 |
+| `visitpulse-api`   | `/clientportal/api/analytics`                                                               |
+| `meandersuite-api` | `/meandersuite/api`                                                                         |
+| `hfssuniforms-api` | `/hfssuniformsapp/api`                                                                      |
 
 The shared application owns `/health` and `/csrf-token`.
 

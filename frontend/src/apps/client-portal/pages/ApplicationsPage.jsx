@@ -7,7 +7,7 @@ export function ApplicationsPage({ user }) {
     <PortalLayout
       eyebrow="Your workspace"
       title={`Welcome back, ${user.username}.`}
-      subtitle="Three applications. One place to get started."
+      subtitle="Your applications, together in one place."
       actions={
         <>
           <a className="home-link" href="/clientportal/account">
@@ -25,31 +25,27 @@ export function ApplicationsPage({ user }) {
       }
     >
       <section className="application-grid" aria-label="Your applications">
-        {portalApps.map((app) => (
-          <a
-            className={`application-card application-${app.id}`}
-            href={app.href}
-            key={app.id}
-          >
-            <span className="application-icon">
-              <i className={`bi ${app.icon}`} aria-hidden="true" />
-            </span>
-            <span className="application-kind">
-              {app.id === "konnect"
-                ? "Communications"
-                : app.id === "billing"
-                  ? "Finance"
-                  : "Insights"}
-            </span>
-            <h2>{app.label}</h2>
-            <p>{app.description}</p>
-            <small>{app.detail}</small>
-            <span className="application-open">
-              Open application{" "}
-              <i className="bi bi-arrow-up-right" aria-hidden="true" />
-            </span>
-          </a>
-        ))}
+        {portalApps
+          .filter((app) => !app.adminOnly || user.role === "admin")
+          .map((app) => (
+            <a
+              className={`application-card application-${app.id}`}
+              href={app.href}
+              key={app.id}
+            >
+              <span className="application-icon">
+                <i className={`bi ${app.icon}`} aria-hidden="true" />
+              </span>
+              <span className="application-kind">{app.kind}</span>
+              <h2>{app.label}</h2>
+              <p>{app.description}</p>
+              <small>{app.detail}</small>
+              <span className="application-open">
+                Open application{" "}
+                <i className="bi bi-arrow-up-right" aria-hidden="true" />
+              </span>
+            </a>
+          ))}
       </section>
     </PortalLayout>
   );

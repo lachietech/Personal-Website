@@ -7,6 +7,7 @@ export const pageRoutes = {
   "/clientportal/admin": "clientportal.html",
   "/clientportal/client": "clientportal.html",
   "/clientportal/billing": "billing.html",
+  "/clientportal/projects": "projects.html",
   "/clientportal/konnect": "konnect.html",
   "/clientportal/visitpulse": "visitpulse.html",
   "/meandersuite": "meander-suite.html",

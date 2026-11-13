@@ -59,7 +59,6 @@ export function Contact() {
 
   return (
     <section id="contact" className="section contact-section">
-      <div className="contact-orb" />
       <div className="container">
         <div className="row g-5">
           <div className="col-lg-5 fade-up">
@@ -67,6 +66,15 @@ export function Contact() {
           </div>
           <div className="col-lg-7 fade-up">
             <div className="contact-form">
+              <div className="floating-card contact-powered-badge">
+                <span className="card-icon">
+                  <Icon name="bi-envelope" />
+                </span>
+                <span>
+                  <small>Powered by</small>
+                  <strong>Konnect</strong>
+                </span>
+              </div>
               {notice && (
                 <div
                   className={`alert alert-${notice.type}`}

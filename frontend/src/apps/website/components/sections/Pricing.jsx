@@ -15,20 +15,12 @@ function BuildCard() {
         A tailored site or application, designed and developed around your
         goals.
       </p>
-      <ul className="price-list">
-        <li>
-          <span>Basic site</span>
-          <strong>$200 + hours</strong>
-        </li>
-        <li>
-          <span>Standard site</span>
-          <strong>$500 + hours</strong>
-        </li>
-        <li>
-          <span>Complex site</span>
-          <strong>$1,000 + hours</strong>
-        </li>
-      </ul>
+      <p className="build-quote">Your idea. A tailored quote.</p>
+      <p className="price-intro">
+        Tell me what you want to build and I’ll put together a free quote
+        for your project. VisitPulse Analytics and Konnect Mailbox access
+        come included.
+      </p>
       <a href="#contact" className="btn btn-dark-custom">
         Get a project quote <Icon name="bi-arrow-right" />
       </a>
@@ -38,10 +30,7 @@ function BuildCard() {
 
 function HostingCard({ plan }) {
   return (
-    <article
-      className={`price-card fade-up${plan.popular ? " price-card-popular" : ""}`}
-    >
-      {plan.popular && <span className="popular-badge">Most popular</span>}
+    <article className="price-card fade-up">
       <div className="price-card-head">
         <span className="price-icon">
           <Icon name={plan.icon} />
@@ -71,12 +60,14 @@ export function Pricing() {
   return (
     <section id="pricing" className="section pricing-section">
       <div className="container">
-        <div className="pricing-header fade-up">
-          <p className="eyebrow">Simple starting points</p>
-          <h2 className="section-heading">Pricing with room to fit.</h2>
+        <div className="section-intro fade-up">
+          <div>
+            <p className="eyebrow">Build & host</p>
+            <h2 className="section-heading">Your project. The right plan.</h2>
+          </div>
           <p>
-            Every project is different. These prices are a guide; get in touch
-            for a free quote based on what your idea needs.
+            Website creation starts with a conversation and a tailored quote.
+            Choose from two monthly hosting packages to keep your site running.
           </p>
         </div>
 
@@ -87,8 +78,8 @@ export function Pricing() {
           ))}
         </div>
         <p className="pricing-disclaimer fade-up">
-          Hosting inclusions and limits are confirmed in your quote and may vary
-          with usage requirements.
+          Server-backed hosting starts at $60 per month. The final cost depends
+          on your application and hosting requirements, confirmed in your quote.
         </p>
       </div>
     </section>

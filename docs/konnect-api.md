@@ -1,13 +1,13 @@
 # Konnect Mailbox API
 
 Konnect is an incoming-message application with its own frontend entry point at
-`/clientportal/konnect`. Billing lives at `/clientportal/billing`; VisitPulse lives
+`/clientportal/konnect`. The client portal lives at `/clientportal/billing`; VisitPulse lives
 at `/clientportal/visitpulse`. `/clientportal` is the application launcher. The
 applications share portal sign-in, but do not load one another's screens or data.
 
 Konnect supports reading, searching, starring, marking unread and archiving.
-There is no compose, reply, forwarding, outbound email or SMTP endpoint. Billing's
-account emails, invoice emails, payment reminders and receipts remain in Billing.
+There is no compose, reply, forwarding, outbound email or SMTP endpoint. Account
+emails, invoice emails, payment reminders and receipts remain in the client portal.
 
 The machine-readable contract is [konnect.openapi.yaml](konnect.openapi.yaml).
 For a complete contact-form example, see the [website integration README](konnect-integration/README.md).

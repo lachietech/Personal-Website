@@ -18,7 +18,6 @@ export default defineConfig(({ mode }) => ({
   ],
   publicDir: false,
   define: {
-    "process.env.NODE_ENV": JSON.stringify("production"),
     "import.meta.env.VITE_API_URL": JSON.stringify(
       resolveApiOrigin(
         loadEnv(mode, import.meta.dirname, "VITE_").VITE_API_URL,
@@ -33,6 +32,7 @@ export default defineConfig(({ mode }) => ({
       input: {
         website: path.resolve(import.meta.dirname, "src/main.jsx"),
         billing: path.resolve(import.meta.dirname, "src/billing.jsx"),
+        projects: path.resolve(import.meta.dirname, "src/projects.jsx"),
         konnect: path.resolve(import.meta.dirname, "src/konnect.jsx"),
         visitpulse: path.resolve(import.meta.dirname, "src/visitpulse.jsx"),
         "client-portal": path.resolve(

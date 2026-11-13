@@ -4,7 +4,9 @@ import { ClientPage } from "../client-portal/pages/ClientPage.jsx";
 export function BillingApp() {
   return (
     <PortalSession>
-      {(user) => (user.role === "admin" ? <AdminPage /> : <ClientPage />)}
+      {(user) =>
+        user.role === "admin" ? <AdminPage user={user} /> : <ClientPage />
+      }
     </PortalSession>
   );
 }

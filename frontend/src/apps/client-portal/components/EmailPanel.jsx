@@ -2,7 +2,12 @@ import { useState } from "react";
 import { portalRequest } from "../api/portalApi.js";
 import { FormMessage } from "./PortalLayout.jsx";
 
-export function EmailPanel({ client, invoice, onClientUpdated }) {
+export function EmailPanel({
+  client,
+  invoice,
+  onClientUpdated,
+  embedded = false,
+}) {
   const [message, setMessage] = useState(null);
   const [sending, setSending] = useState("");
 
@@ -38,15 +43,19 @@ export function EmailPanel({ client, invoice, onClientUpdated }) {
   }
 
   return (
-    <section className="invoice-panel hub-email-panel">
+    <section
+      className={embedded ? "hub-email-panel" : "invoice-panel hub-email-panel"}
+    >
       <div className="panel-heading">
         <div>
-          <h2>Mail &amp; notifications</h2>
+          <h3>Send an email</h3>
         </div>
       </div>
-      <p className="hub-contact">
-        Send to <strong>{client.email}</strong>
-      </p>
+      {!embedded && (
+        <p className="hub-contact">
+          Send to <strong>{client.email}</strong>
+        </p>
+      )}
       <p className="hub-email-context">
         {invoice
           ? `${invoice.number} · Sends the saved invoice. Save edits before sending.`

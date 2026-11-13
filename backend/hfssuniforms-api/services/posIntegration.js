@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import Sales from "../models/Sales.js";
 import POSProduct from "../models/POSProduct.js";
 
@@ -149,7 +150,9 @@ export async function syncPosProductsFromSalesRecords() {
     byVariant.set(variantKey, createdLean);
   }
 
-  const linkedProducts = await POSProduct.find({ salesRecordId: { $ne: null } })
+  const linkedProducts = await POSProduct.find({
+    salesRecordId: mongoose.trusted({ $ne: null }),
+  })
     .sort({ updatedAt: -1, createdAt: -1 })
     .select("_id salesRecordId")
     .lean();
@@ -179,7 +182,7 @@ export async function syncPosProductsFromSalesRecords() {
   let removedDuplicates = 0;
   if (duplicateLinkedIds.length) {
     const deleteResult = await POSProduct.deleteMany({
-      _id: { $in: duplicateLinkedIds },
+      _id: mongoose.trusted({ $in: duplicateLinkedIds }),
     });
     removedDuplicates = deleteResult.deletedCount || 0;
   }
@@ -228,7 +231,9 @@ export async function applyPosOrderToSales(items) {
 
   const [salesById, salesByVariant] = await Promise.all([
     incrementsByRecordId.size
-      ? Sales.find({ _id: { $in: [...incrementsByRecordId.keys()] } })
+      ? Sales.find({
+          _id: mongoose.trusted({ $in: [...incrementsByRecordId.keys()] }),
+        })
           .select("_id category size months sales")
           .lean()
       : Promise.resolve([]),

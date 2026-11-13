@@ -7,7 +7,8 @@ This is a route and access reference; request field validation lives in the link
 routers and feature utilities. See [backend setup and architecture](../backend/README.md).
 
 Implementation is split into `backend/main-api`, `backend/konnect-api`,
-`backend/visitpulse-api`, `backend/meandersuite-api` and `backend/hfssuniforms-api`.
+`backend/visitpulse-api`, `backend/projects-api`, `backend/meandersuite-api` and
+`backend/hfssuniforms-api`.
 The [API registry](../backend/apis.js) defines their mount paths and startup hooks.
 The `/clientportal/api/konnect` and `/clientportal/api/analytics` prefixes remain
 compatible with existing clients while their implementations live in separate APIs.
@@ -15,8 +16,7 @@ compatible with existing clients while their implementations live in separate AP
 ## Requests and authentication
 
 Use `Content-Type: application/json` for JSON requests. Shared parsers accept up to
-50 KB; public Konnect intake accepts 16 KB. Receipt uploads use multipart form data
-with a 2 MB total request limit and PDF/JPEG/PNG/WebP signature validation.
+50 KB; public Konnect intake accepts 16 KB.
 
 Browser requests to session-based APIs use `credentials: "include"`. Credentialed
 CORS accepts only exact trusted origins. POST/PUT/PATCH/DELETE requests require
@@ -102,9 +102,14 @@ means a portal user with the `client` role and a linked client record.
 
 Sources: [auth](../backend/main-api/routing/auth.js),
 [client](../backend/main-api/routing/client.js),
-[projects](../backend/main-api/routing/projects.js),
+[projects](../backend/projects-api/routing/projects.js),
 [analytics](../backend/visitpulse-api/routing/analytics.js),
 [mailbox](../backend/konnect-api/routing/messages.js).
+
+Project routes are owned by the separate Projects API. Its administrator interface
+is `/clientportal/projects`; public website project listings retain the existing
+`/clientportal/api/projects` endpoint. Client, invoice and payment-setting routes
+remain in Main API and are presented together at `/clientportal/billing`.
 
 ### Admin clients and billing
 
@@ -124,24 +129,6 @@ All routes require admin and start with `/clientportal/api/admin`.
 
 Source: [admin router](../backend/main-api/routing/admin.js).
 Inspect the returned `email` result for a skipped send when Resend credentials are absent.
-
-### Bookkeeping
-
-All routes require admin and start with `/clientportal/api/bookkeeping`.
-Transaction and receipt operations are scoped to the authenticated owner.
-
-| Method            | Relative path                          | Purpose                                                 |
-| ----------------- | -------------------------------------- | ------------------------------------------------------- |
-| GET               | `/`                                    | Bookkeeping dashboard.                                  |
-| POST              | `/transactions`                        | Create transaction.                                     |
-| PUT, DELETE       | `/transactions/:transactionId`         | Edit/delete transaction.                                |
-| POST              | `/transactions/bulk-categorize`        | Categorize selected transactions.                       |
-| POST              | `/import`                              | Import transactions.                                    |
-| POST              | `/rules`                               | Create categorization rule.                             |
-| DELETE            | `/rules/:ruleId`                       | Remove rule.                                            |
-| POST, GET, DELETE | `/transactions/:transactionId/receipt` | Upload/download/remove receipt; GET returns file bytes. |
-
-Source: [bookkeeping router](../backend/main-api/routing/bookkeeping.js).
 
 ## Uniform Shop
 

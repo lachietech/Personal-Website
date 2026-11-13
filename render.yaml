@@ -71,6 +71,12 @@ services:
       - type: rewrite
         source: /clientportal/konnect
         destination: /konnect.html
+      - type: rewrite
+        source: /clientportal/projects
+        destination: /projects.html
+      - type: redirect
+        source: /clientportal/projects/
+        destination: /clientportal/projects
       - type: redirect
         source: /clientportal/konnect/
         destination: /clientportal/konnect

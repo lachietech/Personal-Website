@@ -1,5 +1,8 @@
 import express from "express";
-import { requirePortalAdmin, requirePortalAuth } from "../middleware/auth.js";
+import {
+  requirePortalAdmin,
+  requirePortalAuth,
+} from "../../main-api/middleware/auth.js";
 import Project from "../models/Project.js";
 import {
   ensureDefaultProjects,
@@ -38,12 +41,10 @@ router.post("/admin", async (req, res) => {
     const project = await Project.create(projectPayload(req.body));
     res.status(201).json({ project: serializeProject(project) });
   } catch (error) {
-    res
-      .status(error?.code === 11000 ? 409 : 400)
-      .json({
-        error:
-          error?.code === 11000 ? "Project slug already exists" : error.message,
-      });
+    res.status(error?.code === 11000 ? 409 : 400).json({
+      error:
+        error?.code === 11000 ? "Project slug already exists" : error.message,
+    });
   }
 });
 
@@ -57,12 +58,10 @@ router.put("/admin/:projectId", async (req, res) => {
     if (!project) return res.status(404).json({ error: "Project not found" });
     res.json({ project: serializeProject(project) });
   } catch (error) {
-    res
-      .status(error?.code === 11000 ? 409 : 400)
-      .json({
-        error:
-          error?.code === 11000 ? "Project slug already exists" : error.message,
-      });
+    res.status(error?.code === 11000 ? 409 : 400).json({
+      error:
+        error?.code === 11000 ? "Project slug already exists" : error.message,
+    });
   }
 });
 
@@ -97,14 +96,12 @@ router.post("/admin/import-github", async (req, res) => {
       },
     );
     if (!response.ok)
-      return res
-        .status(response.status === 404 ? 404 : 502)
-        .json({
-          error:
-            response.status === 404
-              ? "GitHub repository not found"
-              : "GitHub could not be reached",
-        });
+      return res.status(response.status === 404 ? 404 : 502).json({
+        error:
+          response.status === 404
+            ? "GitHub repository not found"
+            : "GitHub could not be reached",
+      });
     const repository = await response.json();
     const slug = slugify(repository.name);
     const values = projectPayload({

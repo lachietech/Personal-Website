@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { portalRequest } from "../api/portalApi.js";
-import { FormMessage } from "./PortalLayout.jsx";
+import { portalRequest } from "../../client-portal/api/portalApi.js";
+import { FormMessage } from "../../client-portal/components/PortalLayout.jsx";
 
 const emptyProject = {
   title: "",

@@ -80,7 +80,7 @@ Static Sites where `render.yaml` has not been applied:
 
 - `/` serves the public homepage.
 - `/clientportal`, `/clientportal/login` and `/clientportal/account` serve the portal.
-- `/clientportal/billing`, `/clientportal/konnect` and `/clientportal/visitpulse` each
+- `/clientportal/billing`, `/clientportal/projects`, `/clientportal/konnect` and `/clientportal/visitpulse` each
   serve their separate application bundle.
 - The Uniform Shop and Meander Suite pages are generated in the same way.
 
@@ -116,14 +116,14 @@ Development builds use relative API URLs
 unless `VITE_API_URL` is set. For direct local API calls, set it to
 `http://localhost:5000` and use `http://localhost:5173` for the frontend.
 
-| Command                               | Purpose                                                                |
-| ------------------------------------- | ---------------------------------------------------------------------- |
-| `npm run build`                       | Build the static production frontend and exit                          |
-| `npm start` / `npm run start:backend` | Start only the backend API                                             |
-| `npm run dev`                         | Build/watch browser code and run both local development processes      |
-| `npm run dev:frontend`                | Run the local frontend preview/proxy                                   |
-| `npm run dev:backend`                 | Watch the backend API                                                  |
-| `npm run dev:client`                  | Watch/rebuild development browser assets                               |
+| Command                               | Purpose                                                           |
+| ------------------------------------- | ----------------------------------------------------------------- |
+| `npm run build`                       | Build the static production frontend and exit                     |
+| `npm start` / `npm run start:backend` | Start only the backend API                                        |
+| `npm run dev`                         | Build/watch browser code and run both local development processes |
+| `npm run dev:frontend`                | Run the local frontend preview/proxy                              |
+| `npm run dev:backend`                 | Watch the backend API                                             |
+| `npm run dev:client`                  | Watch/rebuild development browser assets                          |
 
 ## Layout and verification
 
@@ -133,13 +133,19 @@ access requirements and CSRF usage.
 
 `frontend/src` contains browser applications and assets; `frontend/public` contains
 HTML documents. `frontend/server` is for local development only.
-`backend` contains five API modules, shared infrastructure and the server entry point.
+See the [client portal frontend guide](docs/client-portal-frontend.md) for its
+component layout, responsive behaviour and visual checks.
+The [application theme guide](docs/application-theme.md) documents the shared dark
+palette, typography and print colours used across every frontend application.
+`backend` contains separate API modules, shared infrastructure and the server entry point.
 `render.yaml` configures the production static site. Generated `frontend/dist`
 output is ignored by Git and rebuilt during deployment.
 
 The root project folders are `backend`, `frontend` and `docs`. Required build
 helpers and the local development launcher live in `frontend/scripts`. Git metadata
 is retained in `.git`; `npm ci` recreates the ignored `node_modules` dependencies.
+Keep `node_modules` installed locally: it is generated tooling, and removing it
+breaks `npm run dev` until you run `npm ci` again.
 
 If the portal root loads but sign-in or an application returns 404, rebuild and
 redeploy the frontend with publish directory `frontend/dist`. Verify that
@@ -153,7 +159,10 @@ Verify live login and message delivery after deployment.
 
 ## Portal applications and Konnect
 
-- Billing: `/clientportal/billing`, including invoice/account email tools.
+- Client portal: `/clientportal/billing`, with clients, invoices, account email tools
+  and expandable payment settings in one workspace. The existing URL is retained.
+- Projects: `/clientportal/projects`, a separate administrator application for
+  portfolio management and GitHub imports.
 - Konnect Mailbox: `/clientportal/konnect`, incoming messages without replies.
 - VisitPulse: `/clientportal/visitpulse`, analytics with existing account permissions.
 

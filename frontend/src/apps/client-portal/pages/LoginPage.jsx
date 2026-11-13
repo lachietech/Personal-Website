@@ -45,7 +45,7 @@ export function LoginPage() {
           <p className="eyebrow">Nielsen Innovations</p>
           <h2>Everything important, in one clear place.</h2>
           <p>
-            Access Billing, Konnect Mailbox and VisitPulse Analytics from your
+            Access invoices, Konnect Mailbox and VisitPulse Analytics from your
             secure client workspace.
           </p>
         </div>
@@ -75,8 +75,9 @@ export function LoginPage() {
               type="text"
               name="username"
               autoComplete="username"
+              autoCapitalize="none"
+              spellCheck={false}
               required
-              autoFocus
             />
           </label>
           <label>

@@ -1,0 +1,120 @@
+@import url("./app-topbar.css");
+
+/* Shared visual language, taken from the homepage hero. */
+:root {
+  color-scheme: dark;
+  --theme-background: #07111f;
+  --theme-panel: #0c1a2d;
+  --theme-raised: #112239;
+  --theme-input: #091626;
+  --theme-hover: #182e49;
+  --theme-text: #f7f9fc;
+  --theme-muted: #a8b7cb;
+  --theme-line: #2c405b;
+  --theme-line-hover: #4d6d97;
+  --theme-accent: #72a9ff;
+  --theme-accent-soft: #172f50;
+  --theme-action: #2563d9;
+  --theme-action-hover: #1d55c1;
+  --theme-on-action: #ffffff;
+  --theme-success: #69e0ad;
+  --theme-success-soft: #10362e;
+  --theme-warning: #ffd18a;
+  --theme-warning-soft: #392b18;
+  --theme-danger: #ff9b9b;
+  --theme-danger-soft: #3d2029;
+  --theme-danger-action: #b42336;
+  --theme-shadow: 0 16px 40px rgba(0, 0, 0, 0.18);
+  --theme-shadow-small: 0 4px 16px rgba(0, 0, 0, 0.12);
+  --theme-font:
+    "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --theme-heading-font: "Space Grotesk", "Inter", "Segoe UI", sans-serif;
+  --theme-page-background:
+    radial-gradient(
+      ellipse at 12% 0%,
+      rgba(47, 125, 246, 0.12),
+      transparent 38rem
+    ),
+    #07111f;
+  background: var(--theme-background);
+  color: var(--theme-text);
+}
+
+body {
+  color: var(--theme-text);
+  background: var(--theme-page-background);
+  font-family: var(--theme-font);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--theme-heading-font);
+}
+
+input,
+select,
+textarea,
+button {
+  font-family: inherit;
+}
+
+input,
+select,
+textarea {
+  accent-color: var(--theme-accent);
+  color: var(--theme-text);
+  background-color: var(--theme-input);
+  border: 1px solid var(--theme-line);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--theme-muted);
+  opacity: 0.8;
+}
+
+input:autofill {
+  box-shadow: inset 0 0 0 1000px var(--theme-input);
+  -webkit-text-fill-color: var(--theme-text);
+  caret-color: var(--theme-text);
+}
+
+:focus-visible {
+  outline: 3px solid var(--theme-accent);
+  outline-offset: 3px;
+}
+
+::selection {
+  color: var(--theme-on-action);
+  background: var(--theme-action);
+}
+
+@media print {
+  :root {
+    color-scheme: light;
+    --theme-background: #ffffff;
+    --theme-panel: #ffffff;
+    --theme-raised: #f1f5f9;
+    --theme-input: #ffffff;
+    --theme-hover: #edf3fa;
+    --theme-text: #172033;
+    --theme-muted: #536174;
+    --theme-line: #cbd5e1;
+    --theme-accent: #1d4ed8;
+    --theme-accent-soft: #e8f0ff;
+    --theme-success: #166534;
+    --theme-success-soft: #dcfce7;
+    --theme-warning: #854d0e;
+    --theme-warning-soft: #fef3c7;
+    --theme-danger: #b42318;
+    --theme-danger-soft: #fee4e2;
+    --theme-shadow: none;
+    --theme-shadow-small: none;
+    --theme-page-background: #ffffff;
+  }
+}

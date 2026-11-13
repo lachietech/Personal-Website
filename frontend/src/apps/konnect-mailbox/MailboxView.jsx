@@ -1,3 +1,5 @@
+import { AppTopbar } from "../../components/AppTopbar.jsx";
+
 const folders = [
   ["inbox", "Inbox", "bi-inbox"],
   ["unread", "Unread", "bi-envelope"],
@@ -47,39 +49,42 @@ export function MailboxView({
   const title = folders.find(([id]) => id === folder)?.[1] || "Inbox";
   return (
     <div className="konnect-app">
-      <header className="konnect-topbar">
-        <a className="konnect-wordmark" href="/clientportal/konnect">
-          <span>
-            <Icon name="bi-inbox-fill" />
-          </span>
-          konnect<span className="konnect-wordmark-sub">MAILBOX</span>
+      <AppTopbar
+        brand={
+          <a className="konnect-wordmark" href="/clientportal/konnect">
+            <span>
+              <Icon name="bi-inbox-fill" />
+            </span>
+            konnect<span className="konnect-wordmark-sub">MAILBOX</span>
+          </a>
+        }
+        search={
+          <label className="konnect-search">
+            <Icon name="bi-search" />
+            <span className="visually-hidden">Search messages</span>
+            <input
+              type="search"
+              placeholder="Search your messages"
+              maxLength={120}
+              value={search}
+              onChange={(event) => onSearch(event.target.value)}
+            />
+          </label>
+        }
+      >
+        <a href="/clientportal" className="konnect-apps-link" aria-label="Applications">
+          <Icon name="bi-grid" />
+          <span>Applications</span>
         </a>
-        <label className="konnect-search">
-          <Icon name="bi-search" />
-          <span className="visually-hidden">Search messages</span>
-          <input
-            type="search"
-            placeholder="Search your messages"
-            maxLength={120}
-            value={search}
-            onChange={(event) => onSearch(event.target.value)}
-          />
-        </label>
-        <div className="konnect-top-actions">
-          <a href="/clientportal" className="konnect-apps-link">
-            <Icon name="bi-grid" />
-            <span>Applications</span>
-          </a>
-          <a
-            className="konnect-avatar"
-            href="/clientportal/account"
-            aria-label={`Account: ${user.username}`}
-            title={user.username}
-          >
-            {initials(user.username)}
-          </a>
-        </div>
-      </header>
+        <a
+          className="konnect-avatar"
+          href="/clientportal/account"
+          aria-label={`Account: ${user.username}`}
+          title={user.username}
+        >
+          {initials(user.username)}
+        </a>
+      </AppTopbar>
       <div className="konnect-workspace">
         <aside className="konnect-sidebar">
           <p className="konnect-sidebar-heading">YOUR MAILBOX</p>

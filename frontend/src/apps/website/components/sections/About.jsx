@@ -1,15 +1,13 @@
-import { aboutValues } from "../content/siteContent.js";
+import { Services } from "./Services.jsx";
 
 export function About() {
   return (
-    <section id="about" className="section section-light">
+    <section id="about" className="section about-section" aria-labelledby="about-heading">
       <div className="container">
         <div className="row g-5 align-items-start">
           <div className="col-lg-5 fade-up">
-            <p className="eyebrow">A little about me</p>
-            <h2 className="section-heading">
-              Built from curiosity. Driven by purpose.
-            </h2>
+            <p className="eyebrow">Nielsen Innovations</p>
+            <h2 id="about-heading" className="section-heading">About me</h2>
           </div>
           <div className="col-lg-7 fade-up">
             <div className="about-copy">
@@ -22,21 +20,15 @@ export function About() {
                 technical problem-solving with a strong focus on the people who
                 use them.
               </p>
-            </div>
-
-            <div className="about-details">
-              {aboutValues.map((value, index) => (
-                <div className="detail-item" key={value.title}>
-                  <span className="detail-number">0{index + 1}</span>
-                  <div>
-                    <h3>{value.title}</h3>
-                    <p>{value.description}</p>
-                  </div>
-                </div>
-              ))}
+              <p>
+                From the first design to development, hosting and ongoing
+                support, I help organisations, teams and founders bring their
+                ideas to life.
+              </p>
             </div>
           </div>
         </div>
+        <Services />
       </div>
     </section>
   );

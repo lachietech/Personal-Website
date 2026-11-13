@@ -5,7 +5,8 @@ export function AccountPage({ user, setUser }) {
     <PortalLayout
       eyebrow="Your account"
       title="Account settings"
-      subtitle="Your sign-in details are shared across all three applications."
+      subtitle="Manage your sign-in details across your applications."
+      className="account-dashboard"
     >
       <section className="invoice-panel">
         <AccountForm user={user} onUpdated={setUser} />
