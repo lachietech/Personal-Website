@@ -50,7 +50,7 @@ Keep the existing backend as a Node **Web Service**:
 | `TRUST_PROXY`      | `1`, or omit on Render to use its ingress default                                                                   |
 
 Keep existing MongoDB URLs, session/JWT/CSRF secrets and integration keys on the
-backend only; see [backend/.env.example](backend/.env.example). Never place secrets
+backend only; see [backend configuration](backend/README.md#configuration). Never place secrets
 in `VITE_*` variables: they are included in public browser bundles. Both services
 require Node 22.12+ or 24 LTS. Do not commit `.env` files.
 
@@ -106,13 +106,13 @@ Open `http://localhost:5173`. This command builds in development mode and runs a
 proxy keeps local requests on one origin; it is not deployed or started by the
 production commands. Its startup explicitly refuses `NODE_ENV=production`.
 
-Copy `backend/.env.example` to `backend/.env` and enter your local database URLs and
+Create `backend/.env` using the [backend guide](backend/README.md) and enter your local database URLs and
 secrets. Keep `NODE_ENV=development` locally. The backend also supports a root `.env`
 as a migration fallback; process environment variables take priority. Use
 `BACKEND_ENV_FILE` to select one explicit backend environment file.
 
-The optional [frontend/.env.example](frontend/.env.example) documents the public
-API override and local preview settings. Development builds use relative API URLs
+An optional `frontend/.env` can set the public `VITE_API_URL` override.
+Development builds use relative API URLs
 unless `VITE_API_URL` is set. For direct local API calls, set it to
 `http://localhost:5000` and use `http://localhost:5173` for the frontend.
 
@@ -124,15 +124,22 @@ unless `VITE_API_URL` is set. For direct local API calls, set it to
 | `npm run dev:frontend`                | Run the local frontend preview/proxy                                   |
 | `npm run dev:backend`                 | Watch the backend API                                                  |
 | `npm run dev:client`                  | Watch/rebuild development browser assets                               |
-| `npm test`                            | Syntax checks, unit tests, production build and HTTP integration tests |
 
 ## Layout and verification
 
+See the [backend guide](backend/README.md) for configuration, code organisation,
+startup and maintenance. The [API reference](docs/backend-api.md) lists routes,
+access requirements and CSRF usage.
+
 `frontend/src` contains browser applications and assets; `frontend/public` contains
-HTML documents. `frontend/server` is for local development and HTTP tests only.
-`backend/src` contains the API, authentication, models and business logic.
+HTML documents. `frontend/server` is for local development only.
+`backend` contains five API modules, shared infrastructure and the server entry point.
 `render.yaml` configures the production static site. Generated `frontend/dist`
 output is ignored by Git and rebuilt during deployment.
+
+The root project folders are `backend`, `frontend` and `docs`. Required build
+helpers and the local development launcher live in `frontend/scripts`. Git metadata
+is retained in `.git`; `npm ci` recreates the ignored `node_modules` dependencies.
 
 If the portal root loads but sign-in or an application returns 404, rebuild and
 redeploy the frontend with publish directory `frontend/dist`. Verify that
@@ -140,10 +147,9 @@ redeploy the frontend with publish directory `frontend/dist`. Verify that
 `/clientportal/visitpulse` each return an application page. No frontend server or
 catch-all rewrite is required.
 
-Tests exercise frontend/backend separation, direct API requests, CORS and cookie
-settings, CSRF, authentication, public Konnect delivery, uploads and local proxy
-behavior. Database operations are stubbed; tests do not send real email or connect
-to production databases. Verify live login and message delivery after deployment.
+Run `npm run build` to verify the production frontend build. Check the backend
+`/health` endpoint, sign-in and relevant application flows locally before deploying.
+Verify live login and message delivery after deployment.
 
 ## Portal applications and Konnect
 

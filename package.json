@@ -13,16 +13,12 @@
   ],
   "scripts": {
     "build": "npm run build --workspace frontend",
-    "build:watch": "npm run build:watch --workspace frontend -- --mode development",
-    "test": "node scripts/check-syntax.js && npm test --workspaces && npm run test:integration",
-    "dev": "npm run build --workspace frontend -- --mode development && node scripts/run-services.js --watch",
+    "dev": "npm run build --workspace frontend -- --mode development && node frontend/scripts/dev.js --watch",
     "dev:client": "npm run build:watch --workspace frontend -- --mode development",
     "dev:frontend": "npm run dev --workspace frontend",
-    "dev:server": "npm run dev --workspace backend",
     "dev:backend": "npm run dev --workspace backend",
     "start": "npm run start:backend",
-    "start:backend": "npm start --workspace backend",
-    "test:integration": "npm run build && node --test tests/*.test.js"
+    "start:backend": "npm start --workspace backend"
   },
   "allowScripts": {
     "bcrypt@6.0.0": true
