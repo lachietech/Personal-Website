@@ -19,17 +19,20 @@ function createDatabaseConnection(label) {
 export const meandersuiteDb = createDatabaseConnection("MeanderSuite");
 export const uniformsDb = createDatabaseConnection("HFSS Uniforms");
 export const clientPortalDb = createDatabaseConnection("Client Portal");
+export const seniorCitzDb = createDatabaseConnection("Sandgate Seniors");
 
 const databases = [
   [clientPortalDb, "MONGO_URI_CLIENT"],
   [uniformsDb, "MONGO_URI_UNIFORMS"],
   [meandersuiteDb, "MONGO_URI_MEANDERSUITE"],
+  [seniorCitzDb, "MONGO_URI_SENIOR_CITZ", true],
 ];
 
 export async function connectDatabases(env = process.env) {
   // Wait for every attempt to settle before cleanup so none can open afterward.
   const results = await Promise.allSettled(
-    databases.map(async ([connection, key]) => {
+    databases.map(async ([connection, key, optional]) => {
+      if (optional && !env[key]?.trim()) return;
       if (!env[key]?.trim()) throw new Error(`Missing configuration: ${key}`);
       await connection.openUri(env[key]);
     }),

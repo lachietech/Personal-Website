@@ -8,6 +8,7 @@ import visitpulseRouter, {
 } from "./visitpulse-api/index.js";
 import meandersuiteRouter from "./meandersuite-api/index.js";
 import projectsRouter from "./projects-api/index.js";
+import seniorCitzRouter from "./senior-citz-api/index.js";
 import uniformsRouter, {
   initialise as initialiseUniforms,
 } from "./hfssuniforms-api/index.js";
@@ -15,6 +16,7 @@ import uniformsRouter, {
 // Register API modules here. Keep existing URL prefixes stable for their clients.
 // publicRouter is reserved for endpoints with their own origin/input/rate policies.
 export const apis = [
+  { name: "Sandgate Seniors API", path: "/senior-citz/api", router: seniorCitzRouter },
   {
     name: "Main API",
     path: "/",

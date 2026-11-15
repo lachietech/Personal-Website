@@ -189,3 +189,10 @@ shared CSRF token before the next mutation.
 
 Sources: [auth](../backend/meandersuite-api/routing/auth.js),
 [suite data](../backend/meandersuite-api/routing/suite.js).
+## Sandgate Seniors API
+
+`/senior-citz/api` provides public notices/timetable reads and authenticated admin
+login, session checks, logout, notice CRUD, timetable updates and admin registration.
+It uses shared cookie sessions, trusted origins and CSRF protection with a separate
+Sandgate identity and optional `MONGO_URI_SENIOR_CITZ` database connection.
+See [the full contract and integration instructions](./senior%20citz%20integration/README.md).

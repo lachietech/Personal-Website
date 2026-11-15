@@ -1,5 +1,13 @@
 # Backend API
 
+Sandgate Seniors is also available at `/senior-citz/api`. Set optional
+`MONGO_URI_SENIOR_CITZ` to its existing database URI to enable it. Its `admins`,
+`notices` and `timetables` collections remain isolated from the other APIs. See the
+[integration guide and AI handoff](../docs/senior%20citz%20integration/README.md)
+for configuration, the API contract and static frontend migration instructions.
+Run `node --test backend/senior-citz-api/tests/integration.test.js` from the root
+to verify the shared middleware and Sandgate workflows without a live database.
+
 Express 5 application using ES modules and three MongoDB databases. It serves APIs
 only; browser pages and static assets belong to `frontend/`. See the
 [root README](../README.md) for deployment and the [API reference](../docs/backend-api.md)
@@ -196,4 +204,4 @@ npm run build
 Run `npm run dev:backend` with local configuration, check `GET /health`, and verify
 the affected API flows through the frontend. For authentication changes, check
 sign-in, sign-out and rejection of missing credentials or invalid CSRF tokens.
-The repository does not include automated test suites or test commands.
+Sandgate and VisitPulse include Node test suites in their API folders. Run them with `node --test backend/senior-citz-api/tests/*.test.js backend/visitpulse-api/tests/*.test.js` from the repository root.
