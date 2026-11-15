@@ -28,7 +28,7 @@ export function createFrontendApp({
           ],
           fontSrc: ["'self'", "https://fonts.gstatic.com", "data:"],
           imgSrc: ["'self'", "data:"],
-          connectSrc: ["'self'"],
+          connectSrc: ["'self'", ...(isProduction ? [] : ["http://localhost:5000", "http://127.0.0.1:5000"])],
           objectSrc: ["'none'"],
           frameSrc: ["'none'"],
           workerSrc: ["'none'"],

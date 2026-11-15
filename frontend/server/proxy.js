@@ -6,7 +6,7 @@ export function isApiPath(pathname) {
   return (
     pathname === "/csrf-token" ||
     pathname === "/contact" ||
-    /^\/(?:clientportal|hfssuniformsapp|meandersuite)\/api(?:\/|$)/.test(
+    /^\/(?:clientportal|hfssuniformsapp|meandersuite|senior-citz)\/api(?:\/|$)/i.test(
       pathname,
     )
   );

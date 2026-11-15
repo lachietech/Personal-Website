@@ -1,18 +1,24 @@
 import rateLimit from "express-rate-limit";
-
-const staticAssetPattern =
-  /\.(?:css|js|map|png|jpg|jpeg|gif|webp|svg|ico|woff2?|ttf|mp4)$/i;
+import { getTrustedOrigin } from "./requestSecurity.js";
 
 // General rate limiter for all routes
 export const generalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 1000, // Keep broad abuse protection without punishing normal app use.
-  message: "Too many requests from this IP, please try again later.",
+  message: { error: "Too many requests from this IP, please try again later." },
   standardHeaders: true,
   legacyHeaders: false,
-  skip: (req) =>
-    req.path.startsWith("/hfssuniformsapp") ||
-    (req.method === "GET" && staticAssetPattern.test(req.path)),
+  handler: (req, res, _next, options) => {
+    const origin = getTrustedOrigin(req.get("origin"));
+    res.vary("Origin");
+    if (origin) {
+      res.set("Access-Control-Allow-Origin", origin);
+      res.set("Access-Control-Allow-Credentials", "true");
+      res.set("Access-Control-Expose-Headers", "Retry-After, RateLimit-Limit, RateLimit-Remaining, RateLimit-Reset");
+    }
+    res.set("Cache-Control", "no-store");
+    res.status(options.statusCode).json(options.message);
+  },
 });
 
 // Rate limiter for authentication routes (login/register)

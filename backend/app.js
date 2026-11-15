@@ -24,6 +24,8 @@ export function createApp() {
   app.set("trust proxy", environment.trustProxy);
 
   app.use(helmet(securityHeaders));
+  // Bound every request before parsing bodies, creating sessions or routing.
+  app.use(generalLimiter);
   // Public intake routers enforce their own origin policies without credentials.
   // All authenticated mailbox APIs still pass through session and CSRF checks.
   for (const api of apis) {
@@ -40,7 +42,6 @@ export function createApp() {
   app.use(session(sessionOptions));
 
   app.locals.generateCsrfToken = generateCsrfToken;
-  app.use(generalLimiter);
   app.get("/csrf-token", csrfTokenRoute);
   app.use(protectFromCsrf);
 

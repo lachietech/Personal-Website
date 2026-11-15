@@ -158,11 +158,22 @@ Analytics requests retry storage initialization if startup initialization failed
 
 ## Request flow and operational limits
 
-Security headers run first. Public Konnect intake is mounted before cookie,
+Security headers and the shared IP rate limit run first, before any body parsing,
+session creation or routing. Every path and method shares a budget of 1,000
+requests per 15 minutes, including public intake, health checks, OPTIONS and
+unknown paths. Exhausted budgets return JSON HTTP 429 with `Retry-After` and
+standard rate-limit headers. Existing stricter feature limits also apply.
+Public Konnect intake is mounted before cookie,
 trusted-origin, session and CSRF middleware; it has its own parser and rate limits.
 Other requests use the common stack. `/health` runs before body/session middleware.
 Feature routes run after shared CSRF protection, with separate CSRF middleware for
 Uniform Shop. Shared handlers finish unknown endpoints and unhandled failures.
+
+Rate limits remain enabled in development. The default local proxy replaces
+forwarded headers with the actual client address. Keep `TRUST_PROXY` restricted
+to your real proxy topology; trusting arbitrary forwarded addresses lets callers
+evade IP limits. Counters are per process: use a shared counter store before
+running multiple backend instances if a deployment-wide budget is required.
 
 `/health` reports process liveness, not ongoing database or integration readiness.
 Startup waits for database connections, but a later outage does not change this

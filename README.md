@@ -116,6 +116,13 @@ Development builds use relative API URLs
 unless `VITE_API_URL` is set. For direct local API calls, set it to
 `http://localhost:5000` and use `http://localhost:5173` for the frontend.
 
+The local proxy forwards `/contact`, `/csrf-token`, `/clientportal/api/*`,
+`/hfssuniformsapp/api/*`, `/meandersuite/api/*` and `/senior-citz/api/*`, including
+uploads and preflight requests. Authentication, CSRF and rate limits still apply.
+Sandgate data endpoints require `MONGO_URI_SENIOR_CITZ`; other data endpoints need
+their databases and external integrations as described in the backend guide.
+`http://localhost:5173/health` checks the frontend; port 5000 checks the backend.
+
 | Command                               | Purpose                                                           |
 | ------------------------------------- | ----------------------------------------------------------------- |
 | `npm run build`                       | Build the static production frontend and exit                     |
