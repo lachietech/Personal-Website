@@ -55,9 +55,10 @@ backend, expose database secrets, or redesign the site.
    `/index.html`. Retain direct `.html` entry URLs. Do not rewrite API or asset requests
    to HTML. Update `README.md`, environment examples and deployment commands to state
    that no Sandgate Node server or MongoDB credentials are required.
-10. **Check CORS/cookies.** Have the Nielsen operator append Sandgate's exact origin
-    to `TRUSTED_ORIGINS` and configure the database as described in the README. Test
-    cookie persistence in the target browser. If third-party cookies are blocked,
+10. **Check CORS/cookies.** The Nielsen backend trusts Sandgate's production origins;
+    have its operator append any preview origins to `TRUSTED_ORIGINS` and
+    configure the database as described in the README. Test cookie persistence
+    in the target browser. If third-party cookies are blocked,
     use the documented same-site API hostname or hosting reverse proxy. Do not
     disable CSRF or replace HttpOnly cookies with browser-stored admin credentials.
 11. **Verify before cutover.** Update browser tests to use an isolated API fixture or

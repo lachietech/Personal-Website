@@ -35,8 +35,10 @@ from Nielsen portal/uniform identities; those identities do not grant Sandgate a
 2. Set `MONGO_URI_SENIOR_CITZ` in the **Nielsen backend environment** to the existing
    Sandgate `MONGO_URI`, including its database name. Allow the Nielsen service to
    access that database. Never place the URI in the frontend or documentation.
-3. Append the exact Sandgate production and preview origins to `TRUSTED_ORIGINS`,
-   retaining existing Nielsen origins. Origins have no path or trailing slash.
+3. The backend already trusts `https://sandgateseniors.com` and
+   `https://www.sandgateseniors.com`. Append any Sandgate preview origins to
+   `TRUSTED_ORIGINS`, retaining existing Nielsen origins. Origins have no path
+   or trailing slash.
 4. Retain Nielsen's existing `SECRET_KEY`, `CSRF_SECRET`, and other required settings.
    For HTTPS direct cross-site requests use `COOKIE_SAME_SITE=none` and
    `NODE_ENV=production`; configure `TRUST_PROXY` for the real hosting proxy.

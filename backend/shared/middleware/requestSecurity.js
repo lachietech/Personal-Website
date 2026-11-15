@@ -1,6 +1,8 @@
 const PRODUCTION_ORIGINS = [
   "https://nielseninnovations.com",
   "https://www.nielseninnovations.com",
+  "https://sandgateseniors.com",
+  "https://www.sandgateseniors.com",
 ];
 const DEVELOPMENT_ORIGINS = [
   "http://localhost:5000",

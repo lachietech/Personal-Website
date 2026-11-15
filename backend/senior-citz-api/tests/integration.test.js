@@ -49,6 +49,12 @@ test("Sandgate API: CORS, CSRF, sessions, notices, uploads and timetable", async
   }
   const refresh = async () => { token = (await (await send("/csrf-token")).json()).csrfToken; };
   assert.equal((await send("/notices", { origin: "https://evil.example" })).status, 403);
+  for (const origin of ["https://sandgateseniors.com", "https://www.sandgateseniors.com"]) {
+    const response = await send("/notices", { origin });
+    assert.equal(response.status, 200);
+    assert.equal(response.headers.get("access-control-allow-origin"), origin);
+    assert.equal(response.headers.get("access-control-allow-credentials"), "true");
+  }
   const preflight = await send("/admin/notice", { method: "OPTIONS" });
   assert.equal(preflight.status, 204);
   assert.equal(preflight.headers.get("access-control-allow-credentials"), "true");
