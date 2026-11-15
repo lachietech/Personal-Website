@@ -24,8 +24,7 @@ header.app-topbar {
   margin-right: auto;
 }
 .app-topbar .brand,
-.app-topbar .app-brand,
-.app-topbar .konnect-wordmark {
+.app-topbar .app-brand {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -38,9 +37,7 @@ header.app-topbar {
   letter-spacing: -0.3px;
   line-height: 1.3;
 }
-.app-topbar .brand-mark,
-.app-topbar .app-brand-mark,
-.app-topbar .konnect-wordmark > span:first-child {
+.app-topbar .app-brand-mark {
   display: grid;
   place-items: center;
   flex: 0 0 32px;
@@ -51,11 +48,6 @@ header.app-topbar {
   background: var(--theme-accent-soft);
   color: var(--theme-accent);
   font-size: 13px;
-}
-.app-topbar .konnect-wordmark > span:first-child {
-  color: var(--theme-success);
-  background: var(--theme-success-soft);
-  font-size: 17px;
 }
 .app-topbar .meander-logo {
   display: block;

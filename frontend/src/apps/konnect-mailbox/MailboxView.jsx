@@ -1,4 +1,5 @@
 import { AppTopbar } from "../../components/AppTopbar.jsx";
+import { ProductBrand } from "../../components/ProductBrand.jsx";
 
 const folders = [
   ["inbox", "Inbox", "bi-inbox"],
@@ -51,11 +52,12 @@ export function MailboxView({
     <div className="konnect-app">
       <AppTopbar
         brand={
-          <a className="konnect-wordmark" href="/clientportal/konnect">
-            <span>
-              <Icon name="bi-inbox-fill" />
-            </span>
-            konnect<span className="konnect-wordmark-sub">MAILBOX</span>
+          <a
+            className="product-brand-link"
+            href="/clientportal/konnect"
+            aria-label="Konnect Mailbox"
+          >
+            <ProductBrand product="konnect" />
           </a>
         }
         search={
@@ -72,7 +74,11 @@ export function MailboxView({
           </label>
         }
       >
-        <a href="/clientportal" className="konnect-apps-link" aria-label="Applications">
+        <a
+          href="/clientportal"
+          className="konnect-apps-link"
+          aria-label="Applications"
+        >
           <Icon name="bi-grid" />
           <span>Applications</span>
         </a>

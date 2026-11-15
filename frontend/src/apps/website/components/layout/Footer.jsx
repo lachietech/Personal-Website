@@ -5,7 +5,7 @@ export function Footer() {
   return (
     <footer className="footer">
       <div className="container">
-        <Brand className="footer-brand" compact />
+        <Brand className="footer-brand" />
         <p>
           © {new Date().getFullYear()} Nielsen Innovations. Built in Brisbane
           with curiosity and care.

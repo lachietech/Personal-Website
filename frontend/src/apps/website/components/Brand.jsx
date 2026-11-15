@@ -1,10 +1,9 @@
-export function Brand({ className = "", compact = false }) {
+import { NielsenWordmark } from "../../../components/NielsenWordmark.jsx";
+
+export function Brand({ className = "" }) {
   return (
-    <a className={className} href="#home">
-      <span className="brand-mark">N</span>
-      <span className="brand-name">
-        Nielsen {compact ? "Innovations" : <strong>Innovations</strong>}
-      </span>
+    <a className={className} href="#home" aria-label="Nielsen Innovations home">
+      <NielsenWordmark />
     </a>
   );
 }

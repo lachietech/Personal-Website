@@ -1,4 +1,5 @@
 import { pagePath } from "../../../pagePath.js";
+import { productBrands } from "../../../components/productBrands.js";
 
 export const portalApps = [
   {
@@ -25,7 +26,7 @@ export const portalApps = [
     href: "/clientportal/konnect",
     label: "Konnect Mailbox",
     kind: "Communications",
-    icon: "bi-inbox",
+    icon: productBrands.konnect.icon,
     description: "Contact enquiries, delivered to your inbox.",
     detail: "A home for every new conversation.",
   },
@@ -34,7 +35,7 @@ export const portalApps = [
     href: "/clientportal/visitpulse",
     label: "VisitPulse Analytics",
     kind: "Insights",
-    icon: "bi-graph-up-arrow",
+    icon: productBrands.visitpulse.icon,
     description: "Website traffic and visitor insights.",
     detail: "Understand the people behind the visits.",
   },

@@ -234,25 +234,6 @@ h3 {
     color: var(--white);
 }
 
-.brand-name strong {
-    font-weight: 700;
-}
-
-.brand-mark {
-    display: inline-grid;
-    place-items: center;
-    width: 2.25rem;
-    height: 2.25rem;
-    flex: 0 0 auto;
-    border: 1px solid rgba(255, 255, 255, 0.22);
-    border-radius: 11px;
-    color: var(--white);
-    background: rgba(255, 255, 255, 0.08);
-    font-family: "Space Grotesk", sans-serif;
-    font-size: 1.02rem;
-    font-weight: 700;
-}
-
 .navbar-toggler {
     padding: 0.4rem 0.5rem;
     border: 1px solid rgba(255, 255, 255, 0.18);
@@ -1179,27 +1160,6 @@ h3 {
     font-weight: 600;
 }
 
-.product-visual-heading small {
-    display: block;
-    margin-top: 0.2rem;
-    color: var(--theme-muted);
-    font-family: var(--theme-font);
-    font-size: 0.75rem;
-    font-weight: 400;
-}
-
-.product-icon {
-    display: grid;
-    place-items: center;
-    width: 2.8rem;
-    height: 2.8rem;
-    flex: 0 0 auto;
-    border: 1px solid var(--line);
-    border-radius: var(--radius-sm);
-    color: var(--blue);
-    background: var(--blue-pale);
-}
-
 .product-chart {
     margin: 2rem 0 1.5rem;
     overflow: hidden;
@@ -1242,11 +1202,6 @@ h3 {
 
 .product-visual-mail {
     background: linear-gradient(145deg, rgba(30, 65, 66, 0.55), rgba(12, 26, 45, 0.9));
-}
-
-.product-visual-mail .product-icon {
-    color: var(--green);
-    background: rgba(105, 224, 173, 0.08);
 }
 
 .product-message {
@@ -1636,13 +1591,6 @@ textarea.form-control {
     font-size: 0.85rem;
 }
 
-.footer-brand .brand-mark {
-    width: 1.9rem;
-    height: 1.9rem;
-    border-radius: 9px;
-    font-size: 0.8rem;
-}
-
 .footer p {
     margin: 0;
     font-size: 0.67rem;
@@ -1872,10 +1820,6 @@ textarea.form-control {
 }
 
 @media (max-width: 575.98px) {
-    .brand-name {
-        font-size: 0.9rem;
-    }
-
     .hero-container {
         padding-top: 8.2rem;
         padding-bottom: 5.5rem;

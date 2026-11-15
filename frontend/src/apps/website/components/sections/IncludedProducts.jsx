@@ -1,4 +1,5 @@
 import { Icon } from "../Icon.jsx";
+import { ProductBrand } from "../../../../components/ProductBrand.jsx";
 
 const products = [
   {
@@ -31,21 +32,36 @@ function AnalyticsVisual() {
   return (
     <div className="product-visual" aria-hidden="true">
       <div className="product-visual-heading">
-        <span className="product-icon"><Icon name="bi-activity" /></span>
-        <span>VisitPulse <small>A clearer view of your audience</small></span>
+        <ProductBrand product="visitpulse" />
       </div>
       <div className="product-chart">
         <svg viewBox="0 0 440 180" fill="none">
-          <path d="M0 145 C35 145 40 102 75 112 S125 145 160 92 S200 125 240 68 S295 100 330 48 S390 60 440 15 V180 H0Z" fill="currentColor" opacity="0.1" />
-          <path d="M0 145 C35 145 40 102 75 112 S125 145 160 92 S200 125 240 68 S295 100 330 48 S390 60 440 15" stroke="currentColor" strokeWidth="3" />
+          <path
+            d="M0 145 C35 145 40 102 75 112 S125 145 160 92 S200 125 240 68 S295 100 330 48 S390 60 440 15 V180 H0Z"
+            fill="currentColor"
+            opacity="0.1"
+          />
+          <path
+            d="M0 145 C35 145 40 102 75 112 S125 145 160 92 S200 125 240 68 S295 100 330 48 S390 60 440 15"
+            stroke="currentColor"
+            strokeWidth="3"
+          />
         </svg>
       </div>
       <div className="product-insights">
-        <span><Icon name="bi-eye" /> Page views</span>
-        <span><Icon name="bi-people" /> Sessions</span>
-        <span><Icon name="bi-signpost-split" /> Referrals</span>
+        <span>
+          <Icon name="bi-eye" /> Page views
+        </span>
+        <span>
+          <Icon name="bi-people" /> Sessions
+        </span>
+        <span>
+          <Icon name="bi-signpost-split" /> Referrals
+        </span>
       </div>
-      <p className="product-visual-caption">Turn website activity into useful insight.</p>
+      <p className="product-visual-caption">
+        Turn website activity into useful insight.
+      </p>
     </div>
   );
 }
@@ -54,20 +70,30 @@ function MailboxVisual() {
   return (
     <div className="product-visual product-visual-mail" aria-hidden="true">
       <div className="product-visual-heading">
-        <span className="product-icon"><Icon name="bi-envelope" /></span>
-        <span>Konnect <small>Your enquiries, together</small></span>
+        <ProductBrand product="konnect" />
       </div>
       <div className="product-message">
         <Icon name="bi-envelope-paper" />
-        <div><strong>Website enquiries</strong><span>From your contact form to your mailbox.</span></div>
+        <div>
+          <strong>Website enquiries</strong>
+          <span>From your contact form to your mailbox.</span>
+        </div>
         <Icon name="bi-star" />
       </div>
       <div className="product-mail-tools">
-        <span><Icon name="bi-search" /> Find it</span>
-        <span><Icon name="bi-star" /> Star it</span>
-        <span><Icon name="bi-archive" /> File it</span>
+        <span>
+          <Icon name="bi-search" /> Find it
+        </span>
+        <span>
+          <Icon name="bi-star" /> Star it
+        </span>
+        <span>
+          <Icon name="bi-archive" /> File it
+        </span>
       </div>
-      <p className="product-visual-caption">A little less inbox clutter. A little more clarity.</p>
+      <p className="product-visual-caption">
+        A little less inbox clutter. A little more clarity.
+      </p>
     </div>
   );
 }
@@ -88,18 +114,29 @@ export function IncludedProducts() {
               <Icon name="bi-clock" /> Coming soon
             </span>
           </div>
-          <h2 id={`${product.id}-heading`} className="section-heading">{product.name}</h2>
+          <h2 id={`${product.id}-heading`} className="section-heading">
+            {product.name}
+          </h2>
           <p className="product-tagline">{product.tagline}</p>
           <p className="product-description">{product.description}</p>
           <ul className="product-benefits">
             {product.benefits.map((benefit) => (
-              <li key={benefit}><Icon name="bi-check2" /><span>{benefit}</span></li>
+              <li key={benefit}>
+                <Icon name="bi-check2" />
+                <span>{benefit}</span>
+              </li>
             ))}
           </ul>
-          <a href="#contact" className="text-link">Discuss your project <Icon name="bi-arrow-up-right" /></a>
+          <a href="#contact" className="text-link">
+            Discuss your project <Icon name="bi-arrow-up-right" />
+          </a>
         </div>
         <div className="included-product-art fade-up">
-          {product.id === "visitpulse" ? <AnalyticsVisual /> : <MailboxVisual />}
+          {product.id === "visitpulse" ? (
+            <AnalyticsVisual />
+          ) : (
+            <MailboxVisual />
+          )}
         </div>
       </div>
     </section>

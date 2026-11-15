@@ -6,6 +6,8 @@ export function PortalLayout({
   eyebrow,
   subtitle,
   actions,
+  headerActions,
+  brand,
   children,
   className = "",
 }) {
@@ -14,7 +16,10 @@ export function PortalLayout({
       <a className="skip-link" href="#portal-content">
         Skip to content
       </a>
-      <AppTopbar brand={<PortalBrand />} label="Client portal navigation">
+      <AppTopbar
+        brand={brand || <PortalBrand />}
+        label="Client portal navigation"
+      >
         <a className="home-link" href="/clientportal">
           <i className="bi bi-grid" aria-hidden="true" /> Applications
         </a>
@@ -31,6 +36,7 @@ export function PortalLayout({
             <h1>{title}</h1>
             {subtitle && <p className="portal-subtitle">{subtitle}</p>}
           </div>
+          {headerActions}
         </section>
         {children}
       </main>

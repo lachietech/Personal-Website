@@ -28,31 +28,7 @@
   opacity: 0.5;
   cursor: default;
 }
-.konnect-wordmark {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  color: var(--theme-text);
-  text-decoration: none;
-  font-size: 26px;
-  font-weight: 750;
-  letter-spacing: -1.2px;
-  font-family: var(--theme-heading-font);
-}
-.konnect-wordmark > span:first-child {
-  display: grid;
-  place-items: center;
-  width: 34px;
-  height: 34px;
-  background: var(--theme-success-soft);
-  color: var(--theme-success);
-  border: 1px solid var(--portal-frame);
-  border-radius: 10px;
-  font-size: 20px;
-}
-.konnect-wordmark-sub {
-  display: none;
-}
+
 .konnect-search {
   display: flex;
   align-items: center;
@@ -587,14 +563,7 @@
   .konnect-app {
     min-height: 0;
   }
-  .konnect-wordmark {
-    font-size: 23px;
-  }
-  .konnect-wordmark > span:first-child {
-    width: 29px;
-    height: 29px;
-    font-size: 18px;
-  }
+
   .konnect-search {
     grid-row: 2;
     grid-column: 1 / -1;

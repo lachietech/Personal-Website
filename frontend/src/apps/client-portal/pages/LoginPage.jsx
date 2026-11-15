@@ -57,7 +57,7 @@ export function LoginPage() {
             <i className="bi bi-envelope" aria-hidden="true" /> Konnect Mailbox
           </li>
           <li>
-            <i className="bi bi-graph-up-arrow" aria-hidden="true" /> VisitPulse
+            <i className="bi bi-activity" aria-hidden="true" /> VisitPulse
             Analytics
           </li>
         </ul>
